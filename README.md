@@ -1,10 +1,10 @@
-# React Tailwindcss Boilerplate build with Vite
+# Backgammon 2.0
 
-This is a [ReactJS](https://reactjs.org) + [Vite](https://vitejs.dev) boilerplate to be used with [Tailwindcss](https://tailwindcss.com).
+This is a nice backgammon game built with [ReactJS](https://reactjs.org) + [Vite](https://vitejs.dev) + [Tailwindcss](https://tailwindcss.com). Enjoy with a friend!
 
 ## What is inside?
 
-This project uses many tools like:
+This project uses:
 
 - [ReactJS](https://reactjs.org)
 - [Vite](https://vitejs.dev)
@@ -18,18 +18,6 @@ This project uses many tools like:
 ## Getting Started
 
 ### Install
-
-Create the project.
-
-```bash
-npx degit joaopaulomoraes/reactjs-vite-tailwindcss-boilerplate my-app
-```
-
-Access the project directory.
-
-```bash
-cd my-app
-```
 
 Install dependencies.
 
