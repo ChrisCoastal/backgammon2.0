@@ -1,14 +1,8 @@
 import { log } from 'console'
-import React, {
-  ReducerAction,
-  useEffect,
-  useReducer,
-  useRef,
-  useState
-} from 'react'
+import React, { useReducer } from 'react'
 
 // types
-import { BoardPositions, CheckerPositionsState } from 'src/@types/types'
+import { CheckerPositionsState } from 'src/@types/types'
 
 // config
 import { INITIAL_POSITIONS } from '../../utils/config'
@@ -55,15 +49,6 @@ interface ReducerActions {
 }
 
 const GameBoard = () => {
-  // const [turnHistory, setTurnHistory] = useState([])
-  // const [options, setOptions] = useState([])
-  // const [activePlayer, setActivePlayer] = useState<null | 1 | 2>(null)
-  // const [diceRoll, setDiceRoll] = useState([0, 0, 0, 0])
-  // const [checkerPositions, setCheckerPositions] = useState(
-  //   initialTableState.checkerPositions
-  // )
-  // const [dropPoints, setDropPoints] = useState<DropState>([])
-
   const [state, dispatch] = useReducer(reducer, initialTableState)
   // const [state, dispatch] = useReducer(reducer, initialTableState, init)
 
@@ -96,26 +81,6 @@ const GameBoard = () => {
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
-  // const initialTableState: tableState = {
-  //   turnHistory: [],
-  //   checkerPositions: {
-  //     table: INITIAL_POSITIONS,
-  //     bar: [],
-  //     bearOff1: [],
-  //     bearOff2: []
-  //   },
-  //   activePlayer: null,
-  //   diceState: {
-  //     diceRoll: [0, 0, 0, 0],
-  //     doublingCube: 1
-  //   },
-  //   validMoves: { dice: null, roll: null, point: null, action: null }
-  // }
-
-  // const optionsHandler = (newState: object) => {
-  //   setOptions((prevOptions) => ({ ...prevOptions, ...newState }))
-  // }
-
   const diceRollHandler = () => {
     const dice = () => Math.floor(Math.random() * 6) + 1
     const die1 = dice()
@@ -143,8 +108,6 @@ const GameBoard = () => {
     console.log(openPoints, activePlayer)
 
     const validMoves = getValidMoves(openPoints, startPoint)
-    // console.log(event)
-    // console.log('dragging', startPoint)
   }
 
   const getBarCheckers = () => {}
