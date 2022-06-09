@@ -86,9 +86,28 @@ const GameBoard = () => {
   //   return statePayload
   // }
 
+  console.log(state)
+  console.log(state.checkerPositions.table)
+
   const { table, bar, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
+
+  // const initialTableState: tableState = {
+  //   turnHistory: [],
+  //   checkerPositions: {
+  //     table: INITIAL_POSITIONS,
+  //     bar: [],
+  //     bearOff1: [],
+  //     bearOff2: []
+  //   },
+  //   activePlayer: null,
+  //   diceState: {
+  //     diceRoll: [0, 0, 0, 0],
+  //     doublingCube: 1
+  //   },
+  //   validMoves: { dice: null, roll: null, point: null, action: null }
+  // }
 
   // const optionsHandler = (newState: object) => {
   //   setOptions((prevOptions) => ({ ...prevOptions, ...newState }))
@@ -209,14 +228,8 @@ const GameBoard = () => {
     // if (event.target === activePlayer)
   }
 
-  useEffect(() => {
-    if (activePlayer) return
-    console.log('init player')
-
-    initActivePlayer()
-  }, diceRoll)
-
   const initActivePlayer = () => {
+    diceRollHandler()
     // initial player
     if (!activePlayer && diceRoll[0] > diceRoll[3])
       return dispatch({ type: 'setActivePlayer', payload: 1 })
@@ -279,7 +292,8 @@ const GameBoard = () => {
         END TURN
       </button>
       <button
-        onClick={startGame}
+        onClick={initActivePlayer}
+        // onClick={startGame}
         disabled={!!activePlayer}
         className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
       >
