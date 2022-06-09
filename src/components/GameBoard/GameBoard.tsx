@@ -70,11 +70,14 @@ const GameBoard = () => {
   function reducer(state: tableState, action: ReducerActions): tableState {
     switch (action.type) {
       case 'setActivePlayer':
-        return (state.activePlayer = action.payload)
+        return { ...state, activePlayer: action.payload }
       case 'setDiceRoll':
-        return (state.diceState.diceRoll = action.payload)
+        return {
+          ...state,
+          diceState: { ...state.diceState, diceRoll: action.payload }
+        }
       case 'setMove':
-        return (state.checkerPositions = action.payload)
+        return { ...state, checkerPositions: action.payload }
       case 'reset':
         return initialTableState
       default:
