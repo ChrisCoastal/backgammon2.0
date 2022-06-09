@@ -12,7 +12,12 @@ const Dice = ({ diceRoll, activePlayer }: DiceProps) => {
     <div>
       <ul>
         {diceRoll.map((dice) => (
-          <li key={Math.random()}>{dice}</li>
+          <li
+            key={Math.random()}
+            className={`inline-flex py-3 px-3 m-2 bg-red-300 rounded-sm`}
+          >
+            {dice}
+          </li>
         ))}
       </ul>
     </div>
