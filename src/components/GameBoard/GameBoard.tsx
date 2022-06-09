@@ -44,7 +44,12 @@ interface ValidMoveState {
 type DropState = ValidMoveState[]
 
 interface ReducerActions {
-  type: 'setActivePlayer' | 'setDiceRoll' | 'setMove' | 'reset'
+  type:
+    | 'setActivePlayer'
+    | 'setDiceRoll'
+    | 'setMove'
+    | 'reset'
+    | 'setDoublingCube'
   payload?: any
 }
 
@@ -53,16 +58,27 @@ const GameBoard = () => {
   // const [state, dispatch] = useReducer(reducer, initialTableState, init)
 
   function reducer(state: tableState, action: ReducerActions): tableState {
-    switch (action.type) {
+    const { type, payload } = action
+
+    switch (type) {
       case 'setActivePlayer':
-        return { ...state, activePlayer: action.payload }
+        return { ...state, activePlayer: payload }
       case 'setDiceRoll':
         return {
           ...state,
-          diceState: { ...state.diceState, diceRoll: action.payload }
+          diceState: { ...state.diceState, diceRoll: payload }
         }
+      case 'setDoublingCube':
+        return {
+          ...state,
+          diceState: {
+            ...state.diceState,
+            doublingCube: state.diceState.doublingCube * 2
+          }
+        }
+
       case 'setMove':
-        return { ...state, checkerPositions: action.payload }
+        return { ...state, checkerPositions: payload }
       case 'reset':
         return initialTableState
       default:
@@ -85,8 +101,10 @@ const GameBoard = () => {
     const dice = () => Math.floor(Math.random() * 6) + 1
     const die1 = dice()
     const die2 = dice()
-    if (!activePlayer)
+    if (!activePlayer) {
       dispatch({ type: 'setDiceRoll', payload: [die1, 0, 0, die2] })
+      return [die1, die2]
+    }
     if (activePlayer === 1)
       dispatch({ type: 'setDiceRoll', payload: [die1, die2, 0, 0] })
     if (activePlayer === 2)
@@ -97,10 +115,8 @@ const GameBoard = () => {
   }
 
   const endTurnHandler = () => {
-    if (activePlayer === 1)
-      return dispatch({ type: 'setActivePlayer', payload: 2 })
-    if (activePlayer === 2)
-      return dispatch({ type: 'setActivePlayer', payload: 1 })
+    if (activePlayer === 1) dispatch({ type: 'setActivePlayer', payload: 2 })
+    if (activePlayer === 2) dispatch({ type: 'setActivePlayer', payload: 1 })
   }
 
   const checkerDragHandler = (startPoint: number, event: DragEvent) => {
@@ -194,24 +210,48 @@ const GameBoard = () => {
     // if (event.target === activePlayer)
   }
 
-  const initActivePlayer = () => {
-    diceRollHandler()
-    // initial player
-    if (!activePlayer && diceRoll[0] > diceRoll[3])
-      return dispatch({ type: 'setActivePlayer', payload: 1 })
-    if (!activePlayer && diceRoll[0] < diceRoll[3])
-      return dispatch({ type: 'setActivePlayer', payload: 2 })
-    if (!activePlayer && diceRoll[0] !== 0 && diceRoll[0] === diceRoll[3]) {
-      console.log('DOUBLE', diceRoll)
+  const toggleActivePlayer = (dice?: number[]) => {
+    // diceRollHandler()
 
-      diceRollHandler()
+    console.log(state.diceState)
+    console.log(diceRoll)
+
+    if (activePlayer === 1)
+      return dispatch({ type: 'setActivePlayer', payload: 2 })
+    if (activePlayer === 2)
+      return dispatch({ type: 'setActivePlayer', payload: 1 })
+
+    // initialize activePLayer
+    if (dice) {
+      if (!activePlayer && dice[0] > dice[1]) {
+        console.log('player 1')
+        dispatch({ type: 'setActivePlayer', payload: 1 })
+      }
+      if (!activePlayer && dice[0] < dice[1]) {
+        console.log('player2')
+        dispatch({ type: 'setActivePlayer', payload: 2 })
+      }
+      if (!activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
+        console.log('DOUBLE', dice)
+        startGameHandler(dice)
+      }
     }
-    // if (activePlayer === 1) dispatch({type: 'setActivePlayer', payload: 2})
-    // if (activePlayer === 2) dispatch({type: 'setActivePlayer', payload: 1})
   }
 
-  const startGame = () => {
-    diceRollHandler()
+  const startGameHandler = (diceRoll?: number[]) => {
+    console.log('STARTING')
+
+    if (activePlayer) return
+    if (diceRoll) {
+      alert(`Both players rolled a ${diceRoll[0]}! Doubling!`)
+      dispatch({ type: 'setDoublingCube', payload: 2 })
+    }
+    const dice = diceRollHandler()
+    toggleActivePlayer(dice)
+  }
+
+  const endGameHandler = () => {
+    return dispatch({ type: 'reset' })
   }
 
   const dropPoint = 'bg-green-200'
@@ -258,15 +298,14 @@ const GameBoard = () => {
         END TURN
       </button>
       <button
-        onClick={initActivePlayer}
-        // onClick={startGame}
+        onClick={() => startGameHandler()}
         disabled={!!activePlayer}
         className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
       >
         START GAME
       </button>
       <button
-        onClick={() => dispatch({ type: 'reset' })}
+        onClick={() => endGameHandler}
         disabled={!!activePlayer}
         className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
       >
