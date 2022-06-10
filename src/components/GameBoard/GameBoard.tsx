@@ -1,5 +1,6 @@
 import { log } from 'console'
 import React, { useReducer } from 'react'
+import { useEffect } from 'react'
 
 // types
 import { CheckerPositionsState } from 'src/@types/types'
@@ -11,15 +12,18 @@ import Dice from '../Dice/Dice'
 import GameOptions from '../GameOptions/GameOptions'
 
 interface tableState {
-  turnHistory: {}[]
+  gameHistory: {}[]
   checkerPositions: CheckerPositionsState
   activePlayer: 1 | 2 | null
   diceState: { diceRoll: number[]; doublingCube: number }
-  validMoves: ValidMoveState
+  movement: {
+    validMoves: ValidMoveState[] | null
+    takenMoves: number[]
+  }
 }
 
 const initialTableState: tableState = {
-  turnHistory: [],
+  gameHistory: [],
   checkerPositions: {
     table: INITIAL_POSITIONS,
     bar: [],
@@ -31,14 +35,17 @@ const initialTableState: tableState = {
     diceRoll: [0, 0, 0, 0],
     doublingCube: 1
   },
-  validMoves: { dice: null, roll: null, point: null, action: null }
+  movement: {
+    validMoves: null,
+    takenMoves: []
+  }
 }
 
 interface ValidMoveState {
-  dice: number | null
-  roll: number | null
-  point: number | null
-  action: string | null
+  dice: number
+  roll: number
+  point: number
+  action: string
 }
 
 type DropState = ValidMoveState[]
@@ -48,8 +55,9 @@ interface ReducerActions {
     | 'setActivePlayer'
     | 'setDiceRoll'
     | 'setMove'
-    | 'reset'
+    | 'showValidMoves'
     | 'setDoublingCube'
+    | 'reset'
   payload?: any
 }
 
@@ -68,6 +76,17 @@ const GameBoard = () => {
           ...state,
           diceState: { ...state.diceState, diceRoll: payload }
         }
+      case 'showValidMoves':
+        return {
+          ...state,
+          movement: {
+            ...state.movement,
+            validMoves: payload ? payload : null
+          }
+        }
+
+      case 'setMove':
+        return { ...state, checkerPositions: payload }
       case 'setDoublingCube':
         return {
           ...state,
@@ -77,8 +96,6 @@ const GameBoard = () => {
           }
         }
 
-      case 'setMove':
-        return { ...state, checkerPositions: payload }
       case 'reset':
         return initialTableState
       default:
@@ -90,8 +107,8 @@ const GameBoard = () => {
   //   return statePayload
   // }
 
-  console.log(state)
-  console.log(state.checkerPositions.table)
+  // console.log(state)
+  // console.log(state.checkerPositions.table)
 
   const { table, bar, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
@@ -103,6 +120,9 @@ const GameBoard = () => {
     const die2 = dice()
     if (!activePlayer) {
       dispatch({ type: 'setDiceRoll', payload: [die1, 0, 0, die2] })
+
+      // TODO: passing the dice values here to startGameHandler
+      // handler was running w/o waiting for state update; this is a workaround
       return [die1, die2]
     }
     if (activePlayer === 1)
@@ -114,22 +134,10 @@ const GameBoard = () => {
     // if (activePlayer === 2) setDiceRoll((prev) => [0, 0, die1, die2])
   }
 
-  const endTurnHandler = () => {
-    if (activePlayer === 1) dispatch({ type: 'setActivePlayer', payload: 2 })
-    if (activePlayer === 2) dispatch({ type: 'setActivePlayer', payload: 1 })
-  }
+  const isCheckersBar = () => {}
+  const isCheckersHome = (checkerPos: Array<1 | 2>[]) => checkerPos
 
-  const checkerDragHandler = (startPoint: number, event: DragEvent) => {
-    const openPoints = getOpenPoints()
-    console.log(openPoints, activePlayer)
-
-    const validMoves = getValidMoves(openPoints, startPoint)
-  }
-
-  const getBarCheckers = () => {}
-  const getHomeCheckers = () => {}
-
-  const getOpenPoints = () => {
+  const OpenPoints = () => {
     const openPoints = table.map((point, i) => {
       return point.length === 0
         ? `open`
@@ -143,22 +151,14 @@ const GameBoard = () => {
     return openPoints
   }
 
-  const getValidMoves = (
-    openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
-    startPoint: number
-  ) => {
-    if (!activePlayer) return
-
-    // checkers on the bar must be moved first
-    if (bar.includes(activePlayer)) console.log('bar')
-
-    // player 1 moves higher point to lower; player 2 vice-versa
+  const diceCombinations = () => {
     const direction = activePlayer === 1 ? -1 : 1
 
     const playerRoll = diceRoll
       .filter((die) => die !== 0)
       .map((die) => die * direction)
-    // doubles get 4 roll
+
+    // doubles get 4 moves of the rolled number
     if (playerRoll[0] === playerRoll[1]) playerRoll.push(...playerRoll)
 
     const movesArr: number[] = []
@@ -168,9 +168,41 @@ const GameBoard = () => {
     }, movesArr)
     combinations.shift()
 
-    const moves = [...playerRoll, ...combinations]
+    // nested array of the available individual rolls, and their combinations
+    const moves = [playerRoll, combinations]
+    // const moves = [...playerRoll, ...combinations]
 
-    // const firstMoves = playerRoll.map((die, i) => {
+    return moves
+  }
+
+  const ValidMoves = (
+    openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
+    startPoint: number,
+    movesArr: number[][]
+  ) => {
+    if (!activePlayer) return
+
+    // checkers on the bar must be moved first
+    if (bar.includes(activePlayer)) console.log('bar')
+
+    // player 1 moves higher point to lower; player 2 vice-versa
+    // const direction = activePlayer === 1 ? -1 : 1
+
+    // const playerRoll = diceRoll
+    //   .filter((die) => die !== 0)
+    //   .map((die) => die * direction)
+    // // doubles get 4 roll
+    // if (playerRoll[0] === playerRoll[1]) playerRoll.push(...playerRoll)
+
+    // const movesArr: number[] = []
+    // const combinations = playerRoll.reduce((pV, cV, i) => {
+    //   const moves = [...pV, i > 0 ? pV[i - 1] + cV : cV]
+    //   return moves
+    // }, movesArr)
+    // combinations.shift()
+
+    const moves = [...movesArr[0], ...movesArr[1]]
+
     const validMoves = moves.map((move, i) => {
       const moveToPoint = startPoint + move
       if (
@@ -197,24 +229,24 @@ const GameBoard = () => {
     return validMoves
   }
 
-  const moveCheckerHandler = () => {
-    'moved'
-  }
+  // const moveCheckerHandler = () => {
+  //   'moved'
+  // }
 
-  const moveHandler = (event: React.MouseEvent<HTMLSpanElement>) => {
-    const checker = event.currentTarget.innerText
-    console.log('click', checker, event.target)
-    if (checker === activePlayer?.toString()) {
-      console.log()
-    }
-    // if (event.target === activePlayer)
-  }
+  // const moveHandler = (event: React.MouseEvent<HTMLSpanElement>) => {
+  //   const checker = event.currentTarget.innerText
+  //   console.log('click', checker, event.target)
+  //   if (checker === activePlayer?.toString()) {
+  //     console.log()
+  //   }
+  //   // if (event.target === activePlayer)
+  // }
 
   const toggleActivePlayer = (dice?: number[]) => {
     // diceRollHandler()
 
-    console.log(state.diceState)
-    console.log(diceRoll)
+    // console.log(state.diceState)
+    // console.log(diceRoll)
 
     if (activePlayer === 1)
       return dispatch({ type: 'setActivePlayer', payload: 2 })
@@ -224,23 +256,31 @@ const GameBoard = () => {
     // initialize activePLayer
     if (dice) {
       if (!activePlayer && dice[0] > dice[1]) {
-        console.log('player 1')
         dispatch({ type: 'setActivePlayer', payload: 1 })
+        diceCombinations()
       }
       if (!activePlayer && dice[0] < dice[1]) {
-        console.log('player2')
         dispatch({ type: 'setActivePlayer', payload: 2 })
+        diceCombinations()
       }
       if (!activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
-        console.log('DOUBLE', dice)
         startGameHandler(dice)
       }
     }
   }
 
-  const startGameHandler = (diceRoll?: number[]) => {
-    console.log('STARTING')
+  const endTurnHandler = () => {
+    dispatch({
+      type: 'setActivePlayer',
+      payload: {
+        roll: diceRoll
+      }
+    })
+    if (activePlayer === 1) dispatch({ type: 'setActivePlayer', payload: 2 })
+    if (activePlayer === 2) dispatch({ type: 'setActivePlayer', payload: 1 })
+  }
 
+  const startGameHandler = (diceRoll?: number[]) => {
     if (activePlayer) return
     if (diceRoll) {
       alert(`Both players rolled a ${diceRoll[0]}! Doubling!`)
@@ -254,20 +294,126 @@ const GameBoard = () => {
     return dispatch({ type: 'reset' })
   }
 
-  const dropPoint = 'bg-green-200'
-  // ${dropPoints.map((point) =>
-  //   point.point === pointIndex && point.action === 'open'
-  //     ? 'bg-green-200'
-  //     : ''
-  // )}
+  // const validDropPoints: string[] = []
+  // // const validDropPoints: Array<undefined | string> =
+  // //   state.movement.validMoves.map((moveObj) => {
+  // //     if (moveObj.point !== null)
+  // //       return (validDropPoints[moveObj.point] = 'bg-green-200')
+  // //   })
 
-  // const validPointHighlight = dropPoints'bg-green-200'
+  // const tablePoints = !state.movement.validMoves ? (
+  //   <>
+  //     {table.map((point, pointIndex) => (
+  //       <div key={pointIndex}>
+  //         <div className={`bg-orange-300 w-48 h-8 mt-4`}>{pointIndex + 1}</div>
+  //         <div>
+  //           {point.map((checker) =>
+  //             checker > 0 ? (
+  //               <Checker
+  //                 key={1 + Math.random()}
+  //                 // activeChecker={activeChecker1}
+  //                 activeChecker={activePlayer}
+  //                 dragHandler={checkerDragHandler}
+  //                 dropHandler={checkerDropHandler}
+  //                 checkerPosition={pointIndex}
+  //                 checkerColor={checker}
+  //               />
+  //             ) : null
+  //           )}
+  //         </div>
+  //       </div>
+  //     ))}
+  //   </>
+  // ) : (
+  //   <>
+  //     {table.map((point, pointIndex) => (
+  //       <div key={pointIndex}>
+  //         <div
+  //           className={`bg-orange-300 w-48 h-8 mt-4 ${validDropPoints[pointIndex]}`}
+  //         >
+  //           {pointIndex + 1}
+  //         </div>
+  //         <div>
+  //           {point.map((checker) =>
+  //             checker > 0 ? (
+  //               <Checker
+  //                 key={1 + Math.random()}
+  //                 // activeChecker={activeChecker1}
+  //                 activeChecker={activePlayer}
+  //                 dragHandler={checkerDragHandler}
+  //                 dropHandler={checkerDropHandler}
+  //                 checkerPosition={pointIndex}
+  //                 checkerColor={checker}
+  //               />
+  //             ) : null
+  //           )}
+  //         </div>
+  //       </div>
+  //     ))}
+  //   </>
+  // )
+
+  // // const validPointHighlight = dropPoints'bg-green-200'
+
+  // useEffect(() => {
+  //   state.movement.validMoves.map((moveObj) => {
+  //     if (moveObj.point !== null)
+  //       validDropPoints[moveObj.point] = 'bg-green-200'
+  //   })
+  // }, state.movement.validMoves)
+
+  const checkerDragHandler = (startPoint: number, event: React.DragEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    // console.log(event)
+
+    const points = OpenPoints()
+    const availableMoves = diceCombinations()
+    const valid = ValidMoves(points, startPoint, availableMoves)
+    dispatch({ type: 'showValidMoves', payload: valid })
+
+    // console.log(points, availableMoves)
+    // console.log(state.movement.validMoves)
+  }
+
+  const checkerDragEndHandler = (
+    startPoint: number,
+    event: React.DragEvent
+  ) => {
+    console.log('DRAG ENDED')
+    event.preventDefault()
+    event.stopPropagation()
+    dispatch({ type: 'showValidMoves' })
+  }
+
+  const checkerDragEnterHandler = (event: React.DragEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    // dispatch({ type: 'showValidMoves' })
+    console.log('DRAG ENTER!!!!!')
+  }
+
+  const checkerDropHandler = (event: React.DragEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    // const home = isCheckersHome(table)
+    console.log('DRAG ENDED', event)
+    dispatch({ type: 'showValidMoves' })
+  }
 
   return (
     <div>
       {table.map((point, pointIndex) => (
         <div key={pointIndex}>
-          <div className={`bg-orange-300 w-48 h-8 mt-4`}>{pointIndex + 1}</div>
+          <div
+            onDragEnter={checkerDragEnterHandler}
+            // onDrop={checkerDropHandler}
+            className={`bg-orange-300 w-48 h-8 mt-4 ${
+              state.movement.validMoves ? 'bg-green-200' : ''
+            }`}
+          >
+            {pointIndex + 1}
+          </div>
           <div>
             {point.map((checker) =>
               checker > 0 ? (
@@ -276,6 +422,8 @@ const GameBoard = () => {
                   // activeChecker={activeChecker1}
                   activeChecker={activePlayer}
                   dragHandler={checkerDragHandler}
+                  dragEndHandler={checkerDragEndHandler}
+                  dropHandler={checkerDropHandler}
                   checkerPosition={pointIndex}
                   checkerColor={checker}
                 />
@@ -290,6 +438,12 @@ const GameBoard = () => {
         className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
       >
         ROLL
+      </button>
+      <button
+        onClick={() => console.log('undo')}
+        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
+      >
+        UNDO
       </button>
       <button
         onClick={endTurnHandler}
