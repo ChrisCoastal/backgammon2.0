@@ -17,7 +17,7 @@ import {
 } from 'src/utils/gameState'
 
 //components
-import { BoardPoint } from '../BoardPoint/BoardPoint'
+import BoardPoint from '../BoardPoint/BoardPoint'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
 import GameOptions from '../GameOptions/GameOptions'
@@ -496,6 +496,7 @@ const GameBoard: FC = () => {
 
   return (
     <div>
+      <div className={`flex`}>{points}</div>
       <div>
         {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}
         <button

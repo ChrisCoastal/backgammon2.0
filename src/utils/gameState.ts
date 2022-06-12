@@ -222,7 +222,7 @@ export const moveCheckerHandler = (
   // dispatch: React.Dispatch<ReducerActions>
 ) => {
   const [checkerPositions, dispatch] = reducerArr
-  console.log(toPoint, item, checkerPositions.table[item.fromPoint])
+  console.log(toPoint, item, reducerArr)
   const { fromPoint, checkerColor } = item
   const newState = checkerPositions
   newState.table[fromPoint].pop()
