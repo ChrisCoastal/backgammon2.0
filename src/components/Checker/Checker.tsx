@@ -1,5 +1,10 @@
-import { log } from 'console'
-import React from 'react'
+import { FC } from 'react'
+
+// config
+import { ItemTypes } from '../../utils/config'
+
+// react dnd
+import { useDrag } from 'react-dnd'
 
 interface CheckerProps {
   dragHandler: Function
@@ -25,20 +30,31 @@ const Checker = ({
 
   const active = activeChecker === checkerColor
 
+  const [{ isDragging }, drag, preview] = useDrag(
+    () => ({
+      type: ItemTypes.CHECKER,
+      collect: (monitor: any) => ({
+        isDragging: !!monitor.isDragging()
+      })
+    }),
+    []
+  )
+
   return (
-    <span
-      key={Math.random()}
-      // onClick={moveHandler}
-      className={`py-2 px-3 rounded-full ${color}`}
-      draggable={active}
-      tabIndex={1}
-      onDragStart={() => dragHandler(checkerPosition)}
-      onDrag={() => dragHandler(checkerPosition, window.event)}
-      onDragEnd={() => console.log('ENDED!!')} // TODO: not firing
-      // onDragEnd={() => dragEndHandler(checkerPosition, window.event)}
-    >
-      {checkerColor}
-    </span>
+    // <span
+    //   key={Math.random()}
+    //   // onClick={moveHandler}
+    //   className={`py-2 px-3 rounded-full ${color}`}
+    //   draggable={active}
+    //   tabIndex={1}
+    //   onDragStart={() => dragHandler(checkerPosition)}
+    //   onDrag={() => dragHandler(checkerPosition, window.event)}
+    //   onDragEnd={() => console.log('ENDED!!')} // TODO: not firing
+    //   // onDragEnd={() => dragEndHandler(checkerPosition, window.event)}
+    // >
+    //   {checkerColor}
+    // </span>
+    <span ref={drag} className={`py-2 px-3 rounded-full ${color}`}></span>
   )
 }
 

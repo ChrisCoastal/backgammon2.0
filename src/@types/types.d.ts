@@ -13,3 +13,25 @@ interface CheckerPositionsState {
   bearOff1: Array<1 | 2>
   bearOff2: Array<1 | 2>
 }
+
+export interface TableState {
+  gameHistory: {}[]
+  checkerPositions: CheckerPositionsState
+  activePlayer: 1 | 2 | null
+  diceState: { diceRoll: number[]; doublingCube: number }
+  movement: {
+    validMoves: ValidMoveState[] | null
+    takenMoves: number[]
+  }
+}
+
+export interface ReducerActions {
+  type:
+    | 'setActivePlayer'
+    | 'setDiceRoll'
+    | 'setMove'
+    | 'showValidMoves'
+    | 'setDoublingCube'
+    | 'reset'
+  payload?: any
+}

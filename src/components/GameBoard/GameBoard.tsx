@@ -1,45 +1,45 @@
 import { log } from 'console'
-import React, { useReducer } from 'react'
+import React, { FC, useReducer } from 'react'
 import { useEffect } from 'react'
 
 // types
-import { CheckerPositionsState } from 'src/@types/types'
+import { TableState, ReducerActions } from 'src/@types/types'
 
 // config
-import { INITIAL_POSITIONS } from '../../utils/config'
+import { INITIAL_POSITIONS, INITIAL_TABLE_STATE } from '../../utils/config'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
 import GameOptions from '../GameOptions/GameOptions'
 
-interface tableState {
-  gameHistory: {}[]
-  checkerPositions: CheckerPositionsState
-  activePlayer: 1 | 2 | null
-  diceState: { diceRoll: number[]; doublingCube: number }
-  movement: {
-    validMoves: ValidMoveState[] | null
-    takenMoves: number[]
-  }
-}
+// interface tableState {
+//   gameHistory: {}[]
+//   checkerPositions: CheckerPositionsState
+//   activePlayer: 1 | 2 | null
+//   diceState: { diceRoll: number[]; doublingCube: number }
+//   movement: {
+//     validMoves: ValidMoveState[] | null
+//     takenMoves: number[]
+//   }
+// }
 
-const initialTableState: tableState = {
-  gameHistory: [],
-  checkerPositions: {
-    table: INITIAL_POSITIONS,
-    bar: [],
-    bearOff1: [],
-    bearOff2: []
-  },
-  activePlayer: null,
-  diceState: {
-    diceRoll: [0, 0, 0, 0],
-    doublingCube: 1
-  },
-  movement: {
-    validMoves: null,
-    takenMoves: []
-  }
-}
+// const INITIAL_TABLE_STATE: TableState = {
+//   gameHistory: [],
+//   checkerPositions: {
+//     table: INITIAL_POSITIONS,
+//     bar: [],
+//     bearOff1: [],
+//     bearOff2: []
+//   },
+//   activePlayer: null,
+//   diceState: {
+//     diceRoll: [0, 0, 0, 0],
+//     doublingCube: 1
+//   },
+//   movement: {
+//     validMoves: null,
+//     takenMoves: []
+//   }
+// }
 
 interface ValidMoveState {
   dice: number
@@ -50,22 +50,22 @@ interface ValidMoveState {
 
 type DropState = ValidMoveState[]
 
-interface ReducerActions {
-  type:
-    | 'setActivePlayer'
-    | 'setDiceRoll'
-    | 'setMove'
-    | 'showValidMoves'
-    | 'setDoublingCube'
-    | 'reset'
-  payload?: any
-}
+// interface ReducerActions {
+//   type:
+//     | 'setActivePlayer'
+//     | 'setDiceRoll'
+//     | 'setMove'
+//     | 'showValidMoves'
+//     | 'setDoublingCube'
+//     | 'reset'
+//   payload?: any
+// }
 
-const GameBoard = () => {
-  const [state, dispatch] = useReducer(reducer, initialTableState)
-  // const [state, dispatch] = useReducer(reducer, initialTableState, init)
+const GameBoard: FC = () => {
+  const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
+  // const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE, init)
 
-  function reducer(state: tableState, action: ReducerActions): tableState {
+  function reducer(state: TableState, action: ReducerActions): TableState {
     const { type, payload } = action
 
     switch (type) {
@@ -97,7 +97,7 @@ const GameBoard = () => {
         }
 
       case 'reset':
-        return initialTableState
+        return INITIAL_TABLE_STATE
       default:
         return state
     }
@@ -269,6 +269,26 @@ const GameBoard = () => {
     }
   }
 
+  // useEffect(() => game.observe(setKnightPos))
+
+  // const renderPoints = (i: number) => {
+  //   const x = i % 8
+  //   const y = Math.floor(i / 8)
+
+  //   return (
+  //     <div key={i} className={`w-1/12 h-1/2`}>
+  //       <BoardPoint pointIndex={i} game={game}>
+  //       {checkerPosition.map((checkerArr) => <Checker isRender={i === checkerPosition[i] && y === knight)}  />
+  //       </BoardPoint>
+  //     </div>
+  //   )
+  // }
+
+  // const points = []
+  // for (let i = 0; i < 24; i += 1) {
+  //   points.push(renderPoints(i))
+  // }
+
   const endTurnHandler = () => {
     dispatch({
       type: 'setActivePlayer',
@@ -403,6 +423,8 @@ const GameBoard = () => {
 
   return (
     <div>
+      {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
+
       {table.map((point, pointIndex) => (
         <div key={pointIndex}>
           <div
