@@ -4,6 +4,9 @@ interface Point {
 }
 export type BoardPositions = Point[]
 
+export type ActivePlayer = 1 | 2 | null
+export type ActiveChecker = 1 | 2
+
 // Dice rolls
 // export type DiceNumber = 1 | 2 | 3 | 4 | 5 | 6 | null
 

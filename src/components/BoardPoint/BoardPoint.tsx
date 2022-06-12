@@ -1,39 +1,33 @@
 import type { FC, ReactNode } from 'react'
 import { useDrop } from 'react-dnd'
 
-// import type { Game } from './Game'
 import { ItemTypes } from '../../utils/config'
-// import { Overlay, OverlayType } from './Overlay'
-// import { Square } from './Square'
 
-export interface BoardPointProps {
+interface PointProps {
+  moveHandler: (startPos: number, item: any) => void
   pointIndex: number
-  children?: ReactNode
-  // game: Game
+  children: ReactNode
 }
 
-export const BoardPoint: FC<BoardPointProps> = ({
+export const BoardPoint: FC<PointProps> = ({
+  moveHandler,
   pointIndex,
   children
-}: // game
-BoardPointProps) => {
-  const [{ isOver, canDrop }, drop] = useDrop(
-    () => ({
-      accept: ItemTypes.CHECKER,
-      // canDrop: () => game.canMoveKnight(x, y),
-      // drop: () => game.moveKnight(x, y),
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-        canDrop: !!monitor.canDrop()
-      })
+}) => {
+  const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
+    accept: ItemTypes.CHECKER,
+    drop: (item) => moveHandler(pointIndex, item),
+    collect: (monitor) => ({
+      isOver: !!monitor.isOver(),
+      getChecker: monitor.getItem(),
+      canDrop: monitor.canDrop()
     })
-    // [game]
-  )
+  }))
   const color = pointIndex % 2 ? 'bg-red-200' : 'bg-blue-200'
 
   return (
     <div
-      ref={drop}
+      ref={dropRef}
       role="Space"
       // data-testid={`(${x},${y})`}
       className={`relative w-full h-full`}
