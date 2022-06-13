@@ -1,6 +1,4 @@
-import { log } from 'console'
-import React, { FC, useReducer } from 'react'
-import { useEffect } from 'react'
+import React, { FC, useReducer, useEffect } from 'react'
 
 // types
 import { TableState, ReducerActions } from 'src/@types/types'
@@ -78,6 +76,8 @@ const GameBoard: FC = () => {
   const { table, bar, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
+
+  useEffect(() => {})
   // const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE, init)
 
   // function reducer(state: TableState, action: ReducerActions): TableState {
@@ -469,13 +469,7 @@ const GameBoard: FC = () => {
     const pointArr = []
     for (let i = 0; i < 24; i++) {
       pointArr.push(
-        <BoardPoint
-          key={i}
-          pointIndex={i}
-          moveHandler={() =>
-            moveCheckerHandler.bind(null, [state.checkerPositions, dispatch])
-          }
-        >
+        <BoardPoint key={i} pointIndex={i} moveHandler={moveCheckerHandler}>
           {table[i].map(
             (checker) =>
               checker && (

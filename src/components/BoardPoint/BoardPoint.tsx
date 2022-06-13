@@ -4,7 +4,7 @@ import { useDrop } from 'react-dnd'
 import { ItemTypes } from '../../utils/config'
 
 interface PointProps {
-  moveHandler: (startPos: number, item: any) => void
+  moveHandler: (pointIndex: number, item: any) => void
   pointIndex: number
   children: ReactNode
 }
@@ -12,6 +12,7 @@ interface PointProps {
 const BoardPoint: FC<PointProps> = ({ moveHandler, pointIndex, children }) => {
   const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
     accept: ItemTypes.CHECKER,
+    canDrop: () => canMoveHandler(pointIndex, item),
     drop: (item) => moveHandler(pointIndex, item),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -25,6 +26,7 @@ const BoardPoint: FC<PointProps> = ({ moveHandler, pointIndex, children }) => {
 
   return (
     <div
+      ref={dropRef}
       className={`flex-column border-2 border-pink-500 ${color} ${hoverColor} w-1/12`}
     >
       {children}

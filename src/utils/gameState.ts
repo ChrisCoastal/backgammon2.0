@@ -9,6 +9,7 @@ import {
 import { INITIAL_TABLE_STATE } from './config'
 
 // useReducer logic
+
 export function reducer(state: TableState, action: ReducerActions): TableState {
   const { type, payload } = action
 
@@ -215,14 +216,13 @@ export const validMoves = (
 }
 
 export const moveCheckerHandler = (
-  reducerArr: [CheckerPositionsState, React.Dispatch<ReducerActions>],
   toPoint: number,
   item: { fromPoint: number; checkerColor: number }
   // state: TableState,
   // dispatch: React.Dispatch<ReducerActions>
 ) => {
-  const [checkerPositions, dispatch] = reducerArr
-  console.log(toPoint, item, reducerArr)
+  // const [checkerPositions, dispatch] = reducerArr
+  console.log(toPoint, item)
   const { fromPoint, checkerColor } = item
   const newState = checkerPositions
   newState.table[fromPoint].pop()
