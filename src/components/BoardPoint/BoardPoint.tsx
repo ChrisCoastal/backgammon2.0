@@ -12,7 +12,7 @@ interface PointProps {
 const BoardPoint: FC<PointProps> = ({ moveHandler, pointIndex, children }) => {
   const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
     accept: ItemTypes.CHECKER,
-    canDrop: () => canMoveHandler(pointIndex, item),
+    // canDrop: () => canMoveHandler(pointIndex, item),
     drop: (item) => moveHandler(pointIndex, item),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
