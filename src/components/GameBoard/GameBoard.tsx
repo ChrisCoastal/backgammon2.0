@@ -5,14 +5,7 @@ import { TableState, ReducerActions } from 'src/@types/types'
 
 // utils
 import { INITIAL_POSITIONS, INITIAL_TABLE_STATE } from '../../utils/config'
-import {
-  reducer,
-  diceRollHandler,
-  diceCombinations,
-  openPoints,
-  validMoves,
-  moveCheckerHandler
-} from 'src/utils/gameState'
+import { gameLogic } from 'src/utils/gameState'
 
 //components
 import BoardPoint from '../BoardPoint/BoardPoint'
@@ -71,13 +64,24 @@ type DropState = ValidMoveState[]
 // }
 
 const GameBoard: FC = () => {
+  const {
+    stateSubscriber,
+    reducer,
+    diceRollHandler,
+    diceCombinations,
+    openPoints,
+    validMoves,
+    moveCheckerHandler
+  } = gameLogic
   const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
 
   const { table, bar, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
-  useEffect(() => {})
+  useEffect(() => {
+    stateSubscriber(state, dispatch)
+  })
   // const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE, init)
 
   // function reducer(state: TableState, action: ReducerActions): TableState {
