@@ -30,16 +30,20 @@ function reducer(state: TableState, action: ReducerActions): TableState {
     case 'setDiceRoll':
       return {
         ...state,
-        diceState: { ...state.diceState, diceRoll: payload }
-      }
-    case 'showValidMoves':
-      return {
-        ...state,
-        movement: {
-          ...state.movement,
-          validMoves: payload ? payload : null
+        diceState: {
+          ...state.diceState,
+          diceRoll: payload.roll,
+          availableRoll: payload.available
         }
       }
+    // case 'showValidMoves':
+    //   return {
+    //     ...state,
+    //     movement: {
+    //       ...state.movement,
+    //       validMoves: payload ? payload : null
+    //     }
+    //   }
 
     case 'setMove':
       return { ...state, checkerPositions: payload }
@@ -115,15 +119,23 @@ const diceRollHandler = (
 
     // TODO: passing the dice values here to startGameHandler
     // handler was running w/o waiting for state update; this is a workaround
-    return [die1, die2]
+    // return [die1, die2]
   }
+
+  const available =
+    gameState.diceState.availableRoll ||
+    diceCombinations([die1, die2], activePlayer)
+
   if (activePlayer === 1)
-    dispatch({ type: 'setDiceRoll', payload: [die1, die2, 0, 0] })
+    dispatch({
+      type: 'setDiceRoll',
+      payload: { roll: [die1, die2, 0, 0], available: available }
+    })
   if (activePlayer === 2)
-    dispatch({ type: 'setDiceRoll', payload: [0, 0, die1, die2] })
-  // if (!activePlayer) setDiceRoll((prev) => [die1, 0, 0, die2])
-  // if (activePlayer === 1) setDiceRoll((prev) => [die1, die2, 0, 0])
-  // if (activePlayer === 2) setDiceRoll((prev) => [0, 0, die1, die2])
+    dispatch({
+      type: 'setDiceRoll',
+      payload: { roll: [0, 0, die1, die2], available: available }
+    })
 }
 
 const diceCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
@@ -217,6 +229,7 @@ const moveChecker = (
   newState.table[fromPoint].pop()
   newState.table[dropPoint].push(checkerColor)
 
+  dispatch({ type: 'setMove', payload: newState })
   dispatch({ type: 'setMove', payload: newState })
 }
 

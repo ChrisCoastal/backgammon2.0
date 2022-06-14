@@ -95,12 +95,11 @@ const GameBoard: FC = () => {
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
     const points = openPoints(table, activePlayer)
-    const availableMoves = diceCombinations(
-      diceRollRef.current.diceRoll,
-      activePlayer
-    )
+    const { diceRoll } = diceRollRef.current
+    const availableMoves = diceCombinations(diceRoll, activePlayer)
     console.log(availableMoves)
-
+    // TODO: find issue with active player (player 2 moves p1 checkers)
+    // TODO: pass diceRoll.availableRoll
     const valid = validMoves(points, dragItem, availableMoves, activePlayer)
 
     console.log(valid)

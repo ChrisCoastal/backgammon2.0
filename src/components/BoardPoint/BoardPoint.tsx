@@ -3,7 +3,7 @@ import { useDrop } from 'react-dnd'
 
 import { gameLogic } from 'src/utils/gameState'
 
-import { ItemTypes } from '../../utils/config'
+import { ItemTypes, BOARD_COLORS } from '../../utils/config'
 
 interface PointProps {
   validMoves: (
@@ -39,7 +39,7 @@ const BoardPoint: FC<PointProps> = ({
 
   const dropColor =
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
-  const color = pointIndex % 2 ? 'bg-red-200' : 'bg-blue-200'
+  const color = pointIndex % 2 ? BOARD_COLORS.oddPoint : BOARD_COLORS.evenPoint
 
   return (
     <div className="flex-column">
