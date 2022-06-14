@@ -35,7 +35,7 @@ export const INITIAL_TABLE_STATE: TableState = {
     bearOff1: [],
     bearOff2: []
   },
-  activePlayer: 1,
+  activePlayer: 2,
   // TODO: activePlayer: null,
   diceState: {
     diceRoll: [0, 0, 0, 0],
@@ -57,5 +57,6 @@ export const BOARD_COLORS = {
 
 // React DnD
 export const ItemTypes = {
-  CHECKER: 'checker'
+  CHECKER1: 'checker1',
+  CHECKER2: 'checker2'
 }

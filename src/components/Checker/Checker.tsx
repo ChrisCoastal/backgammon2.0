@@ -32,7 +32,7 @@ type CheckerProps = {
 // }: CheckerProps) => {
 const Checker: FC<CheckerProps> = ({ point, activePlayer, checkerColor }) => {
   const [{ isDragging }, dragRef] = useDrag(() => ({
-    type: 'checker',
+    type: `checker${checkerColor}`,
     item: { fromPoint: point, checkerColor: checkerColor },
     collect: (monitor) => ({
       isDragging: monitor.isDragging()

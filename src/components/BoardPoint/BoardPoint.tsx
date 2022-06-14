@@ -25,7 +25,7 @@ const BoardPoint: FC<PointProps> = ({
   children
 }) => {
   const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
-    accept: ItemTypes.CHECKER,
+    accept: ItemTypes.CHECKER1 || ItemTypes.CHECKER2,
     canDrop: (item) =>
       validMoves(pointIndex, item as { fromPoint: number; checkerColor: any }),
     drop: (item) =>
@@ -37,15 +37,15 @@ const BoardPoint: FC<PointProps> = ({
     })
   }))
 
-  const hoverColor = isOver ? 'bg-green-100' : ''
+  const dropColor =
+    isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
   const color = pointIndex % 2 ? 'bg-red-200' : 'bg-blue-200'
-  const valid = canDrop && 'bg-orange-400'
 
   return (
     <div className="flex-column">
       <div
         ref={dropRef}
-        className={`flex-column border-2 border-pink-500 ${color} ${hoverColor} ${valid} w-16 h-80`}
+        className={`flex-column border-2 border-pink-500 ${color} ${dropColor} w-16 h-80`}
       >
         {children}
       </div>
