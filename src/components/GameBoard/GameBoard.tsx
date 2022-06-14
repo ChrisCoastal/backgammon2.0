@@ -105,6 +105,12 @@ const GameBoard: FC = () => {
     console.log(valid)
 
     // TODO:
+    console.log(
+      !!valid
+        ?.map((move) => move.action !== 'closed' && move.point)
+        .includes(dropPoint)
+    )
+
     return !!valid
       ?.map((move) => move.action !== 'closed' && move.point)
       .includes(dropPoint)

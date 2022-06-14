@@ -25,7 +25,7 @@ const BoardPoint: FC<PointProps> = ({
   children
 }) => {
   const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
-    accept: ItemTypes.CHECKER1 || ItemTypes.CHECKER2,
+    accept: ItemTypes.CHECKER1 && ItemTypes.CHECKER2,
     canDrop: (item) =>
       validMoves(pointIndex, item as { fromPoint: number; checkerColor: any }),
     drop: (item) =>
