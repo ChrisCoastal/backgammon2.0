@@ -138,6 +138,7 @@ const diceRollHandler = (
     })
 }
 
+// TODO: should only be called from diceRollHandler
 const diceCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
   if (!activePlayer) console.error('diceCombination')
   const direction = activePlayer === 1 ? -1 : 1
@@ -237,7 +238,7 @@ export const gameLogic = {
   stateSubscriber,
   reducer,
   diceRollHandler,
-  diceCombinations,
+  diceCombinations, // TODO: remove
   openPoints,
   validMoves,
   moveChecker
