@@ -21,7 +21,11 @@ export interface TableState {
   gameHistory: {}[]
   checkerPositions: CheckerPositionsState
   activePlayer: 1 | 2 | null
-  diceState: { diceRoll: number[]; doublingCube: number }
+  diceState: {
+    diceRoll: number[]
+    availableRoll: number[]
+    doublingCube: number
+  }
   movement: {
     validMoves: ValidMoveState[] | null
     takenMoves: number[]

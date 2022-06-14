@@ -1,19 +1,35 @@
 import type { FC, ReactNode } from 'react'
 import { useDrop } from 'react-dnd'
 
+import { gameLogic } from 'src/utils/gameState'
+
 import { ItemTypes } from '../../utils/config'
 
 interface PointProps {
-  moveHandler: (pointIndex: number, item: any) => void
+  validMoves: (
+    pointIndex: number,
+    item: { fromPoint: number; checkerColor: any }
+  ) => boolean
+  dropHandler: (
+    pointIndex: number,
+    item: { fromPoint: number; checkerColor: any }
+  ) => void
   pointIndex: number
   children: ReactNode
 }
 
-const BoardPoint: FC<PointProps> = ({ moveHandler, pointIndex, children }) => {
+const BoardPoint: FC<PointProps> = ({
+  validMoves,
+  dropHandler,
+  pointIndex,
+  children
+}) => {
   const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
     accept: ItemTypes.CHECKER,
-    // canDrop: () => canMoveHandler(pointIndex, item),
-    drop: (item) => moveHandler(pointIndex, item),
+    canDrop: (item) =>
+      validMoves(pointIndex, item as { fromPoint: number; checkerColor: any }),
+    drop: (item) =>
+      dropHandler(pointIndex, item as { fromPoint: number; checkerColor: any }),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       getChecker: monitor.getItem(),
@@ -23,13 +39,19 @@ const BoardPoint: FC<PointProps> = ({ moveHandler, pointIndex, children }) => {
 
   const hoverColor = isOver ? 'bg-green-100' : ''
   const color = pointIndex % 2 ? 'bg-red-200' : 'bg-blue-200'
+  const valid = canDrop && 'bg-orange-400'
 
   return (
-    <div
-      ref={dropRef}
-      className={`flex-column border-2 border-pink-500 ${color} ${hoverColor} w-1/12`}
-    >
-      {children}
+    <div className="flex-column">
+      <div
+        ref={dropRef}
+        className={`flex-column border-2 border-pink-500 ${color} ${hoverColor} ${valid} w-16 h-80`}
+      >
+        {children}
+      </div>
+      <div>
+        <p>{pointIndex}</p>
+      </div>
     </div>
   )
   {

@@ -42,7 +42,7 @@ const Checker: FC<CheckerProps> = ({ point, activePlayer, checkerColor }) => {
   const active = activePlayer === checkerColor
 
   const color =
-    activePlayer === 1
+    checkerColor === 1
       ? 'bg-red-600 hover:bg-red-700'
       : 'bg-sky-600 hover:bg-sky-700'
 

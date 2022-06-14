@@ -11,10 +11,13 @@ import { INITIAL_TABLE_STATE } from './config'
 // useReducer logic
 let gameState: TableState = INITIAL_TABLE_STATE
 
-const stateSubscriber = (
-  state: TableState,
-  dispatch: React.Dispatch<ReducerActions>
-) => {
+// triggered to update via useEffect in GameBoard
+function stateSubscriber(
+  state: TableState
+  // dispatch: React.Dispatch<ReducerActions>
+) {
+  console.log('setting state', state)
+  // TODO:
   gameState = state
 }
 
@@ -100,7 +103,10 @@ const isCheckersBar = () => {}
 const isCheckersHome = (checkerPos: CheckerPositionsState) => checkerPos
 
 // Dice and Movement
-const diceRollHandler = (activePlayer: ActivePlayer, dispatch: Function) => {
+const diceRollHandler = (
+  activePlayer: ActivePlayer,
+  dispatch: React.Dispatch<ReducerActions>
+) => {
   const dice = () => Math.floor(Math.random() * 6) + 1
   const die1 = dice()
   const die2 = dice()
@@ -121,7 +127,9 @@ const diceRollHandler = (activePlayer: ActivePlayer, dispatch: Function) => {
 }
 
 const diceCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
+  if (!activePlayer) console.error('diceCombination')
   const direction = activePlayer === 1 ? -1 : 1
+  console.log(diceRoll)
 
   const playerRoll = diceRoll
     .filter((die) => die !== 0)
@@ -160,36 +168,21 @@ const openPoints = (table: Array<1 | 2>[], activePlayer: ActivePlayer) => {
 
 const validMoves = (
   openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
-  startPoint: number,
+  dragItem: { fromPoint: number; checkerColor: any },
+  // dropPoint: number,
   movesArr: number[][],
-  bar: ActiveChecker[],
   activePlayer: ActivePlayer
 ) => {
   if (!activePlayer) return
 
-  // checkers on the bar must be moved first
-  if (bar.includes(activePlayer)) console.log('bar')
-
-  // player 1 moves higher point to lower; player 2 vice-versa
-  // const direction = activePlayer === 1 ? -1 : 1
-
-  // const playerRoll = diceRoll
-  //   .filter((die) => die !== 0)
-  //   .map((die) => die * direction)
-  // // doubles get 4 roll
-  // if (playerRoll[0] === playerRoll[1]) playerRoll.push(...playerRoll)
-
-  // const movesArr: number[] = []
-  // const combinations = playerRoll.reduce((pV, cV, i) => {
-  //   const moves = [...pV, i > 0 ? pV[i - 1] + cV : cV]
-  //   return moves
-  // }, movesArr)
-  // combinations.shift()
+  const { fromPoint, checkerColor } = dragItem
+  // TODO: checkers on the bar must be moved first
+  // if (bar.includes(activePlayer)) console.log('bar')
 
   const moves = [...movesArr[0], ...movesArr[1]]
 
-  const validMoves = moves.map((move, i) => {
-    const moveToPoint = startPoint + move
+  const validMovesArr = moves.map((move, i) => {
+    const moveToPoint = fromPoint + move
     if (
       moveToPoint > 23 ||
       moveToPoint < 0 ||
@@ -198,44 +191,33 @@ const validMoves = (
       return {
         dice: i,
         roll: move,
-        point: moveToPoint + 1,
+        point: moveToPoint,
         action: 'closed'
       }
     else
       return {
         dice: i,
         roll: move,
-        point: moveToPoint + 1,
+        point: moveToPoint,
         action: openPoints[moveToPoint]
       }
   })
 
-  console.log(validMoves)
-  return validMoves
+  return validMovesArr
 }
 
-const moveCheckerHandler = (
-  toPoint: number,
-  item: { fromPoint: number; checkerColor: number }
-  // state: TableState,
-  // dispatch: React.Dispatch<ReducerActions>
+const moveChecker = (
+  dispatch: React.Dispatch<ReducerActions>,
+  dropPoint: number,
+  item: { fromPoint: number; checkerColor: ActiveChecker }
 ) => {
-  // const [checkerPositions, dispatch] = reducerArr
-  console.log(toPoint, item)
   const { fromPoint, checkerColor } = item
+
   const newState = gameState.checkerPositions
   newState.table[fromPoint].pop()
-  newState.table[toPoint].push(1)
-  console.log(newState)
+  newState.table[dropPoint].push(checkerColor)
 
-  // dispatch({ type: 'setMove', payload: newState })
-  // setCheckerState((prevState) => {
-  //   const newState = [...prevState]
-  //   newState[fromPoint].pop()
-  //   newState[toPoint].push(1)
-
-  //   return newState
-  // })
+  dispatch({ type: 'setMove', payload: newState })
 }
 
 export const gameLogic = {
@@ -245,5 +227,5 @@ export const gameLogic = {
   diceCombinations,
   openPoints,
   validMoves,
-  moveCheckerHandler
+  moveChecker
 }
