@@ -8,7 +8,7 @@ import {
 
 import { INITIAL_TABLE_STATE } from './config'
 
-// useReducer logic
+// useReducer
 let gameState: TableState = INITIAL_TABLE_STATE
 let dispatch: React.Dispatch<ReducerActions>
 
@@ -175,26 +175,25 @@ const moveCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
   // if (diceRoll[0] === diceRoll[1]) diceRoll.push(...diceRoll)
 
   // moves from individual dice with board direction added
-  // const singleMoves = diceRoll
-  const singleMoves =
-    gameState.movement.movesRemaining ||
-    gameState.diceState.diceRoll
-      .filter((die) => die !== 0)
-      .map((die) => die * direction)
+  // const singleDiceMoves = diceRoll
+  const singleDiceMoves = gameState.diceState.diceRoll
+    .filter((die) => die !== 0)
+    .map((die) => die * direction)
   // doubles get 4 moves of the rolled number
-  if (singleMoves[0] === singleMoves[1]) singleMoves.push(...singleMoves)
+  if (singleDiceMoves[0] === singleDiceMoves[1])
+    singleDiceMoves.push(...singleDiceMoves)
 
   // all combinations of individual moves
   const combos: number[] = []
-  const combinationMoves = singleMoves.reduce((pV, cV, i) => {
+  const combinationDiceMoves = singleDiceMoves.reduce((pV, cV, i) => {
     const moves = [...pV, i > 0 ? pV[i - 1] + cV : cV]
     return moves
   }, combos)
-  combinationMoves.shift()
+  combinationDiceMoves.shift()
 
   // nested array of the available individual rolls, and their combinations
-  const moves = [singleMoves, combinationMoves]
-  // const moves = [...singleMoves, ...combinations]
+  const moves = { singleDice: singleDiceMoves, multiDice: combinationDiceMoves }
+  // const moves = [...singleDiceMoves, ...combinations]
 
   dispatch({ type: 'setMovesRemaining', payload: moves })
   return moves
@@ -220,7 +219,7 @@ const validMoves = (
   openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
   dragItem: { fromPoint: number; checkerColor: any },
   // dropPoint: number,
-  movesArr: number[][],
+  movesArr: { singleDice: number[]; multiDice: number[] },
   activePlayer: ActivePlayer
 ) => {
   if (!activePlayer) return
@@ -229,7 +228,7 @@ const validMoves = (
   // TODO: checkers on the bar must be moved first
   // if (bar.includes(activePlayer)) console.log('bar')
 
-  const moves = [...movesArr[0], ...movesArr[1]]
+  const moves = [...movesArr.singleDice, ...movesArr.multiDice]
 
   const validMovesArr = moves.map((move, i) => {
     const moveToPoint = fromPoint + move
@@ -264,7 +263,10 @@ const updateRemainingMoves = (
 ) => {
   const moveDistance = Math.abs(fromPoint - dropPoint)
   console.log('moveDist', moveDistance)
-
+  const movesRemaining = gameState.movement.movesRemaining
+  if (movesRemaining.singleDice.includes(moveDistance)) {
+    movesRemaining
+  }
   // dispatch({ type: 'setMovesRemaining', payload: newState })
   return
 }

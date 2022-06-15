@@ -27,7 +27,7 @@ export interface TableState {
     doublingCube: number
   }
   movement: {
-    movesRemaining: number[] | null
+    movesRemaining: { singleDice: number[]; multiDice: number[] }
     takenMoves: number[]
   }
 }

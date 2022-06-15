@@ -43,7 +43,7 @@ export const INITIAL_TABLE_STATE: TableState = {
     doublingCube: 1
   },
   movement: {
-    movesRemaining: null,
+    movesRemaining: { singleDice: [], multiDice: [] },
     takenMoves: []
   }
 }
