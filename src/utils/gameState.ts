@@ -290,5 +290,6 @@ export const gameLogic = {
   moveCombinations, // TODO: remove
   openPoints,
   validMoves,
+  updateRemainingMoves,
   moveChecker
 }

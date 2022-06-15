@@ -71,6 +71,7 @@ const GameBoard: FC = () => {
     moveCombinations,
     openPoints,
     validMoves,
+    updateRemainingMoves,
     moveChecker
   } = gameLogic
 
@@ -125,8 +126,8 @@ const GameBoard: FC = () => {
     // event.stopPropagation()
     // console.log(event)
 
-    moveChecker(dispatch, dropPoint, item)
-    updateRemainingMoves(dispatch, dropPoint, item.fromPoint)
+    moveChecker(dropPoint, item)
+    updateRemainingMoves(dropPoint, item.fromPoint)
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -166,7 +167,7 @@ const GameBoard: FC = () => {
       <div>
         {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}
         <button
-          onClick={() => rollDiceHandler(activePlayer, dispatch)}
+          onClick={() => rollDiceHandler(activePlayer)}
           className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
         >
           ROLL
