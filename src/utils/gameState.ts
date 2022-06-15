@@ -10,15 +10,17 @@ import { INITIAL_TABLE_STATE } from './config'
 
 // useReducer logic
 let gameState: TableState = INITIAL_TABLE_STATE
+let dispatch: React.Dispatch<ReducerActions>
 
 // triggered to update via useEffect in GameBoard
 function stateSubscriber(
-  state: TableState
-  // dispatch: React.Dispatch<ReducerActions>
+  state: TableState,
+  reducerDispatch: React.Dispatch<ReducerActions>
 ) {
   console.log('setting state', state)
   // TODO:
   gameState = state
+  dispatch = reducerDispatch
 }
 
 function reducer(state: TableState, action: ReducerActions): TableState {
@@ -118,8 +120,8 @@ const dice = () => Math.floor(Math.random() * 6) + 1
 const diceRoll = () => [dice(), dice()]
 
 const rollDiceHandler = (
-  activePlayer: ActivePlayer,
-  dispatch: React.Dispatch<ReducerActions>
+  activePlayer: ActivePlayer
+  // dispatch: React.Dispatch<ReducerActions>
 ) => {
   const [die1, die2] = diceRoll()
   const roll = !activePlayer
@@ -131,7 +133,6 @@ const rollDiceHandler = (
   const moves =
     gameState.movement.movesRemaining ||
     moveCombinations([die1, die2], activePlayer)
-  console.log(moves)
 
   dispatch({
     type: 'setDice',
@@ -195,6 +196,7 @@ const moveCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
   const moves = [singleMoves, combinationMoves]
   // const moves = [...singleMoves, ...combinations]
 
+  dispatch({ type: 'setMovesRemaining', payload: moves })
   return moves
 }
 
@@ -254,14 +256,21 @@ const validMoves = (
   return validMovesArr
 }
 
-const updateRemainingMoves = (move) => {
+// TODO: check movesRemaining for the moveDistance
+const updateRemainingMoves = (
+  // dispatch: React.Dispatch<ReducerActions>,
+  dropPoint: number,
+  fromPoint: number
+) => {
   const moveDistance = Math.abs(fromPoint - dropPoint)
-  dispatch({ type: 'setMovesRemaining', payload: newState })
+  console.log('moveDist', moveDistance)
+
+  // dispatch({ type: 'setMovesRemaining', payload: newState })
   return
 }
 
 const moveChecker = (
-  dispatch: React.Dispatch<ReducerActions>,
+  // dispatch: React.Dispatch<ReducerActions>,
   dropPoint: number,
   item: { fromPoint: number; checkerColor: ActiveChecker }
 ) => {

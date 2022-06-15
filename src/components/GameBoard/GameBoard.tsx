@@ -85,7 +85,7 @@ const GameBoard: FC = () => {
 
   useEffect(() => {
     // pass state updates to gameState.ts
-    stateSubscriber(state)
+    stateSubscriber(state, dispatch)
     // ensures current diceState
     diceRollRef.current = state.diceState
   }, [state])
@@ -126,7 +126,7 @@ const GameBoard: FC = () => {
     // console.log(event)
 
     moveChecker(dispatch, dropPoint, item)
-    updateRemainingMoves()
+    updateRemainingMoves(dispatch, dropPoint, item.fromPoint)
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
