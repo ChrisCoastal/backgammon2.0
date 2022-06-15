@@ -27,14 +27,20 @@ function reducer(state: TableState, action: ReducerActions): TableState {
   switch (type) {
     case 'setActivePlayer':
       return { ...state, activePlayer: payload }
-    case 'setDiceRoll':
+    case 'setDice':
       return {
         ...state,
         diceState: {
           ...state.diceState,
-          diceRoll: payload.roll,
-          availableRoll: payload.available
+          diceRoll: payload.roll
         }
+      }
+    case 'setMovesRemaining':
+      console.log(payload)
+
+      return {
+        ...state,
+        movement: { ...state.movement, movesRemaining: payload.moves }
       }
     // case 'showValidMoves':
     //   return {
@@ -45,7 +51,7 @@ function reducer(state: TableState, action: ReducerActions): TableState {
     //     }
     //   }
 
-    case 'setMove':
+    case 'setCheckerPosition':
       return { ...state, checkerPositions: payload }
     case 'setDoublingCube':
       return {
@@ -65,7 +71,7 @@ function reducer(state: TableState, action: ReducerActions): TableState {
 
 // Player Turn
 // const toggleActivePlayer = (dice?: number[]) => {
-//   // diceRollHandler()
+//   // rollDiceHandler()
 
 //   // console.log(state.diceState)
 //   // console.log(diceRoll)
@@ -79,11 +85,11 @@ function reducer(state: TableState, action: ReducerActions): TableState {
 //   if (dice) {
 //     if (!activePlayer && dice[0] > dice[1]) {
 //       dispatch({ type: 'setActivePlayer', payload: 1 })
-//       diceCombinations()
+//       moveCombinations()
 //     }
 //     if (!activePlayer && dice[0] < dice[1]) {
 //       dispatch({ type: 'setActivePlayer', payload: 2 })
-//       diceCombinations()
+//       moveCombinations()
 //     }
 //     if (!activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
 //       startGameHandler(dice)
@@ -107,63 +113,92 @@ const isCheckersBar = () => {}
 const isCheckersHome = (checkerPos: CheckerPositionsState) => checkerPos
 
 // Dice and Movement
-const diceRollHandler = (
+const dice = () => Math.floor(Math.random() * 6) + 1
+
+const diceRoll = () => [dice(), dice()]
+
+const rollDiceHandler = (
   activePlayer: ActivePlayer,
   dispatch: React.Dispatch<ReducerActions>
 ) => {
-  const dice = () => Math.floor(Math.random() * 6) + 1
-  const die1 = dice()
-  const die2 = dice()
-  if (!activePlayer) {
-    dispatch({ type: 'setDiceRoll', payload: [die1, 0, 0, die2] })
+  const [die1, die2] = diceRoll()
+  const roll = !activePlayer
+    ? [die1, 0, 0, die2]
+    : activePlayer === 1
+    ? [die1, die2, 0, 0]
+    : [0, 0, die1, die2] // ∴ activePlayer === 2
 
-    // TODO: passing the dice values here to startGameHandler
-    // handler was running w/o waiting for state update; this is a workaround
-    // return [die1, die2]
-  }
+  const moves =
+    gameState.movement.movesRemaining ||
+    moveCombinations([die1, die2], activePlayer)
+  console.log(moves)
 
-  const available =
-    gameState.diceState.availableRoll ||
-    diceCombinations([die1, die2], activePlayer)
+  dispatch({
+    type: 'setDice',
+    payload: { roll: roll }
+  })
+  dispatch({ type: 'setMovesRemaining', payload: moves })
 
-  if (activePlayer === 1)
-    dispatch({
-      type: 'setDiceRoll',
-      payload: { roll: [die1, die2, 0, 0], available: available }
-    })
-  if (activePlayer === 2)
-    dispatch({
-      type: 'setDiceRoll',
-      payload: { roll: [0, 0, die1, die2], available: available }
-    })
+  // if (!activePlayer) {
+  //   dispatch({ type: 'setDice', payload: roll })
+  // }
+  // if (activePlayer === 1)
+  //   dispatch({
+  //     type: 'setDice',
+  //     payload: { roll: [die1, die2, 0, 0], moves: moves }
+  //   })
+  // dispatch({ type: 'setMovesRemaining', payload: moves })
+  // if (activePlayer === 2)
+  //   dispatch({
+  //     type: 'setDice',
+  //     payload: { roll: [0, 0, die1, die2], moves: moves }
+  //   })
+  // dispatch({ type: 'setMovesRemaining', payload: moves })
 }
 
-// TODO: should only be called from diceRollHandler
-const diceCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
-  if (!activePlayer) console.error('diceCombination')
-  const direction = activePlayer === 1 ? -1 : 1
-  console.log(diceRoll)
+const moveDirection = (activePlayer: ActivePlayer) =>
+  gameState.activePlayer === 1 ? -1 : 1
 
-  const playerRoll = diceRoll
-    .filter((die) => die !== 0)
-    .map((die) => die * direction)
+// TODO: should only be called from rollDiceHandler
+const moveCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
+  if (!activePlayer) console.error('diceCombination')
+  const direction = moveDirection(activePlayer)
+  console.log(
+    'diceRoll',
+    diceRoll,
+    'remaining',
+    gameState.movement.movesRemaining
+  )
 
   // doubles get 4 moves of the rolled number
-  if (playerRoll[0] === playerRoll[1]) playerRoll.push(...playerRoll)
+  // if (diceRoll[0] === diceRoll[1]) diceRoll.push(...diceRoll)
 
-  const movesArr: number[] = []
-  const combinations = playerRoll.reduce((pV, cV, i) => {
+  // moves from individual dice with board direction added
+  // const singleMoves = diceRoll
+  const singleMoves =
+    gameState.movement.movesRemaining ||
+    gameState.diceState.diceRoll
+      .filter((die) => die !== 0)
+      .map((die) => die * direction)
+  // doubles get 4 moves of the rolled number
+  if (singleMoves[0] === singleMoves[1]) singleMoves.push(...singleMoves)
+
+  // all combinations of individual moves
+  const combos: number[] = []
+  const combinationMoves = singleMoves.reduce((pV, cV, i) => {
     const moves = [...pV, i > 0 ? pV[i - 1] + cV : cV]
     return moves
-  }, movesArr)
-  combinations.shift()
+  }, combos)
+  combinationMoves.shift()
 
   // nested array of the available individual rolls, and their combinations
-  const moves = [playerRoll, combinations]
-  // const moves = [...playerRoll, ...combinations]
+  const moves = [singleMoves, combinationMoves]
+  // const moves = [...singleMoves, ...combinations]
 
   return moves
 }
+
+const remianingMoveCombos = () => {}
 
 const openPoints = (table: Array<1 | 2>[], activePlayer: ActivePlayer) => {
   const openPoints = table.map((point, i) => {
@@ -219,27 +254,31 @@ const validMoves = (
   return validMovesArr
 }
 
+const updateRemainingMoves = (move) => {
+  const moveDistance = Math.abs(fromPoint - dropPoint)
+  dispatch({ type: 'setMovesRemaining', payload: newState })
+  return
+}
+
 const moveChecker = (
   dispatch: React.Dispatch<ReducerActions>,
   dropPoint: number,
   item: { fromPoint: number; checkerColor: ActiveChecker }
 ) => {
   const { fromPoint, checkerColor } = item
-  console.log(fromPoint, checkerColor)
 
   const newState = gameState.checkerPositions
   newState.table[fromPoint].pop()
   newState.table[dropPoint].push(checkerColor)
 
-  dispatch({ type: 'setMove', payload: newState })
-  dispatch({ type: 'setMove', payload: newState })
+  dispatch({ type: 'setCheckerPosition', payload: newState })
 }
 
 export const gameLogic = {
   stateSubscriber,
   reducer,
-  diceRollHandler,
-  diceCombinations, // TODO: remove
+  rollDiceHandler,
+  moveCombinations, // TODO: remove
   openPoints,
   validMoves,
   moveChecker

@@ -46,12 +46,7 @@ const Checker: FC<CheckerProps> = ({ point, activePlayer, checkerColor }) => {
       ? 'bg-red-600 hover:bg-red-700'
       : 'bg-sky-600 hover:bg-sky-700'
 
-  return (
-    <div
-      ref={dragRef}
-      className={`h-16 w-16 rounded-full ${color} ${active}`}
-    ></div>
-  )
+  return <div ref={dragRef} className={`h-16 w-16 rounded-full ${color}`}></div>
 
   // return (
   // <span

@@ -39,11 +39,11 @@ export const INITIAL_TABLE_STATE: TableState = {
   // TODO: activePlayer: null,
   diceState: {
     diceRoll: [0, 0, 0, 0],
-    availableRoll: [],
+    // movesRemaining: [],
     doublingCube: 1
   },
   movement: {
-    validMoves: null,
+    movesRemaining: null,
     takenMoves: []
   }
 }

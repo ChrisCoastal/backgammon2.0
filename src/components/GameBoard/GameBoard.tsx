@@ -67,8 +67,8 @@ const GameBoard: FC = () => {
   const {
     stateSubscriber,
     reducer,
-    diceRollHandler,
-    diceCombinations,
+    rollDiceHandler,
+    moveCombinations,
     openPoints,
     validMoves,
     moveChecker
@@ -96,8 +96,8 @@ const GameBoard: FC = () => {
   ) => {
     const points = openPoints(table, activePlayer)
     const { diceRoll } = diceRollRef.current
-    const availableMoves = diceCombinations(diceRoll, activePlayer)
-    console.log(availableMoves)
+    const availableMoves = moveCombinations(diceRoll, activePlayer)
+    console.log(availableMoves, state.movement.movesRemaining)
     // TODO: find issue with active player (player 2 moves p1 checkers)
     // TODO: pass diceRoll.availableRoll
     const valid = validMoves(points, dragItem, availableMoves, activePlayer)
@@ -126,6 +126,7 @@ const GameBoard: FC = () => {
     // console.log(event)
 
     moveChecker(dispatch, dropPoint, item)
+    updateRemainingMoves()
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -165,7 +166,7 @@ const GameBoard: FC = () => {
       <div>
         {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}
         <button
-          onClick={() => diceRollHandler(activePlayer, dispatch)}
+          onClick={() => rollDiceHandler(activePlayer, dispatch)}
           className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
         >
           ROLL

@@ -23,11 +23,11 @@ export interface TableState {
   activePlayer: 1 | 2 | null
   diceState: {
     diceRoll: number[]
-    availableRoll: number[]
+    // movesRemaining: number[]
     doublingCube: number
   }
   movement: {
-    validMoves: ValidMoveState[] | null
+    movesRemaining: number[] | null
     takenMoves: number[]
   }
 }
@@ -35,8 +35,9 @@ export interface TableState {
 export interface ReducerActions {
   type:
     | 'setActivePlayer'
-    | 'setDiceRoll'
-    | 'setMove'
+    | 'setDice'
+    | 'setMovesRemaining'
+    | 'setCheckerPosition'
     | 'showValidMoves'
     | 'setDoublingCube'
     | 'reset'
