@@ -11,7 +11,7 @@ import { gameLogic } from 'src/utils/gameState'
 import BoardPoint from '../BoardPoint/BoardPoint'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
-import GameOptions from '../GameOptions/GameOptions'
+// import GameOptions from '../GameOptions/GameOptions'
 
 // interface tableState {
 //   gameHistory: {}[]
@@ -139,6 +139,7 @@ const GameBoard: FC = () => {
           pointIndex={i}
           validMoves={getValidMoves}
           dropHandler={moveCheckerHandler}
+          activePlayer={activePlayer}
         >
           {table[i].map(
             (checker) =>

@@ -225,6 +225,7 @@ const moveChecker = (
   item: { fromPoint: number; checkerColor: ActiveChecker }
 ) => {
   const { fromPoint, checkerColor } = item
+  console.log(fromPoint, checkerColor)
 
   const newState = gameState.checkerPositions
   newState.table[fromPoint].pop()
