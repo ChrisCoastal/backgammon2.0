@@ -43,7 +43,10 @@ function reducer(state: TableState, action: ReducerActions): TableState {
         ...state,
         movement: {
           ...state.movement,
-          movesRemaining: payload.movesRemaining
+          movesRemaining: [
+            ...state.movement.movesRemaining,
+            payload.movesRemaining
+          ]
         }
       }
     // case 'showValidMoves':
@@ -183,8 +186,7 @@ const initialMoves = (diceRoll: number[]) => {
   // doubles get 4 moves of the rolled number
   if (moves[0] === moves[1]) moves.push(...moves)
 
-  const initialMoves = moves.map((move) => ({ move: move, remains: true }))
-  dispatch({ type: 'setMovesRemaining', payload: initialMoves })
+  dispatch({ type: 'setMovesRemaining', payload: moves })
 
   return moves
 }
@@ -313,39 +315,43 @@ const updateRemainingMoves = (
   console.log('moveDist', moveDistance)
   const { movesRemaining, movesPossible } = gameState.movement
 
+  const moves = movesRemaining.at(-1)
+
   // TODO: refactor? both if statements into single reduce() (see below)
-  if (singleDice.includes(moveDistance)) {
-    const taken = singleDice.splice(singleDice.indexOf(moveDistance), 1)
-    comboDice.map((dice) => dice - moveDistance)
+  if (moves && moves.includes(moveDistance)) {
+    const taken = moves.splice(moves.indexOf(moveDistance), 1)
+    movesPossible.map((dice) => dice - moveDistance)
     return dispatch({
       type: 'setMovesRemaining',
       payload: {
-        movesRemaining: { singleDice, comboDice }, // TODO: just recalc comboDice?
+        movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
         movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
       }
     })
   }
-  if (comboDice.includes(moveDistance)) {
-    comboDice.splice(comboDice.indexOf(moveDistance), 1)
-    const remove = singleDice.reduce(
-      (acc, cur, i) => {
-        if (acc.acc === moveDistance) return acc
-        // can maybe refactor for both cases (move single or combo)
-        // if (cur === moveDistance) return { acc: cur, i: i }; // something like this?
-        return { acc: acc.acc + cur, i: i }
-      },
-      { acc: 0, i: 0 }
-    )
+  if (movesPossible.includes(moveDistance)) {
+    movesPossible.splice(movesPossible.indexOf(moveDistance), 1)
+    if (moves) {
+      const remove = moves.reduce(
+        (acc, cur, i) => {
+          if (acc.acc === moveDistance) return acc
+          // can maybe refactor for both cases (move single or combo)
+          // if (cur === moveDistance) return { acc: cur, i: i }; // something like this?
+          return { acc: acc.acc + cur, i: i }
+        },
+        { acc: 0, i: 0 }
+      )
 
-    // removing constituent single moves
-    const taken = singleDice.splice(0, remove.i + 1)
-    return dispatch({
-      type: 'setMovesRemaining',
-      payload: {
-        movesRemaining: { singleDice, comboDice }, // TODO: just recalc comboDice?
-        movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
-      }
-    })
+      // removing constituent single moves
+      const taken = moves.splice(0, remove.i + 1)
+      return dispatch({
+        type: 'setMovesRemaining',
+        payload: {
+          movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
+          movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+        }
+      })
+    }
   }
   // dispatch({ type: 'setMovesRemaining', payload: newState })
   console.error('MOVE NOT FOUND')
