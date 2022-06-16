@@ -1,3 +1,4 @@
+import { access } from 'fs'
 import {
   TableState,
   ReducerActions,
@@ -38,11 +39,13 @@ function reducer(state: TableState, action: ReducerActions): TableState {
         }
       }
     case 'setMovesRemaining':
-      console.log(payload)
-
       return {
         ...state,
-        movement: { ...state.movement, movesRemaining: payload.moves }
+        movement: {
+          ...state.movement,
+          movesRemaining: payload.movesRemaining,
+          movesTaken: [...state.movement.movesTaken, payload.movesTaken]
+        }
       }
     // case 'showValidMoves':
     //   return {
@@ -117,46 +120,47 @@ const isCheckersHome = (checkerPos: CheckerPositionsState) => checkerPos
 // Dice and Movement
 const dice = () => Math.floor(Math.random() * 6) + 1
 
-const diceRoll = () => [dice(), dice()]
+const getDiceRoll = () => [dice(), dice()]
+// const diceRoll = () => [dice(), dice()]
 
-const rollDiceHandler = (
-  activePlayer: ActivePlayer
-  // dispatch: React.Dispatch<ReducerActions>
-) => {
-  const [die1, die2] = diceRoll()
-  const roll = !activePlayer
-    ? [die1, 0, 0, die2]
-    : activePlayer === 1
-    ? [die1, die2, 0, 0]
-    : [0, 0, die1, die2] // ∴ activePlayer === 2
+// const rollDiceHandler = (
+//   activePlayer: ActivePlayer
+//   // dispatch: React.Dispatch<ReducerActions>
+// ) => {
+//   const [die1, die2] = diceRoll()
+//   const roll = !activePlayer
+//     ? [die1, 0, 0, die2]
+//     : activePlayer === 1
+//     ? [die1, die2, 0, 0]
+//     : [0, 0, die1, die2] // ∴ activePlayer === 2
 
-  const moves =
-    gameState.movement.movesRemaining ||
-    moveCombinations([die1, die2], activePlayer)
+//   const moves = moveCombinations([die1, die2], activePlayer)
 
-  dispatch({
-    type: 'setDice',
-    payload: { roll: roll }
-  })
-  dispatch({ type: 'setMovesRemaining', payload: moves })
+//   dispatch({
+//     type: 'setDice',
+//     payload: { roll: roll }
+//   })
+//   // FIXME: need to correct the payload object
+//   dispatch({ type: 'setMovesRemaining', payload: moves })
 
-  // if (!activePlayer) {
-  //   dispatch({ type: 'setDice', payload: roll })
-  // }
-  // if (activePlayer === 1)
-  //   dispatch({
-  //     type: 'setDice',
-  //     payload: { roll: [die1, die2, 0, 0], moves: moves }
-  //   })
-  // dispatch({ type: 'setMovesRemaining', payload: moves })
-  // if (activePlayer === 2)
-  //   dispatch({
-  //     type: 'setDice',
-  //     payload: { roll: [0, 0, die1, die2], moves: moves }
-  //   })
-  // dispatch({ type: 'setMovesRemaining', payload: moves })
-}
+//   // if (!activePlayer) {
+//   //   dispatch({ type: 'setDice', payload: roll })
+//   // }
+//   // if (activePlayer === 1)
+//   //   dispatch({
+//   //     type: 'setDice',
+//   //     payload: { roll: [die1, die2, 0, 0], moves: moves }
+//   //   })
+//   // dispatch({ type: 'setMovesRemaining', payload: moves })
+//   // if (activePlayer === 2)
+//   //   dispatch({
+//   //     type: 'setDice',
+//   //     payload: { roll: [0, 0, die1, die2], moves: moves }
+//   //   })
+//   // dispatch({ type: 'setMovesRemaining', payload: moves })
+// }
 
+// TODO: remove params
 const moveDirection = (activePlayer: ActivePlayer) =>
   gameState.activePlayer === 1 ? -1 : 1
 
@@ -185,21 +189,19 @@ const moveCombinations = (diceRoll: number[], activePlayer: ActivePlayer) => {
 
   // all combinations of individual moves
   const combos: number[] = []
-  const combinationDiceMoves = singleDiceMoves.reduce((pV, cV, i) => {
-    const moves = [...pV, i > 0 ? pV[i - 1] + cV : cV]
+  const combinationDiceMoves = singleDiceMoves.reduce((acc, cur, i) => {
+    const moves = [...acc, i > 0 ? acc[i - 1] + cur : cur]
     return moves
   }, combos)
   combinationDiceMoves.shift()
 
   // nested array of the available individual rolls, and their combinations
-  const moves = { singleDice: singleDiceMoves, multiDice: combinationDiceMoves }
+  const moves = { singleDice: singleDiceMoves, comboDice: combinationDiceMoves }
   // const moves = [...singleDiceMoves, ...combinations]
 
-  dispatch({ type: 'setMovesRemaining', payload: moves })
+  // dispatch({ type: 'setMovesRemaining', payload: moves })
   return moves
 }
-
-const remianingMoveCombos = () => {}
 
 const openPoints = (table: Array<1 | 2>[], activePlayer: ActivePlayer) => {
   const openPoints = table.map((point, i) => {
@@ -215,11 +217,47 @@ const openPoints = (table: Array<1 | 2>[], activePlayer: ActivePlayer) => {
   return openPoints
 }
 
+const getValidMoves = (
+  dropPoint: number,
+  dragItem: { fromPoint: number; checkerColor: any }
+) => {
+  console.log('MOVEMENT', gameState.movement)
+
+  const points = openPoints(
+    gameState.checkerPositions.table,
+    gameState.activePlayer
+  )
+  const { diceRoll } = gameState.diceState
+  const availableMoves = moveCombinations(diceRoll, gameState.activePlayer)
+  // console.log(availableMoves, state.movement.movesRemaining)
+  // TODO: pass availableRoll
+  const valid = validMoves(
+    points,
+    dragItem,
+    availableMoves,
+    gameState.activePlayer
+  )
+
+  console.log(valid)
+
+  // TODO:
+  console.log(
+    !!valid
+      ?.map((move) => move.action !== 'closed' && move.point)
+      .includes(dropPoint)
+  )
+
+  return !!valid
+    ?.map((move) => move.action !== 'closed' && move.point)
+    .includes(dropPoint)
+  // return valid?.point.includes(dropPoint)
+}
+
 const validMoves = (
   openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
   dragItem: { fromPoint: number; checkerColor: any },
   // dropPoint: number,
-  movesArr: { singleDice: number[]; multiDice: number[] },
+  movesArr: { singleDice: number[]; comboDice: number[] },
   activePlayer: ActivePlayer
 ) => {
   if (!activePlayer) return
@@ -228,7 +266,7 @@ const validMoves = (
   // TODO: checkers on the bar must be moved first
   // if (bar.includes(activePlayer)) console.log('bar')
 
-  const moves = [...movesArr.singleDice, ...movesArr.multiDice]
+  const moves = [...movesArr.singleDice, ...movesArr.comboDice]
 
   const validMovesArr = moves.map((move, i) => {
     const moveToPoint = fromPoint + move
@@ -263,11 +301,45 @@ const updateRemainingMoves = (
 ) => {
   const moveDistance = Math.abs(fromPoint - dropPoint)
   console.log('moveDist', moveDistance)
-  const movesRemaining = gameState.movement.movesRemaining
-  if (movesRemaining.singleDice.includes(moveDistance)) {
-    movesRemaining
+  const { singleDice, comboDice } = gameState.movement.movesRemaining
+
+  // TODO: refactor? both if statements into single reduce() (see below)
+  if (singleDice.includes(moveDistance)) {
+    const taken = singleDice.splice(singleDice.indexOf(moveDistance), 1)
+    comboDice.map((dice) => dice - moveDistance)
+    return dispatch({
+      type: 'setMovesRemaining',
+      payload: {
+        movesRemaining: { singleDice, comboDice }, // TODO: just recalc comboDice?
+        movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+      }
+    })
+  }
+  if (comboDice.includes(moveDistance)) {
+    comboDice.splice(comboDice.indexOf(moveDistance), 1)
+    const remove = singleDice.reduce(
+      (acc, cur, i) => {
+        if (acc.acc === moveDistance) return acc
+        // can maybe refactor for both cases (move single or combo)
+        // if (cur === moveDistance) return { acc: cur, i: i }; // something like this?
+        return { acc: acc.acc + cur, i: i }
+      },
+      { acc: 0, i: 0 }
+    )
+
+    // removing constituent single moves
+    const taken = singleDice.splice(0, remove.i + 1)
+    return dispatch({
+      type: 'setMovesRemaining',
+      payload: {
+        movesRemaining: { singleDice, comboDice }, // TODO: just recalc comboDice?
+        movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+      }
+    })
   }
   // dispatch({ type: 'setMovesRemaining', payload: newState })
+  console.error('MOVE NOT FOUND')
+
   return
 }
 
@@ -288,9 +360,11 @@ const moveChecker = (
 export const gameLogic = {
   stateSubscriber,
   reducer,
-  rollDiceHandler,
+  getDiceRoll,
+  // rollDiceHandler,
   moveCombinations, // TODO: remove
   openPoints,
+  getValidMoves,
   validMoves,
   updateRemainingMoves,
   moveChecker

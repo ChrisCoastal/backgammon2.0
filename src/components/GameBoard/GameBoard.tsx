@@ -1,7 +1,7 @@
 import React, { FC, useReducer, useEffect, useRef } from 'react'
 
 // types
-import { TableState, ReducerActions } from 'src/@types/types'
+import { TableState, ReducerActions, ActivePlayer } from 'src/@types/types'
 
 // utils
 import { INITIAL_POSITIONS, INITIAL_TABLE_STATE } from '../../utils/config'
@@ -20,7 +20,7 @@ import Dice from '../Dice/Dice'
 //   diceState: { diceRoll: number[]; doublingCube: number }
 //   movement: {
 //     validMoves: ValidMoveState[] | null
-//     takenMoves: number[]
+//     movesTaken: number[]
 //   }
 // }
 
@@ -39,7 +39,7 @@ import Dice from '../Dice/Dice'
 //   },
 //   movement: {
 //     validMoves: null,
-//     takenMoves: []
+//     movesTaken: []
 //   }
 // }
 
@@ -67,9 +67,11 @@ const GameBoard: FC = () => {
   const {
     stateSubscriber,
     reducer,
-    rollDiceHandler,
+    // rollDiceHandler,
+    getDiceRoll,
     moveCombinations,
     openPoints,
+    getValidMoves,
     validMoves,
     updateRemainingMoves,
     moveChecker
@@ -81,7 +83,7 @@ const GameBoard: FC = () => {
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
-  // TODO: avoid if possible
+  // TODO: avoid if possible?
   const diceRollRef = useRef(state.diceState)
 
   useEffect(() => {
@@ -91,31 +93,53 @@ const GameBoard: FC = () => {
     diceRollRef.current = state.diceState
   }, [state])
 
-  const getValidMoves = (
-    dropPoint: number,
-    dragItem: { fromPoint: number; checkerColor: any }
+  // const getValidMoves = (
+  //   dropPoint: number,
+  //   dragItem: { fromPoint: number; checkerColor: any }
+  // ) => {
+  //   console.log('MOVEMENT', state.movement)
+
+  //   const points = openPoints(table, activePlayer)
+  //   const { diceRoll } = diceRollRef.current
+  //   const availableMoves = moveCombinations(diceRoll, activePlayer)
+  //   // console.log(availableMoves, state.movement.movesRemaining)
+  //   // TODO: pass availableRoll
+  //   const valid = validMoves(points, dragItem, availableMoves, activePlayer)
+
+  //   console.log(valid)
+
+  //   // TODO:
+  //   console.log(
+  //     !!valid
+  //       ?.map((move) => move.action !== 'closed' && move.point)
+  //       .includes(dropPoint)
+  //   )
+
+  //   return !!valid
+  //     ?.map((move) => move.action !== 'closed' && move.point)
+  //     .includes(dropPoint)
+  //   // return valid?.point.includes(dropPoint)
+  // }
+
+  const rollDiceHandler = (
+    activePlayer: ActivePlayer
+    // dispatch: React.Dispatch<ReducerActions>
   ) => {
-    const points = openPoints(table, activePlayer)
-    const { diceRoll } = diceRollRef.current
-    const availableMoves = moveCombinations(diceRoll, activePlayer)
-    console.log(availableMoves, state.movement.movesRemaining)
-    // TODO: find issue with active player (player 2 moves p1 checkers)
-    // TODO: pass diceRoll.availableRoll
-    const valid = validMoves(points, dragItem, availableMoves, activePlayer)
+    const [die1, die2] = getDiceRoll()
+    const roll = !activePlayer
+      ? [die1, 0, 0, die2]
+      : activePlayer === 1
+      ? [die1, die2, 0, 0]
+      : [0, 0, die1, die2] // ∴ activePlayer === 2
 
-    console.log(valid)
+    const moves = moveCombinations([die1, die2], activePlayer)
 
-    // TODO:
-    console.log(
-      !!valid
-        ?.map((move) => move.action !== 'closed' && move.point)
-        .includes(dropPoint)
-    )
-
-    return !!valid
-      ?.map((move) => move.action !== 'closed' && move.point)
-      .includes(dropPoint)
-    // return valid?.point.includes(dropPoint)
+    dispatch({
+      type: 'setDice',
+      payload: { roll: roll }
+    })
+    // FIXME: need to correct the payload object
+    dispatch({ type: 'setMovesRemaining', payload: moves })
   }
 
   const moveCheckerHandler = (
@@ -127,6 +151,7 @@ const GameBoard: FC = () => {
     // console.log(event)
 
     moveChecker(dropPoint, item)
+    // FIXME:
     updateRemainingMoves(dropPoint, item.fromPoint)
   }
 
