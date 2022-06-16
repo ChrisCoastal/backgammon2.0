@@ -43,10 +43,15 @@ function reducer(state: TableState, action: ReducerActions): TableState {
         ...state,
         movement: {
           ...state.movement,
-          movesRemaining: [
-            ...state.movement.movesRemaining,
-            payload.movesRemaining
-          ]
+          movesRemaining: [...state.movement.movesRemaining, payload]
+        }
+      }
+    case 'setMovesPossible':
+      return {
+        ...state,
+        movement: {
+          ...state.movement,
+          movesPossible: payload
         }
       }
     // case 'showValidMoves':
@@ -180,14 +185,14 @@ const getDiceRoll = () => {
 const initialMoves = (diceRoll: number[]) => {
   // set moves in a + or - direction
   // const direction = moveDirection(gameState.activePlayer)
-  const moves = gameState.diceState.diceRoll
+  const moves = diceRoll
   // .filter((die) => die !== 0) // TODO: can remove if only passing 2 nums
   // .map((die) => die * direction)
   // doubles get 4 moves of the rolled number
   if (moves[0] === moves[1]) moves.push(...moves)
 
   dispatch({ type: 'setMovesRemaining', payload: moves })
-
+  console.log([moves])
   return moves
 }
 
@@ -215,6 +220,9 @@ const possibleMoves = (
       .map((move) => move * direction)
   )
 
+  dispatch({ type: 'setMovesPossible', payload: [...moveCombinations] })
+  console.log([...moveCombinations])
+
   return [...moveCombinations]
 }
 
@@ -238,15 +246,27 @@ const getValidMoves = (
 ) => {
   console.log('MOVEMENT', gameState.movement)
 
-  const points = openPoints(
+  const open = openPoints(
     gameState.checkerPositions.table,
     gameState.activePlayer
   )
-  const { diceRoll } = gameState.diceState
-  const possible = possibleMoves(gameState.activePlayer, diceRoll)
+  // const moves = possibleMoves(
+  //   gameState.activePlayer,
+  //   gameState.diceState.diceRoll
+  // )
+
+  const { movesPossible } = gameState.movement
+  console.log(open, movesPossible)
+
+  // const possible = possibleMoves(gameState.activePlayer, diceRoll)
   // console.log(possible, state.movement.movesRemaining)
   // TODO: pass availableRoll
-  const valid = validMoves(points, dragItem, possible, gameState.activePlayer)
+  const valid = validMoves(
+    open,
+    dragItem,
+    gameState.movement.movesPossible,
+    gameState.activePlayer
+  )
 
   console.log(valid)
 

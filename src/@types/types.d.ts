@@ -38,6 +38,7 @@ export interface ReducerActions {
     | 'setActivePlayer'
     | 'setDice'
     | 'setMovesRemaining'
+    | 'setMovesPossible'
     | 'setCheckerPosition'
     | 'showValidMoves'
     | 'setDoublingCube'
