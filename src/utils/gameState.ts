@@ -306,6 +306,7 @@ const validMoves = (
 }
 
 // TODO: check movesRemaining for the moveDistance
+// FIXME: function reaching the error
 const updateRemainingMoves = (
   // dispatch: React.Dispatch<ReducerActions>,
   dropPoint: number,

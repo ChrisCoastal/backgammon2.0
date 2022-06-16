@@ -11,37 +11,6 @@ import { gameLogic } from 'src/utils/gameState'
 import BoardPoint from '../BoardPoint/BoardPoint'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
-// import GameOptions from '../GameOptions/GameOptions'
-
-// interface tableState {
-//   gameHistory: {}[]
-//   checkerPositions: CheckerPositionsState
-//   activePlayer: 1 | 2 | null
-//   diceState: { diceRoll: number[]; doublingCube: number }
-//   movement: {
-//     validMoves: ValidMoveState[] | null
-//     movesTaken: number[]
-//   }
-// }
-
-// const INITIAL_TABLE_STATE: TableState = {
-//   gameHistory: [],
-//   checkerPositions: {
-//     table: INITIAL_POSITIONS,
-//     bar: [],
-//     bearOff1: [],
-//     bearOff2: []
-//   },
-//   activePlayer: null,
-//   diceState: {
-//     diceRoll: [0, 0, 0, 0],
-//     doublingCube: 1
-//   },
-//   movement: {
-//     validMoves: null,
-//     movesTaken: []
-//   }
-// }
 
 interface ValidMoveState {
   dice: number
@@ -49,19 +18,6 @@ interface ValidMoveState {
   point: number
   action: string
 }
-
-type DropState = ValidMoveState[]
-
-// interface ReducerActions {
-//   type:
-//     | 'setActivePlayer'
-//     | 'setDiceRoll'
-//     | 'setMove'
-//     | 'showValidMoves'
-//     | 'setDoublingCube'
-//     | 'reset'
-//   payload?: any
-// }
 
 const GameBoard: FC = () => {
   const {
@@ -94,32 +50,17 @@ const GameBoard: FC = () => {
     diceRollRef.current = state.diceState
   }, [state])
 
-  const rollDiceHandler = (
-    activePlayer: ActivePlayer
-    // dispatch: React.Dispatch<ReducerActions>
-  ) => {
+  const rollDiceHandler = (activePlayer: ActivePlayer) => {
     const roll = getDiceRoll()
     const moves = initialMoves(roll)
     const possible = possibleMoves(activePlayer, roll)
-
-    // dispatch({
-    //   type: 'setDice',
-    //   payload: { roll: roll }
-    // })
-    // FIXME: need to correct the payload object
-    // dispatch({ type: 'setMovesRemaining', payload: moves })
   }
 
   const moveCheckerHandler = (
     dropPoint: number,
     item: { fromPoint: number; checkerColor: any }
   ) => {
-    // event.preventDefault()
-    // event.stopPropagation()
-    // console.log(event)
-
     moveChecker(dropPoint, item)
-    // FIXME:
     updateRemainingMoves(dropPoint, item.fromPoint)
   }
 
