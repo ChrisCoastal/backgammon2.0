@@ -69,7 +69,8 @@ const GameBoard: FC = () => {
     reducer,
     // rollDiceHandler,
     getDiceRoll,
-    moveCombinations,
+    initialMoves,
+    possibleMoves,
     openPoints,
     getValidMoves,
     validMoves,
@@ -93,53 +94,20 @@ const GameBoard: FC = () => {
     diceRollRef.current = state.diceState
   }, [state])
 
-  // const getValidMoves = (
-  //   dropPoint: number,
-  //   dragItem: { fromPoint: number; checkerColor: any }
-  // ) => {
-  //   console.log('MOVEMENT', state.movement)
-
-  //   const points = openPoints(table, activePlayer)
-  //   const { diceRoll } = diceRollRef.current
-  //   const availableMoves = moveCombinations(diceRoll, activePlayer)
-  //   // console.log(availableMoves, state.movement.movesRemaining)
-  //   // TODO: pass availableRoll
-  //   const valid = validMoves(points, dragItem, availableMoves, activePlayer)
-
-  //   console.log(valid)
-
-  //   // TODO:
-  //   console.log(
-  //     !!valid
-  //       ?.map((move) => move.action !== 'closed' && move.point)
-  //       .includes(dropPoint)
-  //   )
-
-  //   return !!valid
-  //     ?.map((move) => move.action !== 'closed' && move.point)
-  //     .includes(dropPoint)
-  //   // return valid?.point.includes(dropPoint)
-  // }
-
   const rollDiceHandler = (
     activePlayer: ActivePlayer
     // dispatch: React.Dispatch<ReducerActions>
   ) => {
-    const [die1, die2] = getDiceRoll()
-    const roll = !activePlayer
-      ? [die1, 0, 0, die2]
-      : activePlayer === 1
-      ? [die1, die2, 0, 0]
-      : [0, 0, die1, die2] // ∴ activePlayer === 2
+    const roll = getDiceRoll()
+    const moves = initialMoves(roll)
+    const possible = possibleMoves(activePlayer, roll)
 
-    const moves = moveCombinations([die1, die2], activePlayer)
-
-    dispatch({
-      type: 'setDice',
-      payload: { roll: roll }
-    })
+    // dispatch({
+    //   type: 'setDice',
+    //   payload: { roll: roll }
+    // })
     // FIXME: need to correct the payload object
-    dispatch({ type: 'setMovesRemaining', payload: moves })
+    // dispatch({ type: 'setMovesRemaining', payload: moves })
   }
 
   const moveCheckerHandler = (

@@ -27,8 +27,9 @@ export interface TableState {
     doublingCube: number
   }
   movement: {
-    movesRemaining: { singleDice: number[]; comboDice: number[] }
-    movesTaken: { fromPoint: number; toPoint: number; moves: [] }[]
+    movesRemaining: { move: number; remains: boolean }[]
+    movesPossible: number[]
+    movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
   }
 }
 
