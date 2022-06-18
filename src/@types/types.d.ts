@@ -27,8 +27,8 @@ export interface TableState {
     doublingCube: number
   }
   movement: {
-    movesRemaining: number[][]
-    movesPossible: number[]
+    movesRemaining: number[] // want to push a new array
+    // movesPossible: number[]
     movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
   }
 }

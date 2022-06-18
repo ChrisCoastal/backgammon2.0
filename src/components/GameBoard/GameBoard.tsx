@@ -27,10 +27,10 @@ const GameBoard: FC = () => {
     getDiceRoll,
     initialMoves,
     possibleMoves,
-    openPoints,
+    // getOpenPoints,
     getValidMoves,
-    validMoves,
-    updateRemainingMoves,
+    // validMoves,
+    // updateRemainingMoves,
     moveChecker
   } = gameLogic
 
@@ -53,15 +53,15 @@ const GameBoard: FC = () => {
   const rollDiceHandler = (activePlayer: ActivePlayer) => {
     const roll = getDiceRoll()
     const moves = initialMoves(roll)
-    const possible = possibleMoves(activePlayer, roll)
+    // const possible = possibleMoves(activePlayer, roll)
   }
 
-  const moveCheckerHandler = (
+  const dropCheckerHandler = (
     dropPoint: number,
     item: { fromPoint: number; checkerColor: any }
   ) => {
     moveChecker(dropPoint, item)
-    updateRemainingMoves(dropPoint, item.fromPoint)
+    // updateRemainingMoves(dropPoint, item.fromPoint)
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -74,7 +74,7 @@ const GameBoard: FC = () => {
           key={i}
           pointIndex={i}
           validMoves={getValidMoves}
-          dropHandler={moveCheckerHandler}
+          dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
         >
           {table[i].map(

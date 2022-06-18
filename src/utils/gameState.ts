@@ -1,4 +1,5 @@
 import { access } from 'fs'
+import { useDrop } from 'react-dnd'
 import {
   TableState,
   ReducerActions,
@@ -43,17 +44,17 @@ function reducer(state: TableState, action: ReducerActions): TableState {
         ...state,
         movement: {
           ...state.movement,
-          movesRemaining: [...state.movement.movesRemaining, payload]
+          movesRemaining: payload
         }
       }
-    case 'setMovesPossible':
-      return {
-        ...state,
-        movement: {
-          ...state.movement,
-          movesPossible: payload
-        }
-      }
+    // case 'setMovesPossible':
+    //   return {
+    //     ...state,
+    //     movement: {
+    //       ...state.movement,
+    //       movesPossible: payload
+    //     }
+    //   }
     // case 'showValidMoves':
     //   return {
     //     ...state,
@@ -143,51 +144,9 @@ const getDiceRoll = () => {
 
   return [die1, die2]
 }
-// const diceRoll = () => [dice(), dice()]
-
-// const rollDiceHandler = (
-//   activePlayer: ActivePlayer
-//   // dispatch: React.Dispatch<ReducerActions>
-// ) => {
-//   const [die1, die2] = diceRoll()
-//   const roll = !activePlayer
-//     ? [die1, 0, 0, die2]
-//     : activePlayer === 1
-//     ? [die1, die2, 0, 0]
-//     : [0, 0, die1, die2] // ∴ activePlayer === 2
-
-//   const moves = possibleMoves([die1, die2], activePlayer)
-
-//   dispatch({
-//     type: 'setDice',
-//     payload: { roll: roll }
-//   })
-//   // FIXME: need to correct the payload object
-//   dispatch({ type: 'setMovesRemaining', payload: moves })
-
-//   // if (!activePlayer) {
-//   //   dispatch({ type: 'setDice', payload: roll })
-//   // }
-//   // if (activePlayer === 1)
-//   //   dispatch({
-//   //     type: 'setDice',
-//   //     payload: { roll: [die1, die2, 0, 0], moves: moves }
-//   //   })
-//   // dispatch({ type: 'setMovesRemaining', payload: moves })
-//   // if (activePlayer === 2)
-//   //   dispatch({
-//   //     type: 'setDice',
-//   //     payload: { roll: [0, 0, die1, die2], moves: moves }
-//   //   })
-//   // dispatch({ type: 'setMovesRemaining', payload: moves })
-// }
 
 const initialMoves = (diceRoll: number[]) => {
-  // set moves in a + or - direction
-  // const direction = moveDirection(gameState.activePlayer)
   const moves = diceRoll
-  // .filter((die) => die !== 0) // TODO: can remove if only passing 2 nums
-  // .map((die) => die * direction)
   // doubles get 4 moves of the rolled number
   if (moves[0] === moves[1]) moves.push(...moves)
 
@@ -200,34 +159,10 @@ const initialMoves = (diceRoll: number[]) => {
 const moveDirection = (activePlayer: ActivePlayer) =>
   gameState.activePlayer === 1 ? -1 : 1
 
-// TODO: should only be called from rollDiceHandler
-const possibleMoves = (
-  activePlayer: ActivePlayer,
-  remainingMoves: number[]
-) => {
-  if (!activePlayer) console.error('diceCombination')
-  const direction = moveDirection(activePlayer)
+const getOpenPoints = () => {
+  const { activePlayer, checkerPositions } = gameState
 
-  const combos: number[] = []
-  const moveCombinations = new Set(
-    remainingMoves
-      .concat(
-        remainingMoves.reduce((acc, cur, i) => {
-          const moves = [...acc, i > 0 ? acc[i - 1] + cur : cur]
-          return moves
-        }, combos)
-      )
-      .map((move) => move * direction)
-  )
-
-  dispatch({ type: 'setMovesPossible', payload: [...moveCombinations] })
-  console.log([...moveCombinations])
-
-  return [...moveCombinations]
-}
-
-const openPoints = (table: Array<1 | 2>[], activePlayer: ActivePlayer) => {
-  const openPoints = table.map((point, i) => {
+  const openPoints = checkerPositions.table.map((point, i) => {
     return point.length === 0
       ? `open`
       : point.length === 1 && point[0] !== activePlayer
@@ -240,145 +175,177 @@ const openPoints = (table: Array<1 | 2>[], activePlayer: ActivePlayer) => {
   return openPoints
 }
 
+// TODO: should only be called once a drag starts
+const possibleMoves = (
+  activePlayer: ActivePlayer,
+  remainingMoves: number[],
+  // dropPoint: number,
+  dragItem: { fromPoint: number; checkerColor: any }
+) => {
+  if (!activePlayer || !remainingMoves) return []
+
+  // console.log(activePlayer, remainingMoves, dropPoint, dragItem)
+
+  const { fromPoint, checkerColor } = dragItem
+  const direction = moveDirection(activePlayer)
+  const directionalMoves = remainingMoves.map((move) => move * direction)
+  const openPoints = getOpenPoints()
+
+  const getMoves = (moves: number[]) => {
+    let moveAcc = 0
+    const moveCombos = moves.map((move) => (moveAcc += move))
+    const isMoveValid = moveCombos.map((move) =>
+      fromPoint + move >= 0 && fromPoint + move <= 23
+        ? openPoints[fromPoint + move]
+        : 'closed'
+    )
+    const invalidIndex = isMoveValid.indexOf('closed')
+    const validMoves =
+      invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
+    const validCurrentMoves = validMoves.map((move) => fromPoint + move)
+
+    return validCurrentMoves
+  }
+
+  const validForward = getMoves(directionalMoves)
+  const validReverse = getMoves([...directionalMoves].reverse())
+
+  const validMoves = new Set([...validForward, ...validReverse])
+
+  return [...validMoves]
+}
+
 const getValidMoves = (
   dropPoint: number,
   dragItem: { fromPoint: number; checkerColor: any }
 ) => {
-  console.log('MOVEMENT', gameState.movement)
+  console.log(dragItem)
 
-  const open = openPoints(
-    gameState.checkerPositions.table,
-    gameState.activePlayer
+  const { activePlayer, movement } = gameState
+
+  const { fromPoint } = dragItem
+  const direction = moveDirection(activePlayer)
+  const directionalMoves = movement.movesRemaining.map(
+    (move) => move * direction
   )
-  // const moves = possibleMoves(
-  //   gameState.activePlayer,
-  //   gameState.diceState.diceRoll
-  // )
+  const openPoints = getOpenPoints()
 
-  const { movesPossible } = gameState.movement
-  console.log(open, movesPossible)
-
-  // const possible = possibleMoves(gameState.activePlayer, diceRoll)
-  // console.log(possible, state.movement.movesRemaining)
-  // TODO: pass availableRoll
-  const valid = validMoves(
-    open,
-    dragItem,
-    gameState.movement.movesPossible,
-    gameState.activePlayer
-  )
-
-  console.log(valid)
-
-  // TODO:
-  console.log(
-    !!valid
-      ?.map((move) => move.action !== 'closed' && move.point)
-      .includes(dropPoint)
-  )
-
-  return !!valid
-    ?.map((move) => move.action !== 'closed' && move.point)
-    .includes(dropPoint)
-  // return valid?.point.includes(dropPoint)
-}
-
-const validMoves = (
-  openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
-  dragItem: { fromPoint: number; checkerColor: any },
-  // dropPoint: number,
-  movesPossible: number[],
-  activePlayer: ActivePlayer
-) => {
-  if (!activePlayer) return
-
-  const { fromPoint, checkerColor } = dragItem
-  // TODO: checkers on the bar must be moved first
-  // if (bar.includes(activePlayer)) console.log('bar')
-
-  // const moveArr = [...moves.singleDice, ...moves.comboDice]
-
-  // moves.singleDice
-
-  const validMovesArr = movesPossible.map((move, i) => {
-    const moveToPoint = fromPoint + move
-    if (
-      moveToPoint > 23 ||
-      moveToPoint < 0 ||
-      openPoints[moveToPoint] === 'closed'
+  const getMoves = (moves: number[]) => {
+    let moveAcc = 0
+    const moveCombos = moves.map((move) => (moveAcc += move))
+    const isMoveValid = moveCombos.map((move) =>
+      fromPoint + move >= 0 && fromPoint + move <= 23
+        ? openPoints[fromPoint + move]
+        : 'closed'
     )
-      return {
-        dice: i,
-        roll: move,
-        point: moveToPoint,
-        action: 'closed'
-      }
-    else
-      return {
-        dice: i,
-        roll: move,
-        point: moveToPoint,
-        action: openPoints[moveToPoint]
-      }
-  })
+    const invalidIndex = isMoveValid.indexOf('closed')
+    const validMoves =
+      invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
+    const validCurrentMoves = validMoves.map((move) => fromPoint + move)
 
-  return validMovesArr
+    return validCurrentMoves
+  }
+
+  const validForward = getMoves(directionalMoves)
+  const validReverse = getMoves([...directionalMoves].reverse())
+
+  const validMoves = new Set([...validForward, ...validReverse])
+
+  return [...validMoves].includes(dropPoint)
 }
+
+// const validMoves = (
+//   openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
+//   dragItem: { fromPoint: number; checkerColor: any },
+//   // dropPoint: number,
+//   movesPossible: number[],
+//   activePlayer: ActivePlayer
+// ) => {
+//   if (!activePlayer) return
+
+//   const { fromPoint, checkerColor } = dragItem
+//   // TODO: checkers on the bar must be moved first
+//   // if (bar.includes(activePlayer)) console.log('bar')
+
+//   const validMovesArr = movesPossible.map((move, i) => {
+//     const moveToPoint = fromPoint + move
+//     if (
+//       moveToPoint > 23 ||
+//       moveToPoint < 0 ||
+//       openPoints[moveToPoint] === 'closed'
+//     )
+//       return {
+//         dice: i,
+//         roll: move,
+//         point: moveToPoint,
+//         action: 'closed'
+//       }
+//     else
+//       return {
+//         dice: i,
+//         roll: move,
+//         point: moveToPoint,
+//         action: openPoints[moveToPoint]
+//       }
+//   })
+
+//   return validMovesArr
+// }
 
 // TODO: check movesRemaining for the moveDistance
 // FIXME: function reaching the error
-const updateRemainingMoves = (
-  // dispatch: React.Dispatch<ReducerActions>,
-  dropPoint: number,
-  fromPoint: number
-) => {
-  const moveDistance = Math.abs(fromPoint - dropPoint)
-  console.log('moveDist', moveDistance)
-  const { movesRemaining, movesPossible } = gameState.movement
+// const updateRemainingMoves = (
+//   // dispatch: React.Dispatch<ReducerActions>,
+//   dropPoint: number,
+//   fromPoint: number
+// ) => {
+//   const moveDistance = Math.abs(fromPoint - dropPoint)
+//   console.log('moveDist', moveDistance)
+//   const { movesRemaining, movesPossible } = gameState.movement
 
-  const moves = movesRemaining.at(-1)
+//   const moves = movesRemaining.at(-1)
 
-  // TODO: refactor? both if statements into single reduce() (see below)
-  if (moves && moves.includes(moveDistance)) {
-    const taken = moves.splice(moves.indexOf(moveDistance), 1)
-    movesPossible.map((dice) => dice - moveDistance)
-    return dispatch({
-      type: 'setMovesRemaining',
-      payload: {
-        movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
-        movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
-      }
-    })
-  }
-  if (movesPossible.includes(moveDistance)) {
-    movesPossible.splice(movesPossible.indexOf(moveDistance), 1)
-    if (moves) {
-      const remove = moves.reduce(
-        (acc, cur, i) => {
-          if (acc.acc === moveDistance) return acc
-          // can maybe refactor for both cases (move single or combo)
-          // if (cur === moveDistance) return { acc: cur, i: i }; // something like this?
-          return { acc: acc.acc + cur, i: i }
-        },
-        { acc: 0, i: 0 }
-      )
+//   // TODO: refactor? both if statements into single reduce() (see below)
+//   if (moves && moves.includes(moveDistance)) {
+//     const taken = moves.splice(moves.indexOf(moveDistance), 1)
+//     movesPossible.map((dice) => dice - moveDistance)
+//     // return dispatch({
+//     //   type: 'setMovesRemaining',
+//     //   payload: {
+//     //     movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
+//     //     movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+//     //   }
+//     // })
+//   }
+//   if (movesPossible.includes(moveDistance)) {
+//     movesPossible.splice(movesPossible.indexOf(moveDistance), 1)
+//     if (moves) {
+//       const remove = moves.reduce(
+//         (acc, cur, i) => {
+//           if (acc.acc === moveDistance) return acc
+//           // can maybe refactor for both cases (move single or combo)
+//           // if (cur === moveDistance) return { acc: cur, i: i }; // something like this?
+//           return { acc: acc.acc + cur, i: i }
+//         },
+//         { acc: 0, i: 0 }
+//       )
 
-      // removing constituent single moves
-      const taken = moves.splice(0, remove.i + 1)
-      return dispatch({
-        type: 'setMovesRemaining',
-        payload: {
-          movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
-          movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
-        }
-      })
-    }
-  }
-  // dispatch({ type: 'setMovesRemaining', payload: newState })
-  console.error('MOVE NOT FOUND')
+//       // removing constituent single moves
+//       const taken = moves.splice(0, remove.i + 1)
+//       // return dispatch({
+//       //   type: 'setMovesRemaining',
+//       //   payload: {
+//       //     movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
+//       //     movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+//       //   }
+//       // })
+//     }
+//   }
+//   // dispatch({ type: 'setMovesRemaining', payload: newState })
+//   console.error('MOVE NOT FOUND')
 
-  return
-}
+//   return
+// }
 
 const moveChecker = (
   // dispatch: React.Dispatch<ReducerActions>,
@@ -401,9 +368,9 @@ export const gameLogic = {
   // rollDiceHandler,
   initialMoves,
   possibleMoves, // TODO: remove
-  openPoints,
+  getOpenPoints,
   getValidMoves,
-  validMoves,
-  updateRemainingMoves,
+  // validMoves,
+  // updateRemainingMoves,
   moveChecker
 }
