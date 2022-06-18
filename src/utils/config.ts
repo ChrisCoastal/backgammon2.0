@@ -35,7 +35,7 @@ export const INITIAL_TABLE_STATE: TableState = {
     bearOff1: [],
     bearOff2: []
   },
-  activePlayer: 2,
+  activePlayer: 1,
   // TODO: activePlayer: null,
   diceState: {
     diceRoll: [0, 0, 0, 0],
@@ -43,7 +43,8 @@ export const INITIAL_TABLE_STATE: TableState = {
     doublingCube: 1
   },
   movement: {
-    movesRemaining: { singleDice: [], comboDice: [] },
+    movesRemaining: [],
+    // movesPossible: [],
     movesTaken: []
   }
 }

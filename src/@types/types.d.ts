@@ -27,8 +27,9 @@ export interface TableState {
     doublingCube: number
   }
   movement: {
-    movesRemaining: { singleDice: number[]; comboDice: number[] }
-    movesTaken: { fromPoint: number; toPoint: number; moves: [] }[]
+    movesRemaining: number[] // want to push a new array
+    // movesPossible: number[]
+    movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
   }
 }
 
@@ -37,6 +38,7 @@ export interface ReducerActions {
     | 'setActivePlayer'
     | 'setDice'
     | 'setMovesRemaining'
+    | 'setMovesPossible'
     | 'setCheckerPosition'
     | 'showValidMoves'
     | 'setDoublingCube'

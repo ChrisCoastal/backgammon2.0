@@ -11,37 +11,6 @@ import { gameLogic } from 'src/utils/gameState'
 import BoardPoint from '../BoardPoint/BoardPoint'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
-// import GameOptions from '../GameOptions/GameOptions'
-
-// interface tableState {
-//   gameHistory: {}[]
-//   checkerPositions: CheckerPositionsState
-//   activePlayer: 1 | 2 | null
-//   diceState: { diceRoll: number[]; doublingCube: number }
-//   movement: {
-//     validMoves: ValidMoveState[] | null
-//     movesTaken: number[]
-//   }
-// }
-
-// const INITIAL_TABLE_STATE: TableState = {
-//   gameHistory: [],
-//   checkerPositions: {
-//     table: INITIAL_POSITIONS,
-//     bar: [],
-//     bearOff1: [],
-//     bearOff2: []
-//   },
-//   activePlayer: null,
-//   diceState: {
-//     diceRoll: [0, 0, 0, 0],
-//     doublingCube: 1
-//   },
-//   movement: {
-//     validMoves: null,
-//     movesTaken: []
-//   }
-// }
 
 interface ValidMoveState {
   dice: number
@@ -50,30 +19,18 @@ interface ValidMoveState {
   action: string
 }
 
-type DropState = ValidMoveState[]
-
-// interface ReducerActions {
-//   type:
-//     | 'setActivePlayer'
-//     | 'setDiceRoll'
-//     | 'setMove'
-//     | 'showValidMoves'
-//     | 'setDoublingCube'
-//     | 'reset'
-//   payload?: any
-// }
-
 const GameBoard: FC = () => {
   const {
     stateSubscriber,
     reducer,
     // rollDiceHandler,
     getDiceRoll,
-    moveCombinations,
-    openPoints,
+    initialMoves,
+    possibleMoves,
+    // getOpenPoints,
     getValidMoves,
-    validMoves,
-    updateRemainingMoves,
+    // validMoves,
+    // updateRemainingMoves,
     moveChecker
   } = gameLogic
 
@@ -93,66 +50,18 @@ const GameBoard: FC = () => {
     diceRollRef.current = state.diceState
   }, [state])
 
-  // const getValidMoves = (
-  //   dropPoint: number,
-  //   dragItem: { fromPoint: number; checkerColor: any }
-  // ) => {
-  //   console.log('MOVEMENT', state.movement)
-
-  //   const points = openPoints(table, activePlayer)
-  //   const { diceRoll } = diceRollRef.current
-  //   const availableMoves = moveCombinations(diceRoll, activePlayer)
-  //   // console.log(availableMoves, state.movement.movesRemaining)
-  //   // TODO: pass availableRoll
-  //   const valid = validMoves(points, dragItem, availableMoves, activePlayer)
-
-  //   console.log(valid)
-
-  //   // TODO:
-  //   console.log(
-  //     !!valid
-  //       ?.map((move) => move.action !== 'closed' && move.point)
-  //       .includes(dropPoint)
-  //   )
-
-  //   return !!valid
-  //     ?.map((move) => move.action !== 'closed' && move.point)
-  //     .includes(dropPoint)
-  //   // return valid?.point.includes(dropPoint)
-  // }
-
-  const rollDiceHandler = (
-    activePlayer: ActivePlayer
-    // dispatch: React.Dispatch<ReducerActions>
-  ) => {
-    const [die1, die2] = getDiceRoll()
-    const roll = !activePlayer
-      ? [die1, 0, 0, die2]
-      : activePlayer === 1
-      ? [die1, die2, 0, 0]
-      : [0, 0, die1, die2] // ∴ activePlayer === 2
-
-    const moves = moveCombinations([die1, die2], activePlayer)
-
-    dispatch({
-      type: 'setDice',
-      payload: { roll: roll }
-    })
-    // FIXME: need to correct the payload object
-    dispatch({ type: 'setMovesRemaining', payload: moves })
+  const rollDiceHandler = (activePlayer: ActivePlayer) => {
+    const roll = getDiceRoll()
+    const moves = initialMoves(roll)
+    // const possible = possibleMoves(activePlayer, roll)
   }
 
-  const moveCheckerHandler = (
+  const dropCheckerHandler = (
     dropPoint: number,
     item: { fromPoint: number; checkerColor: any }
   ) => {
-    // event.preventDefault()
-    // event.stopPropagation()
-    // console.log(event)
-
     moveChecker(dropPoint, item)
-    // FIXME:
-    updateRemainingMoves(dropPoint, item.fromPoint)
+    // updateRemainingMoves(dropPoint, item.fromPoint)
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -165,7 +74,7 @@ const GameBoard: FC = () => {
           key={i}
           pointIndex={i}
           validMoves={getValidMoves}
-          dropHandler={moveCheckerHandler}
+          dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
         >
           {table[i].map(
