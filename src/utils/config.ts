@@ -36,7 +36,7 @@ export const INITIAL_TABLE_STATE: TableState = {
     bearOff2: []
   },
   activePlayer: 1,
-  // TODO: activePlayer: null,
+  // activePlayer: null,
   diceState: {
     diceRoll: [0, 0, 0, 0],
     // movesRemaining: [],

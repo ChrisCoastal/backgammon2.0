@@ -9,11 +9,11 @@ import { ItemTypes, BOARD_COLORS } from '../../utils/config'
 interface PointProps {
   validMoves: (
     pointIndex: number,
-    item: { fromPoint: number; checkerColor: any }
+    item: { fromPoint: number; checkerColor: 1 | 2 }
   ) => boolean
   dropHandler: (
     pointIndex: number,
-    item: { fromPoint: number; checkerColor: any }
+    item: { fromPoint: number; checkerColor: 1 | 2 }
   ) => void
   pointIndex: number
   activePlayer: ActivePlayer
@@ -27,12 +27,23 @@ const BoardPoint: FC<PointProps> = ({
   activePlayer,
   children
 }) => {
+  console.log('POINT', activePlayer)
+
+  const droppable = activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2
+  console.log('DROPPABLE', droppable)
+
   const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
-    accept: activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2,
+    accept: droppable,
     canDrop: (item) =>
-      validMoves(pointIndex, item as { fromPoint: number; checkerColor: any }),
+      validMoves(
+        pointIndex,
+        item as { fromPoint: number; checkerColor: 1 | 2 }
+      ),
     drop: (item) =>
-      dropHandler(pointIndex, item as { fromPoint: number; checkerColor: any }),
+      dropHandler(
+        pointIndex,
+        item as { fromPoint: number; checkerColor: 1 | 2 }
+      ),
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
       getChecker: monitor.getItem(),

@@ -23,15 +23,12 @@ const GameBoard: FC = () => {
   const {
     stateSubscriber,
     reducer,
-    // rollDiceHandler,
     getDiceRoll,
     initialMoves,
-    possibleMoves,
-    // getOpenPoints,
     getValidMoves,
-    // validMoves,
-    // updateRemainingMoves,
-    moveChecker
+    updateRemainingMoves,
+    moveChecker,
+    toggleActivePlayer
   } = gameLogic
 
   const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
@@ -50,10 +47,16 @@ const GameBoard: FC = () => {
     diceRollRef.current = state.diceState
   }, [state])
 
-  const rollDiceHandler = (activePlayer: ActivePlayer) => {
+  const rollDiceHandler = () => {
     const roll = getDiceRoll()
     const moves = initialMoves(roll)
+    if (!activePlayer) {
+      const active = toggleActivePlayer(roll)
+      active === 'doubles' && rollDiceHandler()
+      console.log('ACTIVE', active)
+    }
     // const possible = possibleMoves(activePlayer, roll)
+    console.log(state.activePlayer)
   }
 
   const dropCheckerHandler = (
@@ -61,7 +64,11 @@ const GameBoard: FC = () => {
     item: { fromPoint: number; checkerColor: any }
   ) => {
     moveChecker(dropPoint, item)
-    // updateRemainingMoves(dropPoint, item.fromPoint)
+    updateRemainingMoves(dropPoint, item.fromPoint)
+  }
+
+  const endTurnHandler = () => {
+    toggleActivePlayer()
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -95,29 +102,37 @@ const GameBoard: FC = () => {
   }
   const points = renderPoints()
 
+  const disable = state.movement.movesRemaining.length !== 0
+  const rollButtonColor = disable
+    ? 'bg-gray-300'
+    : 'bg-blue-600 hover:bg-blue-700'
+  const buttonColor = disable ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
+
   return (
     <div>
       <div className={`flex`}>{points}</div>
       <div>
         {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}
         <button
-          onClick={() => rollDiceHandler(activePlayer)}
-          className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
+          disabled={disable}
+          onClick={() => rollDiceHandler()}
+          className={`py-2 px-6 m-2 rounded ${rollButtonColor} bg-g`}
         >
           ROLL
         </button>
       </div>
+      <button
+        disabled={disable}
+        onClick={endTurnHandler}
+        className={`py-2 px-6 m-2 rounded ${buttonColor}`}
+      >
+        END TURN
+      </button>
       {/* <button
         onClick={() => console.log('undo')}
         className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
       >
         UNDO
-      </button>
-      <button
-        onClick={endTurnHandler}
-        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
-      >
-        END TURN
       </button>
       <button
         onClick={() => startGameHandler()}

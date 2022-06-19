@@ -20,7 +20,7 @@ function stateSubscriber(
   reducerDispatch: React.Dispatch<ReducerActions>
 ) {
   console.log('setting state', state)
-  // TODO:
+
   gameState = state
   dispatch = reducerDispatch
 }
@@ -44,7 +44,9 @@ function reducer(state: TableState, action: ReducerActions): TableState {
         ...state,
         movement: {
           ...state.movement,
-          movesRemaining: payload
+          movesRemaining: payload.movesRemaining,
+          // FIXME: spreads to undefined on first pass
+          movesTaken: [...state.movement.movesTaken, payload.movesTaken]
         }
       }
     // case 'setMovesPossible':
@@ -83,43 +85,38 @@ function reducer(state: TableState, action: ReducerActions): TableState {
 }
 
 // Player Turn
-// const toggleActivePlayer = (dice?: number[]) => {
-//   // rollDiceHandler()
+const toggleActivePlayer = (dice?: number[]) => {
+  let action = 'toggle'
+  console.log('TOG', gameState.activePlayer)
 
-//   // console.log(state.diceState)
-//   // console.log(diceRoll)
+  // initialize activePLayer
+  if (dice) {
+    if (!gameState.activePlayer && dice[0] > dice[1]) {
+      dispatch({ type: 'setActivePlayer', payload: 1 })
+      return (action = 'P1')
+    }
+    if (!gameState.activePlayer && dice[0] < dice[1]) {
+      dispatch({ type: 'setActivePlayer', payload: 2 })
+      return (action = 'P2')
+    }
+    if (!gameState.activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
+      alert('DOUBLES ROLLED')
+      return (action = 'doubles')
+      // dispatch doubling cube
+    }
+  } else {
+    console.log('TOGGLING')
 
-//   if (activePlayer === 1)
-//     return dispatch({ type: 'setActivePlayer', payload: 2 })
-//   if (activePlayer === 2)
-//     return dispatch({ type: 'setActivePlayer', payload: 1 })
-
-//   // initialize activePLayer
-//   if (dice) {
-//     if (!activePlayer && dice[0] > dice[1]) {
-//       dispatch({ type: 'setActivePlayer', payload: 1 })
-//       possibleMoves()
-//     }
-//     if (!activePlayer && dice[0] < dice[1]) {
-//       dispatch({ type: 'setActivePlayer', payload: 2 })
-//       possibleMoves()
-//     }
-//     if (!activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
-//       startGameHandler(dice)
-//     }
-//   }
-// }
-
-// const endTurnHandler = () => {
-//   dispatch({
-//     type: 'setActivePlayer',
-//     payload: {
-//       roll: diceRoll
-//     }
-//   })
-//   if (activePlayer === 1) dispatch({ type: 'setActivePlayer', payload: 2 })
-//   if (activePlayer === 2) dispatch({ type: 'setActivePlayer', payload: 1 })
-// }
+    // if (gameState.activePlayer === 1)
+    //   return dispatch({ type: 'setActivePlayer', payload: 2 })
+    // if (gameState.activePlayer === 2)
+    //   return dispatch({ type: 'setActivePlayer', payload: 1 })
+    gameState.activePlayer === 1
+      ? dispatch({ type: 'setActivePlayer', payload: 2 })
+      : dispatch({ type: 'setActivePlayer', payload: 1 })
+  }
+  return action
+}
 
 // Table Position
 const isCheckersBar = () => {}
@@ -150,7 +147,10 @@ const initialMoves = (diceRoll: number[]) => {
   // doubles get 4 moves of the rolled number
   if (moves[0] === moves[1]) moves.push(...moves)
 
-  dispatch({ type: 'setMovesRemaining', payload: moves })
+  dispatch({
+    type: 'setMovesRemaining',
+    payload: { movesRemaining: moves, movesTaken: '' }
+  })
   console.log([moves])
   return moves
 }
@@ -175,53 +175,14 @@ const getOpenPoints = () => {
   return openPoints
 }
 
-// TODO: should only be called once a drag starts
-const possibleMoves = (
-  activePlayer: ActivePlayer,
-  remainingMoves: number[],
-  // dropPoint: number,
-  dragItem: { fromPoint: number; checkerColor: any }
-) => {
-  if (!activePlayer || !remainingMoves) return []
-
-  // console.log(activePlayer, remainingMoves, dropPoint, dragItem)
-
-  const { fromPoint, checkerColor } = dragItem
-  const direction = moveDirection(activePlayer)
-  const directionalMoves = remainingMoves.map((move) => move * direction)
-  const openPoints = getOpenPoints()
-
-  const getMoves = (moves: number[]) => {
-    let moveAcc = 0
-    const moveCombos = moves.map((move) => (moveAcc += move))
-    const isMoveValid = moveCombos.map((move) =>
-      fromPoint + move >= 0 && fromPoint + move <= 23
-        ? openPoints[fromPoint + move]
-        : 'closed'
-    )
-    const invalidIndex = isMoveValid.indexOf('closed')
-    const validMoves =
-      invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
-    const validCurrentMoves = validMoves.map((move) => fromPoint + move)
-
-    return validCurrentMoves
-  }
-
-  const validForward = getMoves(directionalMoves)
-  const validReverse = getMoves([...directionalMoves].reverse())
-
-  const validMoves = new Set([...validForward, ...validReverse])
-
-  return [...validMoves]
-}
-
 const getValidMoves = (
   dropPoint: number,
   dragItem: { fromPoint: number; checkerColor: any }
 ) => {
-  console.log(dragItem)
-
   const { activePlayer, movement } = gameState
+  if (movement.movesRemaining.length === 0) return false
+
+  console.log(dragItem)
 
   const { fromPoint } = dragItem
   const direction = moveDirection(activePlayer)
@@ -254,101 +215,51 @@ const getValidMoves = (
   return [...validMoves].includes(dropPoint)
 }
 
-// const validMoves = (
-//   openPoints: ('open' | 'blot' | 'closed' | 'anchor')[],
-//   dragItem: { fromPoint: number; checkerColor: any },
-//   // dropPoint: number,
-//   movesPossible: number[],
-//   activePlayer: ActivePlayer
-// ) => {
-//   if (!activePlayer) return
+const updateRemainingMoves = (dropPoint: number, fromPoint: number) => {
+  const moveDistance = Math.abs(fromPoint - dropPoint)
+  console.log('moveDist', moveDistance)
+  const { movesRemaining } = gameState.movement
 
-//   const { fromPoint, checkerColor } = dragItem
-//   // TODO: checkers on the bar must be moved first
-//   // if (bar.includes(activePlayer)) console.log('bar')
+  //   const moves = movesRemaining.at(-1)
+  const moves = [...movesRemaining]
 
-//   const validMovesArr = movesPossible.map((move, i) => {
-//     const moveToPoint = fromPoint + move
-//     if (
-//       moveToPoint > 23 ||
-//       moveToPoint < 0 ||
-//       openPoints[moveToPoint] === 'closed'
-//     )
-//       return {
-//         dice: i,
-//         roll: move,
-//         point: moveToPoint,
-//         action: 'closed'
-//       }
-//     else
-//       return {
-//         dice: i,
-//         roll: move,
-//         point: moveToPoint,
-//         action: openPoints[moveToPoint]
-//       }
-//   })
+  let moveAcc = 0
+  const moveCombos = moves.map((move) => (moveAcc += move))
+  //   // TODO: refactor? both if statements into single reduce() (see below)
+  const takeSingleMove = (moveDist: number) => {
+    console.log('SINGLEMOVE')
+    const taken = moves.splice(moves.indexOf(moveDist), 1)
+    return dispatch({
+      type: 'setMovesRemaining',
+      payload: {
+        movesRemaining: moves, // this is the mutated value from splice()
+        movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+      }
+    })
+  }
 
-//   return validMovesArr
-// }
+  const takeComboMove = (moveDist: number) => {
+    // const taken = moves.splice(moves.indexOf(move), 1)
 
-// TODO: check movesRemaining for the moveDistance
-// FIXME: function reaching the error
-// const updateRemainingMoves = (
-//   // dispatch: React.Dispatch<ReducerActions>,
-//   dropPoint: number,
-//   fromPoint: number
-// ) => {
-//   const moveDistance = Math.abs(fromPoint - dropPoint)
-//   console.log('moveDist', moveDistance)
-//   const { movesRemaining, movesPossible } = gameState.movement
+    let moveAcc = 0
+    const movesIndex = moves.map((move) => (moveAcc += move)).indexOf(moveDist)
+    const taken = moves.splice(0, movesIndex + 1)
+    console.log('COMBOMOVE', movesIndex, taken, moves)
 
-//   const moves = movesRemaining.at(-1)
+    return dispatch({
+      type: 'setMovesRemaining',
+      payload: {
+        movesRemaining: moves, // this is the mutated value from splice()
+        movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
+      }
+    })
+  }
 
-//   // TODO: refactor? both if statements into single reduce() (see below)
-//   if (moves && moves.includes(moveDistance)) {
-//     const taken = moves.splice(moves.indexOf(moveDistance), 1)
-//     movesPossible.map((dice) => dice - moveDistance)
-//     // return dispatch({
-//     //   type: 'setMovesRemaining',
-//     //   payload: {
-//     //     movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
-//     //     movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
-//     //   }
-//     // })
-//   }
-//   if (movesPossible.includes(moveDistance)) {
-//     movesPossible.splice(movesPossible.indexOf(moveDistance), 1)
-//     if (moves) {
-//       const remove = moves.reduce(
-//         (acc, cur, i) => {
-//           if (acc.acc === moveDistance) return acc
-//           // can maybe refactor for both cases (move single or combo)
-//           // if (cur === moveDistance) return { acc: cur, i: i }; // something like this?
-//           return { acc: acc.acc + cur, i: i }
-//         },
-//         { acc: 0, i: 0 }
-//       )
-
-//       // removing constituent single moves
-//       const taken = moves.splice(0, remove.i + 1)
-//       // return dispatch({
-//       //   type: 'setMovesRemaining',
-//       //   payload: {
-//       //     movesRemaining: { movesRemaining, movesPossible }, // TODO: just recalc movesPossible?
-//       //     movesTaken: { fromPoint: fromPoint, toPoint: dropPoint, moves: taken }
-//       //   }
-//       // })
-//     }
-//   }
-//   // dispatch({ type: 'setMovesRemaining', payload: newState })
-//   console.error('MOVE NOT FOUND')
-
-//   return
-// }
+  moves.indexOf(moveDistance) >= 0 && takeSingleMove(moveDistance)
+  moves.indexOf(moveDistance) === -1 && takeComboMove(moveDistance)
+}
 
 const moveChecker = (
-  // dispatch: React.Dispatch<ReducerActions>,
   dropPoint: number,
   item: { fromPoint: number; checkerColor: ActiveChecker }
 ) => {
@@ -365,12 +276,10 @@ export const gameLogic = {
   stateSubscriber,
   reducer,
   getDiceRoll,
-  // rollDiceHandler,
   initialMoves,
-  possibleMoves, // TODO: remove
   getOpenPoints,
   getValidMoves,
-  // validMoves,
-  // updateRemainingMoves,
-  moveChecker
+  updateRemainingMoves,
+  moveChecker,
+  toggleActivePlayer
 }
