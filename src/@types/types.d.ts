@@ -12,7 +12,6 @@ export type ActiveChecker = 1 | 2
 
 interface CheckerPositionsState {
   table: Array<1 | 2>[]
-  bar: Array<1 | 2>
   bearOff1: Array<1 | 2>
   bearOff2: Array<1 | 2>
 }

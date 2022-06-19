@@ -1,6 +1,9 @@
 import { TableState } from 'src/@types/types'
 
+export const PLAYER_1_BAR = 25
+export const PLAYER_2_BAR = 0
 export const INITIAL_POSITIONS: Array<1 | 2>[] = [
+  [], // bar player2
   [2, 2],
   [],
   [],
@@ -24,14 +27,14 @@ export const INITIAL_POSITIONS: Array<1 | 2>[] = [
   [],
   [],
   [],
-  [1, 1]
+  [1, 1],
+  [] // bar player1
 ]
 
 export const INITIAL_TABLE_STATE: TableState = {
   gameHistory: [],
   checkerPositions: {
     table: INITIAL_POSITIONS,
-    bar: [],
     bearOff1: [],
     bearOff2: []
   },
@@ -51,12 +54,10 @@ export const INITIAL_TABLE_STATE: TableState = {
 export const BOARD_COLORS = {
   oddPoint: 'bg-red-200',
   evenPoint: 'bg-blue-200',
+  bar: 'bg-slate-500',
   player1checker: 'bg-red-500',
   player2checker: 'bg-blue-500'
 }
-
-export const PLAYER_1_START = 24
-export const PLAYER_2_START = 0
 
 // React DnD
 export const ItemTypes = {

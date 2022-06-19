@@ -8,7 +8,7 @@ import {
   CheckerPositionsState
 } from '../@types/types'
 
-import { INITIAL_TABLE_STATE, PLAYER_1_START, PLAYER_2_START } from './config'
+import { INITIAL_TABLE_STATE, PLAYER_1_BAR, PLAYER_2_BAR } from './config'
 
 // useReducer
 let gameState: TableState = INITIAL_TABLE_STATE
@@ -87,7 +87,6 @@ function reducer(state: TableState, action: ReducerActions): TableState {
 // Player Turn
 const toggleActivePlayer = (dice?: number[]) => {
   let action = 'toggle'
-  console.log('TOG', gameState.activePlayer)
 
   // initialize activePLayer
   if (dice) {
@@ -105,8 +104,6 @@ const toggleActivePlayer = (dice?: number[]) => {
       // dispatch doubling cube
     }
   } else {
-    console.log('TOGGLING')
-
     // if (gameState.activePlayer === 1)
     //   return dispatch({ type: 'setActivePlayer', payload: 2 })
     // if (gameState.activePlayer === 2)
@@ -179,10 +176,15 @@ const getValidMoves = (
   dropPoint: number,
   dragItem: { fromPoint: number; checkerColor: any }
 ) => {
-  const { activePlayer, movement } = gameState
-  if (movement.movesRemaining.length === 0) return false
-
+  const { activePlayer, checkerPositions, movement } = gameState
   const { fromPoint } = dragItem
+  const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+  // check for remaining moves
+  if (movement.movesRemaining.length === 0) return false
+  // check for checkers on bar
+  if (checkerPositions.table[bar].length !== 0 && fromPoint !== bar)
+    return false
+
   const direction = moveDirection(activePlayer)
   const directionalMoves = movement.movesRemaining.map(
     (move) => move * direction
@@ -194,7 +196,7 @@ const getValidMoves = (
     let moveAcc = 0
     const moveCombos = moves.map((move) => (moveAcc += move))
     const isMoveValid = moveCombos.map((move) =>
-      fromPoint + move >= 0 && fromPoint + move <= 23
+      fromPoint + move >= 1 && fromPoint + move <= 24
         ? openPoints[fromPoint + move]
         : 'closed'
     )
@@ -214,34 +216,20 @@ const getValidMoves = (
   return [...validMoves].includes(dropPoint)
 }
 
-const getValidBarMoves = (
-  dropPoint: number,
-  dragItem: { fromPoint: number; checkerColor: any }
-) => {
-  const { fromPoint, checkerColor } = dragItem
-
-  const initialPoint =
-    typeof fromPoint === 'number'
-      ? fromPoint
-      : fromPoint === 'bar' && checkerColor === 1
-      ? PLAYER_1_START
-      : PLAYER_2_START
-}
-
 const updateRemainingMoves = (
   dropPoint: number,
   dragItem: { fromPoint: number; checkerColor: any }
 ) => {
   const { fromPoint, checkerColor } = dragItem
 
-  const initialPoint =
-    typeof fromPoint === 'number'
-      ? fromPoint
-      : fromPoint === 'bar' && checkerColor === 1
-      ? PLAYER_1_START
-      : PLAYER_2_START
+  // const initialPoint =
+  //   typeof fromPoint === 'number'
+  //     ? fromPoint
+  //     : fromPoint === 'bar' && checkerColor === 1
+  //     ? PLAYER_1_BAR
+  //     : PLAYER_2_BAR
 
-  const moveDistance = Math.abs(initialPoint - dropPoint)
+  const moveDistance = Math.abs(fromPoint - dropPoint)
   console.log('moveDist', moveDistance)
   const { movesRemaining } = gameState.movement
 
@@ -277,9 +265,10 @@ const updateRemainingMoves = (
       }
     })
   }
+  const moveIndex = moves.indexOf(moveDistance)
 
-  moves.indexOf(moveDistance) >= 0 && takeSingleMove(moveDistance)
-  moves.indexOf(moveDistance) === -1 && takeComboMove(moveDistance)
+  moveIndex >= 0 && takeSingleMove(moveDistance)
+  moveIndex === -1 && takeComboMove(moveDistance)
 }
 
 const moveChecker = (
@@ -289,8 +278,11 @@ const moveChecker = (
   const { fromPoint, checkerColor } = item
   const openPoints = getOpenPoints()
 
+  const barPoint = [PLAYER_1_BAR, PLAYER_2_BAR]
   let newState = gameState.checkerPositions
   // move to open or anchor point
+
+  // (!barPoint.includes(fromPoint) && openPoints[dropPoint] === 'open') ||
   if (openPoints[dropPoint] === 'open' || openPoints[dropPoint] === 'anchor') {
     const movingChecker = newState.table[fromPoint].pop() as ActiveChecker
     newState.table[dropPoint].push(movingChecker)
@@ -300,7 +292,9 @@ const moveChecker = (
   // hit opponent blot
   if (openPoints[dropPoint] === 'blot') {
     const hitBlot = newState.table[dropPoint].pop() as ActiveChecker
-    newState.bar.push(hitBlot)
+    hitBlot === 1
+      ? newState.table[25].push(hitBlot)
+      : newState.table[0].push(hitBlot)
     const movingChecker = newState.table[fromPoint].pop() as ActiveChecker
     newState.table[dropPoint].push(movingChecker)
   }
@@ -315,7 +309,6 @@ export const gameLogic = {
   initialMoves,
   getOpenPoints,
   getValidMoves,
-  getValidBarMoves,
   updateRemainingMoves,
   moveChecker,
   toggleActivePlayer

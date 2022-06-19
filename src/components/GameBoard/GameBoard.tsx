@@ -27,7 +27,6 @@ const GameBoard: FC = () => {
     getDiceRoll,
     initialMoves,
     getValidMoves,
-    getValidBarMoves,
     updateRemainingMoves,
     moveChecker,
     toggleActivePlayer
@@ -35,7 +34,7 @@ const GameBoard: FC = () => {
 
   const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
 
-  const { table, bar, bearOff1, bearOff2 } = state.checkerPositions
+  const { table, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
@@ -68,12 +67,7 @@ const GameBoard: FC = () => {
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
-    let valid = false
-    if (!bar.includes(activePlayer as 1 | 2))
-      valid = getValidMoves(dropPoint, dragItem)
-    if (bar.includes(activePlayer as 1 | 2))
-      valid = getValidBarMoves(dropPoint, dragItem)
-    // must return a boolean
+    const valid = getValidMoves(dropPoint, dragItem)
     return valid
   }
 
@@ -87,13 +81,17 @@ const GameBoard: FC = () => {
 
   const endTurnHandler = () => {
     toggleActivePlayer()
+    // TODO:
+    // push movesTaken
+    // updateTurnHistory()
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
 
   const renderPoints = () => {
     const pointArr = []
-    for (let i = 0; i < 24; i++) {
+    // TODO: change to render bar
+    for (let i = 0; i < 26; i++) {
       pointArr.push(
         <BoardPoint
           key={i}
@@ -101,7 +99,7 @@ const GameBoard: FC = () => {
           validMoves={validMoveHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
-          bar={bar}
+          table={table}
         >
           {table[i].map(
             (checker) =>
@@ -130,7 +128,6 @@ const GameBoard: FC = () => {
     <div>
       <div>
         <div className={`flex`}>{points}</div>
-        <Bar barCheckers={bar} />
       </div>
       <div>
         {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}

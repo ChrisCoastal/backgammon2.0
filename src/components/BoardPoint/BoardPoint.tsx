@@ -5,7 +5,12 @@ import { useDrop } from 'react-dnd'
 import { ActiveChecker, ActivePlayer } from 'src/@types/types'
 import type { gameLogic } from 'src/utils/gameState'
 
-import { ItemTypes, BOARD_COLORS } from '../../utils/config'
+import {
+  ItemTypes,
+  BOARD_COLORS,
+  PLAYER_1_BAR,
+  PLAYER_2_BAR
+} from '../../utils/config'
 
 interface PointProps {
   validMoves: (
@@ -18,7 +23,7 @@ interface PointProps {
   ) => void
   pointIndex: number
   activePlayer: ActivePlayer
-  bar: ActiveChecker[]
+  table: Array<1 | 2>[]
   children: ReactNode
 }
 
@@ -27,23 +32,14 @@ const BoardPoint: FC<PointProps> = ({
   dropHandler,
   pointIndex,
   activePlayer,
-  bar,
+  table,
   children
 }) => {
-  const getDropppable = () => {
-    const dropType = !activePlayer
-      ? 'null'
-      : bar.includes(activePlayer as 1 | 2) && activePlayer === 1
-      ? ItemTypes.CHECKER_1_BAR
-      : bar.includes(activePlayer as 1 | 2) && activePlayer === 2
-      ? ItemTypes.CHECKER_2_BAR
-      : activePlayer === 1
-      ? ItemTypes.CHECKER_1
-      : ItemTypes.CHECKER_2
-    return dropType
-  }
-
-  const droppable = getDropppable()
+  const droppable = !activePlayer
+    ? 'null'
+    : activePlayer === 1
+    ? ItemTypes.CHECKER_1
+    : ItemTypes.CHECKER_2
 
   const [{ isOver, canDrop }, dropRef] = useDrop(
     () => ({
@@ -64,12 +60,17 @@ const BoardPoint: FC<PointProps> = ({
         canDrop: monitor.canDrop()
       })
     }),
-    [activePlayer]
+    [activePlayer, table]
   )
 
   const dropColor =
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
-  const color = pointIndex % 2 ? BOARD_COLORS.oddPoint : BOARD_COLORS.evenPoint
+  const color =
+    pointIndex === 0 || pointIndex === 25
+      ? BOARD_COLORS.bar
+      : pointIndex % 2
+      ? BOARD_COLORS.oddPoint
+      : BOARD_COLORS.evenPoint
 
   return (
     <div className="flex-column">

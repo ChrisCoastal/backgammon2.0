@@ -5,24 +5,18 @@ import { ActivePlayer, ActiveChecker } from 'src/@types/types'
 import { useDrag } from 'react-dnd'
 
 // config
-import { ItemTypes } from '../../utils/config'
+import { ItemTypes, PLAYER_1_BAR, PLAYER_2_BAR } from '../../utils/config'
 
 type CheckerProps = {
-  point: number | 'bar' | 'bearOff1' | 'bearOff2'
+  point: number | 'bearOff1' | 'bearOff2'
   // activePlayer: ActivePlayer
   checkerColor: ActiveChecker
 }
 
 const Checker: FC<CheckerProps> = ({ point, checkerColor }) => {
-  const dropType =
-    point !== 'bar'
-      ? `checker${checkerColor}`
-      : point === 'bar'
-      ? `checker${checkerColor}Bar`
-      : ''
-
   const [{ isDragging }, dragRef] = useDrag(() => ({
-    type: dropType,
+    // type: dropType,
+    type: `checker${checkerColor}`,
     item: { fromPoint: point, checkerColor: checkerColor },
     collect: (monitor) => ({
       isDragging: monitor.isDragging()
