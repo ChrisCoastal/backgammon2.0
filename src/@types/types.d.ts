@@ -1,3 +1,6 @@
+import { ColorSchemeOverrides } from '@mui/material'
+import { BlobOptions } from 'buffer'
+
 // Board Positions
 interface Point {
   [key: string]: Array<string | null>
@@ -12,6 +15,7 @@ export type ActiveChecker = 1 | 2
 
 interface CheckerPositionsState {
   table: Array<1 | 2>[]
+  openPoints: Array<'open' | 'blot' | 'closed' | 'anchor'>
   bearOff1: Array<1 | 2>
   bearOff2: Array<1 | 2>
 }
@@ -36,6 +40,7 @@ export interface ReducerActions {
   type:
     | 'setActivePlayer'
     | 'setDice'
+    | 'setOpenPoints'
     | 'setMovesRemaining'
     | 'setMovesPossible'
     | 'setCheckerPosition'

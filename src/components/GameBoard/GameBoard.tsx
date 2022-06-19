@@ -26,6 +26,7 @@ const GameBoard: FC = () => {
     reducer,
     getDiceRoll,
     initialMoves,
+    getOpenPoints,
     getValidMoves,
     updateRemainingMoves,
     moveChecker,
@@ -53,7 +54,8 @@ const GameBoard: FC = () => {
     const moves = initialMoves(roll)
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
-    // const valid = findValidMoves()
+    const openPoints = getOpenPoints()
+    // const valid = isValidMoves()
     if (!activePlayer) {
       const active = toggleActivePlayer(roll)
       active === 'doubles' && rollDiceHandler()

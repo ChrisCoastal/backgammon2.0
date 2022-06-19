@@ -39,6 +39,14 @@ function reducer(state: TableState, action: ReducerActions): TableState {
           diceRoll: payload.roll
         }
       }
+    case 'setOpenPoints':
+      return {
+        ...state,
+        checkerPositions: {
+          ...state.checkerPositions,
+          openPoints: payload
+        }
+      }
     case 'setMovesRemaining':
       return {
         ...state,
@@ -169,7 +177,12 @@ const getOpenPoints = () => {
       : `anchor`
   })
 
+  dispatch({ type: 'setOpenPoints', payload: openPoints })
   return openPoints
+}
+
+const isValidMoves = () => {
+  const { openPoints } = gameState.checkerPositions
 }
 
 const getValidMoves = (
@@ -189,7 +202,7 @@ const getValidMoves = (
   const directionalMoves = movement.movesRemaining.map(
     (move) => move * direction
   )
-  const openPoints = getOpenPoints()
+  const openPoints = gameState.checkerPositions.openPoints
 
   // TODO: add handling for blots
   const getMoves = (moves: number[]) => {
@@ -250,7 +263,8 @@ const updateRemainingMoves = (
       }
     })
   }
-
+  // FIXME: maybe this should return the dice to be taken as two individual moves
+  // send dice to dropCheckerHandler
   const takeComboMove = (moveDist: number) => {
     let moveAcc = 0
     const movesIndex = moves.map((move) => (moveAcc += move)).indexOf(moveDist)
@@ -276,7 +290,7 @@ const moveChecker = (
   item: { fromPoint: number; checkerColor: ActiveChecker }
 ) => {
   const { fromPoint, checkerColor } = item
-  const openPoints = getOpenPoints()
+  const openPoints = gameState.checkerPositions.openPoints
 
   const barPoint = [PLAYER_1_BAR, PLAYER_2_BAR]
   let newState = gameState.checkerPositions
@@ -288,13 +302,13 @@ const moveChecker = (
     newState.table[dropPoint].push(movingChecker)
     // newState.table[dropPoint].push(checkerColor)
   }
-
+  // TODO: add hits in comboMoves
   // hit opponent blot
   if (openPoints[dropPoint] === 'blot') {
     const hitBlot = newState.table[dropPoint].pop() as ActiveChecker
     hitBlot === 1
-      ? newState.table[25].push(hitBlot)
-      : newState.table[0].push(hitBlot)
+      ? newState.table[PLAYER_1_BAR].push(hitBlot)
+      : newState.table[PLAYER_2_BAR].push(hitBlot)
     const movingChecker = newState.table[fromPoint].pop() as ActiveChecker
     newState.table[dropPoint].push(movingChecker)
   }

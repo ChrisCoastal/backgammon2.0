@@ -35,6 +35,7 @@ export const INITIAL_TABLE_STATE: TableState = {
   gameHistory: [],
   checkerPositions: {
     table: INITIAL_POSITIONS,
+    openPoints: [],
     bearOff1: [],
     bearOff2: []
   },
