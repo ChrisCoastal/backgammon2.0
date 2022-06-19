@@ -9,6 +9,7 @@ import { gameLogic } from 'src/utils/gameState'
 
 //components
 import BoardPoint from '../BoardPoint/BoardPoint'
+import Bar from '../Bar/Bar'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
 
@@ -91,7 +92,6 @@ const GameBoard: FC = () => {
                   key={`checker ${i + Math.random()}`}
                   point={i}
                   checkerColor={checker}
-                  activePlayer={activePlayer}
                 />
               )
           )}
@@ -110,7 +110,10 @@ const GameBoard: FC = () => {
 
   return (
     <div>
-      <div className={`flex`}>{points}</div>
+      <div>
+        <div className={`flex`}>{points}</div>
+        <Bar barCheckers={bar} />
+      </div>
       <div>
         {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}
         <button

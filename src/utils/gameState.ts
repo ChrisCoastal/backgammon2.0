@@ -182,7 +182,7 @@ const getValidMoves = (
   const { activePlayer, movement } = gameState
   if (movement.movesRemaining.length === 0) return false
 
-  console.log(dragItem)
+  console.log(gameState.activePlayer, dragItem)
 
   const { fromPoint } = dragItem
   const direction = moveDirection(activePlayer)
@@ -191,6 +191,7 @@ const getValidMoves = (
   )
   const openPoints = getOpenPoints()
 
+  // TODO: add handling for blots
   const getMoves = (moves: number[]) => {
     let moveAcc = 0
     const moveCombos = moves.map((move) => (moveAcc += move))
@@ -209,9 +210,9 @@ const getValidMoves = (
 
   const validForward = getMoves(directionalMoves)
   const validReverse = getMoves([...directionalMoves].reverse())
-
   const validMoves = new Set([...validForward, ...validReverse])
 
+  // checks if the array of valid moves includes the point (div) hovered over
   return [...validMoves].includes(dropPoint)
 }
 

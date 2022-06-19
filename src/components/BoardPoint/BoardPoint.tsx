@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { FC, ReactNode } from 'react'
 import { useDrop } from 'react-dnd'
 
@@ -29,27 +30,37 @@ const BoardPoint: FC<PointProps> = ({
 }) => {
   console.log('POINT', activePlayer)
 
-  const droppable = activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2
-  console.log('DROPPABLE', droppable)
+  // let droppable: string = ItemTypes.CHECKER2
+  // useEffect(() => {
+  //   activePlayer === 1
+  //     ? (droppable = ItemTypes.CHECKER1)
+  //     : (droppable = ItemTypes.CHECKER2)
+  // }, [activePlayer])
 
-  const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
-    accept: droppable,
-    canDrop: (item) =>
-      validMoves(
-        pointIndex,
-        item as { fromPoint: number; checkerColor: 1 | 2 }
-      ),
-    drop: (item) =>
-      dropHandler(
-        pointIndex,
-        item as { fromPoint: number; checkerColor: 1 | 2 }
-      ),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-      getChecker: monitor.getItem(),
-      canDrop: monitor.canDrop()
-    })
-  }))
+  const droppable = activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2
+  // console.log('DROPPABLE', droppable)
+
+  const [{ isOver, canDrop }, dropRef] = useDrop(
+    () => ({
+      accept: droppable,
+      canDrop: (item) =>
+        validMoves(
+          pointIndex,
+          item as { fromPoint: number; checkerColor: 1 | 2 }
+        ),
+      drop: (item) =>
+        dropHandler(
+          pointIndex,
+          item as { fromPoint: number; checkerColor: 1 | 2 }
+        ),
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+        getChecker: monitor.getItem(),
+        canDrop: monitor.canDrop()
+      })
+    }),
+    [activePlayer]
+  )
 
   const dropColor =
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''

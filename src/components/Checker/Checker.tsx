@@ -8,12 +8,12 @@ import { useDrag } from 'react-dnd'
 import { ItemTypes } from '../../utils/config'
 
 type CheckerProps = {
-  point: number
-  activePlayer: ActivePlayer
+  point: number | 'bar' | 'bearOff1' | 'bearOff2'
+  // activePlayer: ActivePlayer
   checkerColor: ActiveChecker
 }
 
-const Checker: FC<CheckerProps> = ({ point, activePlayer, checkerColor }) => {
+const Checker: FC<CheckerProps> = ({ point, checkerColor }) => {
   const [{ isDragging }, dragRef] = useDrag(() => ({
     type: `checker${checkerColor}`,
     item: { fromPoint: point, checkerColor: checkerColor },
