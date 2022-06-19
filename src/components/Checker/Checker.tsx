@@ -14,8 +14,15 @@ type CheckerProps = {
 }
 
 const Checker: FC<CheckerProps> = ({ point, checkerColor }) => {
+  const dropType =
+    point !== 'bar'
+      ? `checker${checkerColor}`
+      : point === 'bar'
+      ? `checker${checkerColor}Bar`
+      : ''
+
   const [{ isDragging }, dragRef] = useDrag(() => ({
-    type: `checker${checkerColor}`,
+    type: dropType,
     item: { fromPoint: point, checkerColor: checkerColor },
     collect: (monitor) => ({
       isDragging: monitor.isDragging()

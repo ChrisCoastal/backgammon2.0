@@ -101,6 +101,7 @@ const GameBoard: FC = () => {
           validMoves={validMoveHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
+          bar={bar}
         >
           {table[i].map(
             (checker) =>

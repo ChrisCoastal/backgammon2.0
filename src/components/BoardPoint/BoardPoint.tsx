@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import type { FC, ReactNode } from 'react'
 import { useDrop } from 'react-dnd'
 
-import { ActivePlayer } from 'src/@types/types'
+import { ActiveChecker, ActivePlayer } from 'src/@types/types'
 import type { gameLogic } from 'src/utils/gameState'
 
 import { ItemTypes, BOARD_COLORS } from '../../utils/config'
@@ -18,6 +18,7 @@ interface PointProps {
   ) => void
   pointIndex: number
   activePlayer: ActivePlayer
+  bar: ActiveChecker[]
   children: ReactNode
 }
 
@@ -26,9 +27,23 @@ const BoardPoint: FC<PointProps> = ({
   dropHandler,
   pointIndex,
   activePlayer,
+  bar,
   children
 }) => {
-  const droppable = activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2
+  const getDropppable = () => {
+    const dropType = !activePlayer
+      ? 'null'
+      : bar.includes(activePlayer as 1 | 2) && activePlayer === 1
+      ? ItemTypes.CHECKER_1_BAR
+      : bar.includes(activePlayer as 1 | 2) && activePlayer === 2
+      ? ItemTypes.CHECKER_2_BAR
+      : activePlayer === 1
+      ? ItemTypes.CHECKER_1
+      : ItemTypes.CHECKER_2
+    return dropType
+  }
+
+  const droppable = getDropppable()
 
   const [{ isOver, canDrop }, dropRef] = useDrop(
     () => ({

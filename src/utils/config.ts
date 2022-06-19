@@ -60,6 +60,8 @@ export const PLAYER_2_START = 0
 
 // React DnD
 export const ItemTypes = {
-  CHECKER1: 'checker1',
-  CHECKER2: 'checker2'
+  CHECKER_1: 'checker1',
+  CHECKER_1_BAR: 'checker1Bar',
+  CHECKER_2: 'checker2',
+  CHECKER_2_BAR: 'checker2Bar'
 }
