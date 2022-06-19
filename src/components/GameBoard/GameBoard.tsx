@@ -27,6 +27,7 @@ const GameBoard: FC = () => {
     getDiceRoll,
     initialMoves,
     getValidMoves,
+    getValidBarMoves,
     updateRemainingMoves,
     moveChecker,
     toggleActivePlayer
@@ -51,6 +52,9 @@ const GameBoard: FC = () => {
   const rollDiceHandler = () => {
     const roll = getDiceRoll()
     const moves = initialMoves(roll)
+    // TODO: must check if there are any valid moves available
+    // pass every activePlayer occupied point through getValidMoves
+    // const valid = findValidMoves()
     if (!activePlayer) {
       const active = toggleActivePlayer(roll)
       active === 'doubles' && rollDiceHandler()
@@ -60,12 +64,25 @@ const GameBoard: FC = () => {
     console.log(state.activePlayer)
   }
 
+  const validMoveHandler = (
+    dropPoint: number,
+    dragItem: { fromPoint: number; checkerColor: any }
+  ) => {
+    let valid = false
+    if (!bar.includes(activePlayer as 1 | 2))
+      valid = getValidMoves(dropPoint, dragItem)
+    if (bar.includes(activePlayer as 1 | 2))
+      valid = getValidBarMoves(dropPoint, dragItem)
+    // must return a boolean
+    return valid
+  }
+
   const dropCheckerHandler = (
     dropPoint: number,
     item: { fromPoint: number; checkerColor: any }
   ) => {
     moveChecker(dropPoint, item)
-    updateRemainingMoves(dropPoint, item.fromPoint)
+    updateRemainingMoves(dropPoint, item)
   }
 
   const endTurnHandler = () => {
@@ -81,7 +98,7 @@ const GameBoard: FC = () => {
         <BoardPoint
           key={i}
           pointIndex={i}
-          validMoves={getValidMoves}
+          validMoves={validMoveHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
         >

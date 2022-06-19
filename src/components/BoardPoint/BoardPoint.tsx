@@ -28,17 +28,7 @@ const BoardPoint: FC<PointProps> = ({
   activePlayer,
   children
 }) => {
-  console.log('POINT', activePlayer)
-
-  // let droppable: string = ItemTypes.CHECKER2
-  // useEffect(() => {
-  //   activePlayer === 1
-  //     ? (droppable = ItemTypes.CHECKER1)
-  //     : (droppable = ItemTypes.CHECKER2)
-  // }, [activePlayer])
-
   const droppable = activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2
-  // console.log('DROPPABLE', droppable)
 
   const [{ isOver, canDrop }, dropRef] = useDrop(
     () => ({

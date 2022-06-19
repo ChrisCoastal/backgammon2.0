@@ -55,6 +55,9 @@ export const BOARD_COLORS = {
   player2checker: 'bg-blue-500'
 }
 
+export const PLAYER_1_START = 24
+export const PLAYER_2_START = 0
+
 // React DnD
 export const ItemTypes = {
   CHECKER1: 'checker1',

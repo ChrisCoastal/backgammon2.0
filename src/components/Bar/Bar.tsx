@@ -12,7 +12,7 @@ interface BarProps {
 
 const Bar: React.FC<BarProps> = ({ barCheckers }) => {
   return (
-    <div className={`flex-column w-80 h-16 bg-amber-300`}>
+    <div className={`flex w-80 h-16 bg-amber-300`}>
       {barCheckers.map(
         (checker) =>
           checker && (
