@@ -6,7 +6,7 @@ interface DiceProps {
 }
 
 const Dice = ({ diceRoll, activePlayer }: DiceProps) => {
-  console.log(diceRoll)
+  // console.log(diceRoll)
 
   return (
     <div>

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import type { FC, ReactNode } from 'react'
 import { useDrop } from 'react-dnd'
 
@@ -9,11 +10,11 @@ import { ItemTypes, BOARD_COLORS } from '../../utils/config'
 interface PointProps {
   validMoves: (
     pointIndex: number,
-    item: { fromPoint: number; checkerColor: any }
+    item: { fromPoint: number; checkerColor: 1 | 2 }
   ) => boolean
   dropHandler: (
     pointIndex: number,
-    item: { fromPoint: number; checkerColor: any }
+    item: { fromPoint: number; checkerColor: 1 | 2 }
   ) => void
   pointIndex: number
   activePlayer: ActivePlayer
@@ -27,18 +28,39 @@ const BoardPoint: FC<PointProps> = ({
   activePlayer,
   children
 }) => {
-  const [{ isOver, canDrop }, dropRef] = useDrop(() => ({
-    accept: activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2,
-    canDrop: (item) =>
-      validMoves(pointIndex, item as { fromPoint: number; checkerColor: any }),
-    drop: (item) =>
-      dropHandler(pointIndex, item as { fromPoint: number; checkerColor: any }),
-    collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
-      getChecker: monitor.getItem(),
-      canDrop: monitor.canDrop()
-    })
-  }))
+  console.log('POINT', activePlayer)
+
+  // let droppable: string = ItemTypes.CHECKER2
+  // useEffect(() => {
+  //   activePlayer === 1
+  //     ? (droppable = ItemTypes.CHECKER1)
+  //     : (droppable = ItemTypes.CHECKER2)
+  // }, [activePlayer])
+
+  const droppable = activePlayer === 1 ? ItemTypes.CHECKER1 : ItemTypes.CHECKER2
+  // console.log('DROPPABLE', droppable)
+
+  const [{ isOver, canDrop }, dropRef] = useDrop(
+    () => ({
+      accept: droppable,
+      canDrop: (item) =>
+        validMoves(
+          pointIndex,
+          item as { fromPoint: number; checkerColor: 1 | 2 }
+        ),
+      drop: (item) =>
+        dropHandler(
+          pointIndex,
+          item as { fromPoint: number; checkerColor: 1 | 2 }
+        ),
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+        getChecker: monitor.getItem(),
+        canDrop: monitor.canDrop()
+      })
+    }),
+    [activePlayer]
+  )
 
   const dropColor =
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
