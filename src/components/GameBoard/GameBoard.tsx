@@ -10,6 +10,7 @@ import { gameLogic } from 'src/utils/gameState'
 //components
 import BoardPoint from '../BoardPoint/BoardPoint'
 import Bar from '../Bar/Bar'
+import Checkers from '../Checkers/Checkers'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
 
@@ -25,8 +26,10 @@ const GameBoard: FC = () => {
     stateSubscriber,
     reducer,
     getDiceRoll,
-    initialMoves,
     getOpenPoints,
+    initialMoves,
+    checkMoves,
+    isValidMoves,
     getValidMoves,
     updateRemainingMoves,
     moveChecker,
@@ -55,6 +58,7 @@ const GameBoard: FC = () => {
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
     const openPoints = getOpenPoints()
+    const valid = checkMoves(openPoints, roll as [number, number])
     // const valid = isValidMoves()
     if (!activePlayer) {
       const active = toggleActivePlayer(roll)
@@ -62,14 +66,13 @@ const GameBoard: FC = () => {
       console.log('ACTIVE', active)
     }
     // const possible = possibleMoves(activePlayer, roll)
-    console.log(state.activePlayer)
   }
 
   const validMoveHandler = (
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
-    const valid = getValidMoves(dropPoint, dragItem)
+    const valid = getValidMoves(dragItem, dropPoint)
     return valid
   }
 
@@ -103,8 +106,10 @@ const GameBoard: FC = () => {
           activePlayer={activePlayer}
           table={table}
         >
-          {table[i].map(
-            (checker) =>
+          <Checkers pointIndex={i} checkers={table[i]} />
+          {/* {table[i].map((checker, checkerIndex) => {
+            if (checkerIndex > 5) return
+            return (
               checker && (
                 <Checker
                   key={`checker ${i + Math.random()}`}
@@ -112,7 +117,8 @@ const GameBoard: FC = () => {
                   checkerColor={checker}
                 />
               )
-          )}
+            )
+          })} */}
         </BoardPoint>
       )
     }

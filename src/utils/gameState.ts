@@ -5,12 +5,14 @@ import {
   ReducerActions,
   ActivePlayer,
   ActiveChecker,
-  CheckerPositionsState
+  CheckerPositionsState,
+  OpenPoint
 } from '../@types/types'
 
 import { INITIAL_TABLE_STATE, PLAYER_1_BAR, PLAYER_2_BAR } from './config'
 
-// useReducer
+////////////////////
+// useReducer and State Management
 let gameState: TableState = INITIAL_TABLE_STATE
 let dispatch: React.Dispatch<ReducerActions>
 
@@ -92,6 +94,7 @@ function reducer(state: TableState, action: ReducerActions): TableState {
   }
 }
 
+////////////////////
 // Player Turn
 const toggleActivePlayer = (dice?: number[]) => {
   let action = 'toggle'
@@ -123,10 +126,12 @@ const toggleActivePlayer = (dice?: number[]) => {
   return action
 }
 
+////////////////////
 // Table Position
 const isCheckersBar = () => {}
 const isCheckersHome = (checkerPos: CheckerPositionsState) => checkerPos
 
+////////////////////
 // Dice and Movement
 const dice = () => Math.floor(Math.random() * 6) + 1
 
@@ -149,7 +154,7 @@ const getDiceRoll = () => {
 
 const initialMoves = (diceRoll: number[]) => {
   const moves = diceRoll
-  // doubles get 4 moves of the rolled number
+  // rolling doubles gives 4 moves of the rolled number
   if (moves[0] === moves[1]) moves.push(...moves)
 
   dispatch({
@@ -160,13 +165,10 @@ const initialMoves = (diceRoll: number[]) => {
   return moves
 }
 
-// TODO: remove params
-const moveDirection = (activePlayer: ActivePlayer) =>
-  gameState.activePlayer === 1 ? -1 : 1
+const getDirection = () => (gameState.activePlayer === 1 ? -1 : 1)
 
 const getOpenPoints = () => {
   const { activePlayer, checkerPositions } = gameState
-
   const openPoints = checkerPositions.table.map((point, i) => {
     return point.length === 0
       ? `open`
@@ -181,13 +183,85 @@ const getOpenPoints = () => {
   return openPoints
 }
 
-const isValidMoves = () => {
+const isValidMoves = (openPoints: OpenPoint) => {
+  // const { openPoints } = gameState.checkerPositions
+  const fromPoints = openPoints.reduce((acc, point, i) => {
+    return point === 'anchor' ? [...acc, i] : acc
+  }, [] as number[])
+  console.log(fromPoints)
+
+  // const validMoves = fromPoints.map((fromPoint) =>
+  //   getValidMoves(
+  //     {fromPoint: fromPoint,
+  //     checkerColor: gameState.activePlayer}
+  //   )
+  // )
+  // console.log(validMoves)
+}
+
+const checkMoves = (openPoints: OpenPoint, moves: [number, number]) => {
+  const { table } = gameState.checkerPositions
+  const direction = getDirection()
+  // const dirMoves = (moves || gameState.movement.movesRemaining).map(
+  const dirMoves = moves.map((move) => move * direction)
+  const bar = gameState.activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+
+  // take the possible fromPoints[]
+  let fromPoints = openPoints.reduce((acc, point, i) => {
+    // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
+    return point === 'anchor'
+      ? [...acc, { pointIndex: i, checkerQty: table[i].length }]
+      : acc
+    // return point === 'anchor' && canMove ? [...acc, i] : acc
+  }, [] as { pointIndex: number; checkerQty: number }[])
+
+  // check for activePlayer checkers on bar
+  if (fromPoints.map((from) => from.pointIndex).includes(bar)) {
+    // then move 1 or 2
+  }
+
+  // check first number against all fromPoints.length > 0
+  const checkFirstMove = fromPoints.filter(
+    (fromPoint) => openPoints[fromPoint.pointIndex + dirMoves[0]] !== 'closed'
+  )
+  if (checkFirstMove.length === 1) {
+    // then must take move with that checker
+  }
+  const checkSecondMove = fromPoints.filter(
+    (fromPoint) => openPoints[fromPoint.pointIndex + dirMoves[1]] !== 'closed'
+  )
+  if (checkSecondMove.length === 1) {
+    // then must take move with that checker
+  }
+  // check first number against all fromPoints.length > 1
+  // repeat for second number
+  console.log(checkFirstMove, checkSecondMove)
+
+  return
+}
+
+const getMoves = (fromPoint: number, moves: number[]) => {
   const { openPoints } = gameState.checkerPositions
+
+  let moveAcc = 0
+  const moveCombos = moves.map((move) => (moveAcc += move))
+  const isMoveValid = moveCombos.map((move) =>
+    fromPoint + move >= 1 && fromPoint + move <= 24
+      ? openPoints[fromPoint + move]
+      : 'closed'
+  )
+  const invalidIndex = isMoveValid.indexOf('closed')
+  const validMoves =
+    invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
+  const validCurrentMoves = validMoves.map((move) => fromPoint + move)
+
+  return validCurrentMoves
 }
 
 const getValidMoves = (
-  dropPoint: number,
-  dragItem: { fromPoint: number; checkerColor: any }
+  dragItem: { fromPoint: number; checkerColor: any },
+  dropPoint: number
+  // dropPoint?: number
 ) => {
   const { activePlayer, checkerPositions, movement } = gameState
   const { fromPoint } = dragItem
@@ -198,11 +272,11 @@ const getValidMoves = (
   if (checkerPositions.table[bar].length !== 0 && fromPoint !== bar)
     return false
 
-  const direction = moveDirection(activePlayer)
+  const direction = getDirection()
   const directionalMoves = movement.movesRemaining.map(
     (move) => move * direction
   )
-  const openPoints = gameState.checkerPositions.openPoints
+  const { openPoints } = gameState.checkerPositions
 
   // TODO: add handling for blots
   const getMoves = (moves: number[]) => {
@@ -225,6 +299,9 @@ const getValidMoves = (
   const validReverse = getMoves([...directionalMoves].reverse())
   const validMoves = new Set([...validForward, ...validReverse])
 
+  // return dropPoint !== undefined
+  //   ? [...validMoves].includes(dropPoint)
+  //   : [...validMoves]
   // checks if the array of valid moves includes the point (div) hovered over
   return [...validMoves].includes(dropPoint)
 }
@@ -314,14 +391,19 @@ const moveChecker = (
   }
 
   dispatch({ type: 'setCheckerPosition', payload: newState })
+  const newOpenPoints = getOpenPoints()
+
+  dispatch({ type: 'setOpenPoints', payload: newOpenPoints })
 }
 
 export const gameLogic = {
   stateSubscriber,
   reducer,
   getDiceRoll,
-  initialMoves,
   getOpenPoints,
+  initialMoves,
+  checkMoves,
+  isValidMoves,
   getValidMoves,
   updateRemainingMoves,
   moveChecker,

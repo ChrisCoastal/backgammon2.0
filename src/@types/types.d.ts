@@ -6,6 +6,7 @@ interface Point {
   [key: string]: Array<string | null>
 }
 export type BoardPositions = Point[]
+export type OpenPoint = Array<'open' | 'blot' | 'closed' | 'anchor'>
 
 export type ActivePlayer = 1 | 2 | null
 export type ActiveChecker = 1 | 2
@@ -13,11 +14,13 @@ export type ActiveChecker = 1 | 2
 // Dice rolls
 // export type DiceNumber = 1 | 2 | 3 | 4 | 5 | 6 | null
 
+export type CheckerPositions = Array<1 | 2>
+
 interface CheckerPositionsState {
   table: Array<1 | 2>[]
-  openPoints: Array<'open' | 'blot' | 'closed' | 'anchor'>
-  bearOff1: Array<1 | 2>
-  bearOff2: Array<1 | 2>
+  openPoints: OpenPoint
+  bearOff1: CheckerPositions
+  bearOff2: CheckerPositions
 }
 
 export interface TableState {
