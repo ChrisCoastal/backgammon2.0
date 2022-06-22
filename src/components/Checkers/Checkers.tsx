@@ -10,15 +10,12 @@ interface CheckersProps {
   checkers: (1 | 2)[]
 }
 
-const Checkers: FC<CheckersProps> = ({
-  pointIndex,
-
-  checkers
-}) => {
+const Checkers: FC<CheckersProps> = ({ pointIndex, checkers }) => {
+  //TODO: add handling for over 5 checkers
   return (
     <>
       {checkers.map((checker: 1 | 2, checkerIndex) => {
-        if (checkerIndex > 5) return
+        // if (checkerIndex > 5) return
         return (
           checker && (
             <Checker

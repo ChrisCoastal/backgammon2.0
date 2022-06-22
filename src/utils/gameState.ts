@@ -136,7 +136,8 @@ const isCheckersHome = (checkerPos: CheckerPositionsState) => checkerPos
 const dice = () => Math.floor(Math.random() * 6) + 1
 
 const getDiceRoll = () => {
-  const [die1, die2] = [dice(), dice()]
+  // const [die1, die2] = [dice(), dice()]
+  const [die1, die2] = [6, 1]
 
   const roll = !gameState.activePlayer
     ? [die1, 0, 0, die2]
@@ -206,38 +207,78 @@ const checkMoves = (openPoints: OpenPoint, moves: [number, number]) => {
   const dirMoves = moves.map((move) => move * direction)
   const bar = gameState.activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
 
-  // take the possible fromPoints[]
-  let fromPoints = openPoints.reduce((acc, point, i) => {
-    // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
-    return point === 'anchor'
-      ? [...acc, { pointIndex: i, checkerQty: table[i].length }]
-      : acc
-    // return point === 'anchor' && canMove ? [...acc, i] : acc
-  }, [] as { pointIndex: number; checkerQty: number }[])
+  let fromPoints
+  // if the active bar is occupied, can only move from there
+  if (table[bar].length > 0)
+    fromPoints = [{ pointIndex: bar, checkerQty: table[bar].length }] as {
+      pointIndex: number
+      checkerQty: number
+    }[]
+  // otherwise check all other occupied points
+  else
+    fromPoints = openPoints.reduce((acc, point, i) => {
+      // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
+      return point === 'anchor'
+        ? [...acc, { pointIndex: i, checkerQty: table[i].length }]
+        : acc
+    }, [] as { pointIndex: number; checkerQty: number }[])
 
-  // check for activePlayer checkers on bar
-  if (fromPoints.map((from) => from.pointIndex).includes(bar)) {
-    // then move 1 or 2
-  }
-
+  // TODO: move this into a map or forEach loop?
   // check first number against all fromPoints.length > 0
-  const checkFirstMove = fromPoints.filter(
+  // const check1Move = fromPoints.map((fromPoint) => {
+  //   const moveTo = openPoints[fromPoint.pointIndex + dirMoves[0]]
+  //   if (moveTo !== 'closed') return { ...fromPoint, dropPoint: moveTo }
+  //   return
+  // })
+  let check1Move = fromPoints.filter(
     (fromPoint) => openPoints[fromPoint.pointIndex + dirMoves[0]] !== 'closed'
   )
-  if (checkFirstMove.length === 1) {
+  let check12Move = check1Move.filter(
+    (fromPoint) =>
+      openPoints[fromPoint.pointIndex + dirMoves[0] + dirMoves[1]] !== 'closed'
+  )
+  if (check1Move.length === 1) {
     // then must take move with that checker
   }
-  const checkSecondMove = fromPoints.filter(
+  let check2Move = fromPoints.filter(
     (fromPoint) => openPoints[fromPoint.pointIndex + dirMoves[1]] !== 'closed'
   )
-  if (checkSecondMove.length === 1) {
-    // then must take move with that checker
-  }
-  // check first number against all fromPoints.length > 1
-  // repeat for second number
-  console.log(checkFirstMove, checkSecondMove)
+  let check21Move = check2Move.filter(
+    (fromPoint) =>
+      openPoints[fromPoint.pointIndex + dirMoves[1] + dirMoves[0]] !== 'closed'
+  )
+  console.log(
+    '1',
+    check1Move,
+    '2',
+    check2Move,
+    '12',
+    check12Move,
+    '21',
+    check21Move
+  )
 
-  return
+  let validMoves = [check1Move, check2Move].flat()
+
+  // if (check2Move.length === 1) {
+  //   // then must take move with that checker
+  // }
+  // // check 1 number against all fromPoints.length > 1
+  // // repeat for 2 number
+  if (check1Move.length === 0 && check2Move.length === 0) {
+    alert('NO MOVES AVAILABLE')
+    validMoves = []
+  }
+  if (check12Move.length > 0 && check2Move.length === 0) {
+    // check1Move.filter((move) => check12Move.includes(move))
+    // get rid of check1move
+    validMoves = check12Move
+  }
+  if (check1Move.length === 0 && check21Move.length > 0) {
+    // check2Move.filter((move) => check21Move.includes(move))
+    validMoves = check21Move
+  }
+  return validMoves
 }
 
 const getMoves = (fromPoint: number, moves: number[]) => {
@@ -391,9 +432,9 @@ const moveChecker = (
   }
 
   dispatch({ type: 'setCheckerPosition', payload: newState })
-  const newOpenPoints = getOpenPoints()
-
-  dispatch({ type: 'setOpenPoints', payload: newOpenPoints })
+  // TODO: remove if openPoints call in dropCheckerHandler is updating after each move
+  // const newOpenPoints = getOpenPoints()
+  // dispatch({ type: 'setOpenPoints', payload: newOpenPoints })
 }
 
 export const gameLogic = {

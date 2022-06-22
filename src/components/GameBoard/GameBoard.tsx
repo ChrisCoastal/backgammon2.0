@@ -57,18 +57,18 @@ const GameBoard: FC = () => {
     const moves = initialMoves(roll)
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
-    const openPoints = getOpenPoints()
-    const valid = checkMoves(openPoints, roll as [number, number])
-    // const valid = isValidMoves()
     if (!activePlayer) {
       const active = toggleActivePlayer(roll)
       active === 'doubles' && rollDiceHandler()
       console.log('ACTIVE', active)
     }
+    const openPoints = getOpenPoints()
+    const valid = checkMoves(openPoints, roll as [number, number])
+    // TODO: if valid returns no moves possible call endTurnHandler
     // const possible = possibleMoves(activePlayer, roll)
   }
 
-  const validMoveHandler = (
+  const dragCheckerHandler = (
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
@@ -82,6 +82,7 @@ const GameBoard: FC = () => {
   ) => {
     moveChecker(dropPoint, item)
     updateRemainingMoves(dropPoint, item)
+    getOpenPoints()
   }
 
   const endTurnHandler = () => {
@@ -101,14 +102,13 @@ const GameBoard: FC = () => {
         <BoardPoint
           key={i}
           pointIndex={i}
-          validMoves={validMoveHandler}
+          validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
           table={table}
         >
           <Checkers pointIndex={i} checkers={table[i]} />
           {/* {table[i].map((checker, checkerIndex) => {
-            if (checkerIndex > 5) return
             return (
               checker && (
                 <Checker
