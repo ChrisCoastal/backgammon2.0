@@ -9,7 +9,13 @@ import {
   OpenPoint
 } from '../@types/types'
 
-import { INITIAL_TABLE_STATE, PLAYER_1_BAR, PLAYER_2_BAR } from './config'
+import {
+  INITIAL_TABLE_STATE,
+  PLAYER_1_BAR,
+  PLAYER_2_BAR,
+  PLAYER_1_HOME_LIMIT,
+  PLAYER_2_HOME_LIMIT
+} from './config'
 
 ////////////////////
 // useReducer and State Management
@@ -47,6 +53,14 @@ function reducer(state: TableState, action: ReducerActions): TableState {
         checkerPositions: {
           ...state.checkerPositions,
           openPoints: payload
+        }
+      }
+    case 'setValidMoves':
+      return {
+        ...state,
+        movement: {
+          ...state.movement,
+          validMoves: payload
         }
       }
     case 'setMovesRemaining':
@@ -128,8 +142,25 @@ const toggleActivePlayer = (dice?: number[]) => {
 
 ////////////////////
 // Table Position
-const isCheckersBar = () => {}
-const isCheckersHome = (checkerPos: CheckerPositionsState) => checkerPos
+const isCheckersBar = () => {
+  const { activePlayer, checkerPositions } = gameState
+  const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+  // check for checkers on bar
+  if (checkerPositions.table[bar].length === 0)
+    return { isCheckers: false, point: bar }
+  return { isCheckers: true, point: bar }
+}
+const isCheckersHome = () => {
+  const { activePlayer, checkerPositions } = gameState
+  const home = activePlayer === 1 ? PLAYER_1_HOME_LIMIT : PLAYER_2_HOME_LIMIT
+  return (
+    checkerPositions.table.filter((point, i) =>
+      activePlayer === 1
+        ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
+        : i > PLAYER_2_HOME_LIMIT && !point.includes(2)
+    ).length > 0
+  )
+}
 
 ////////////////////
 // Dice and Movement
@@ -209,9 +240,9 @@ const checkMoves = (openPoints: OpenPoint, moves: [number, number]) => {
 
   let fromPoints
   // if the active bar is occupied, can only move from there
-  if (table[bar].length > 0)
-    fromPoints = [{ pointIndex: bar, checkerQty: table[bar].length }] as {
-      pointIndex: number
+  if (isCheckersBar())
+    fromPoints = [{ fromPoint: bar, checkerQty: table[bar].length }] as {
+      fromPoint: number
       checkerQty: number
     }[]
   // otherwise check all other occupied points
@@ -219,33 +250,30 @@ const checkMoves = (openPoints: OpenPoint, moves: [number, number]) => {
     fromPoints = openPoints.reduce((acc, point, i) => {
       // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
       return point === 'anchor'
-        ? [...acc, { pointIndex: i, checkerQty: table[i].length }]
+        ? [...acc, { fromPoint: i, checkerQty: table[i].length }]
         : acc
-    }, [] as { pointIndex: number; checkerQty: number }[])
+    }, [] as { fromPoint: number; checkerQty: number }[])
 
   // TODO: move this into a map or forEach loop?
   // check first number against all fromPoints.length > 0
   // const check1Move = fromPoints.map((fromPoint) => {
-  //   const moveTo = openPoints[fromPoint.pointIndex + dirMoves[0]]
+  //   const moveTo = openPoints[fromPoint.fromPoint + dirMoves[0]]
   //   if (moveTo !== 'closed') return { ...fromPoint, dropPoint: moveTo }
   //   return
   // })
   let check1Move = fromPoints.filter(
-    (fromPoint) => openPoints[fromPoint.pointIndex + dirMoves[0]] !== 'closed'
+    (fromPoint) => openPoints[fromPoint.fromPoint + dirMoves[0]] !== 'closed'
   )
   let check12Move = check1Move.filter(
     (fromPoint) =>
-      openPoints[fromPoint.pointIndex + dirMoves[0] + dirMoves[1]] !== 'closed'
+      openPoints[fromPoint.fromPoint + dirMoves[0] + dirMoves[1]] !== 'closed'
   )
-  if (check1Move.length === 1) {
-    // then must take move with that checker
-  }
   let check2Move = fromPoints.filter(
-    (fromPoint) => openPoints[fromPoint.pointIndex + dirMoves[1]] !== 'closed'
+    (fromPoint) => openPoints[fromPoint.fromPoint + dirMoves[1]] !== 'closed'
   )
   let check21Move = check2Move.filter(
     (fromPoint) =>
-      openPoints[fromPoint.pointIndex + dirMoves[1] + dirMoves[0]] !== 'closed'
+      openPoints[fromPoint.fromPoint + dirMoves[1] + dirMoves[0]] !== 'closed'
   )
   console.log(
     '1',
@@ -278,6 +306,9 @@ const checkMoves = (openPoints: OpenPoint, moves: [number, number]) => {
     // check2Move.filter((move) => check21Move.includes(move))
     validMoves = check21Move
   }
+  console.log(validMoves)
+
+  dispatch({ type: 'setValidMoves', payload: validMoves })
   return validMoves
 }
 
@@ -306,12 +337,22 @@ const getValidMoves = (
 ) => {
   const { activePlayer, checkerPositions, movement } = gameState
   const { fromPoint } = dragItem
-  const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+  console.log('HOME', isCheckersHome())
+
+  // check that the fromPoint will allow all moves to be taken
+  if (
+    !gameState.movement.validMoves
+      .map((move) => move.fromPoint)
+      .includes(fromPoint)
+  ) {
+    // alert('NO MOVE')
+    return false
+  }
   // check for remaining moves
   if (movement.movesRemaining.length === 0) return false
-  // check for checkers on bar
-  if (checkerPositions.table[bar].length !== 0 && fromPoint !== bar)
-    return false
+
+  const bar = isCheckersBar()
+  if (bar.isCheckers && fromPoint !== bar.point) return false
 
   const direction = getDirection()
   const directionalMoves = movement.movesRemaining.map(

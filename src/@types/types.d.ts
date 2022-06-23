@@ -34,6 +34,7 @@ export interface TableState {
   }
   movement: {
     movesRemaining: number[] // want to push a new array
+    validMoves: { fromPoint: number; checkerQty: number }[]
     // movesPossible: number[]
     movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
   }
@@ -44,6 +45,7 @@ export interface ReducerActions {
     | 'setActivePlayer'
     | 'setDice'
     | 'setOpenPoints'
+    | 'setValidMoves'
     | 'setMovesRemaining'
     | 'setMovesPossible'
     | 'setCheckerPosition'

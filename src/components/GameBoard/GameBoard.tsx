@@ -63,6 +63,7 @@ const GameBoard: FC = () => {
       console.log('ACTIVE', active)
     }
     const openPoints = getOpenPoints()
+    //
     const valid = checkMoves(openPoints, roll as [number, number])
     // TODO: if valid returns no moves possible call endTurnHandler
     // const possible = possibleMoves(activePlayer, roll)

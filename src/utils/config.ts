@@ -1,7 +1,9 @@
 import { TableState } from 'src/@types/types'
 
 export const PLAYER_1_BAR = 25
+export const PLAYER_1_HOME_LIMIT = 6
 export const PLAYER_2_BAR = 0
+export const PLAYER_2_HOME_LIMIT = 19
 export const INITIAL_POSITIONS: Array<1 | 2>[] = [
   // [], // bar player2
   // [2, 2],
@@ -29,7 +31,7 @@ export const INITIAL_POSITIONS: Array<1 | 2>[] = [
   // [],
   // [1, 1],
   // [] // bar player1
-  [], // bar player2
+  [2], // bar player2
   [],
   [2],
   [1, 1],
@@ -73,7 +75,8 @@ export const INITIAL_TABLE_STATE: TableState = {
   },
   movement: {
     movesRemaining: [],
-    // movesPossible: [],
+    // movesPossible: number[]
+    validMoves: [],
     movesTaken: []
   }
 }
