@@ -312,8 +312,23 @@ const checkMoves = (openPoints: OpenPoint, moves: [number, number]) => {
   return validMoves
 }
 
-const getMoves = (fromPoint: number, moves: number[]) => {
-  const { openPoints } = gameState.checkerPositions
+const getMoves = (moves: number[]) => {
+  const { openPoints, table } = gameState.checkerPositions
+  const { activePlayer } = gameState
+
+  const direction = getDirection()
+  const dirMoves = moves.map((move) => move * direction)
+
+  // get array of all occupied points
+  // const fromPoints = table.map((point) => if (point[0] === activePlayer))
+  const fromPoints = table.reduce(
+    (acc, point, i) =>
+      point[0] === activePlayer
+        ? [...acc, { fromPoint: i, checkerQty: table[i].length }]
+        : acc,
+    [] as { fromPoint: number; checkerQty: number }[]
+  )
+  const dropPoints = fromPoints.map((point) => )
 
   let moveAcc = 0
   const moveCombos = moves.map((move) => (moveAcc += move))
@@ -485,6 +500,7 @@ export const gameLogic = {
   getOpenPoints,
   initialMoves,
   checkMoves,
+  getMoves,
   isValidMoves,
   getValidMoves,
   updateRemainingMoves,
