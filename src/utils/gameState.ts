@@ -126,34 +126,11 @@ const initializeActivePlayer = (dice: [number, number]) => {
 }
 }
 
-const toggleActivePlayer = (dice?: number[]) => {
-  let action = 'toggle'
-
-  // initialize activePLayer
-  if (dice) {
-    if (!gameState.activePlayer && dice[0] > dice[1]) {
-      dispatch({ type: 'setActivePlayer', payload: 1 })
-      return (action = 'P1')
-    }
-    if (!gameState.activePlayer && dice[0] < dice[1]) {
-      dispatch({ type: 'setActivePlayer', payload: 2 })
-      return (action = 'P2')
-    }
-    if (!gameState.activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
-      alert('DOUBLES ROLLED')
-      return (action = 'doubles')
-      // dispatch doubling cube
-    }
-  } else {
-    // if (gameState.activePlayer === 1)
-    //   return dispatch({ type: 'setActivePlayer', payload: 2 })
-    // if (gameState.activePlayer === 2)
-    //   return dispatch({ type: 'setActivePlayer', payload: 1 })
+const toggleActivePlayer = () => {
     gameState.activePlayer === 1
       ? dispatch({ type: 'setActivePlayer', payload: 2 })
       : dispatch({ type: 'setActivePlayer', payload: 1 })
-  }
-  return action
+
 }
 
 ////////////////////
