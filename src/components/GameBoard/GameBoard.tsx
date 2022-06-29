@@ -1,11 +1,28 @@
-import React, { FC, useReducer, useEffect, useRef } from 'react'
+import { FC, useReducer, useEffect, useRef, Dispatch } from 'react'
 
 // types
-import { TableState, ReducerActions, ActivePlayer } from 'src/@types/types'
+import {
+  ActivePlayer,
+  CheckerPositions,
+  ReducerActions
+} from 'src/@types/types'
 
-// utils
-import { INITIAL_POSITIONS, INITIAL_TABLE_STATE } from '../../utils/config'
-import { gameLogic } from 'src/utils/gameState'
+// config
+import {
+  PLAYER_1_BAR,
+  PLAYER_1_HOME_LIMIT,
+  PLAYER_2_BAR,
+  PLAYER_2_HOME_LIMIT
+} from '../../utils/config'
+
+// helpers
+import {
+  initialMoves,
+  getOpenPoints,
+  getDiceRoll,
+  getMoves,
+  checkMoves
+} from 'src/utils/gameState'
 
 //components
 import BoardPoint from '../BoardPoint/BoardPoint'
@@ -14,56 +31,36 @@ import Checkers from '../Checkers/Checkers'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
 
-interface ValidMoveState {
-  dice: number
-  roll: number
-  point: number
-  action: string
+interface GameBoardProps {
+  activePlayer: ActivePlayer
+  boardPositions: CheckerPositions
+  roll: [number, number]
+  movesRemaining: number[]
+  dragCheckerHandler: () => boolean
+  dropCheckerHandler: () => void
+  endTurnHandler: () => void
+  dispatch: Dispatch<ReducerActions>
 }
 
-const GameBoard: FC = () => {
-  const {
-    stateSubscriber,
-    reducer,
-    getDiceRoll,
-    getOpenPoints,
-    initialMoves,
-    checkMoves,
-    getMoves,
-    isValidMoves,
-    getValidMoves,
-    updateRemainingMoves,
-    moveChecker,
-    toggleActivePlayer
-  } = gameLogic
-
-  const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
-
-  const { table, bearOff1, bearOff2 } = state.checkerPositions
-  const { diceRoll, doublingCube } = state.diceState
-  const { activePlayer } = state
-
-  // TODO: avoid if possible?
-  const diceRollRef = useRef(state.diceState)
-
-  useEffect(() => {
-    // pass state updates to gameState.ts
-    stateSubscriber(state, dispatch)
-    // ensures current diceState
-    diceRollRef.current = state.diceState
-  }, [state])
+const GameBoard: FC<GameBoardProps> = ({
+  activePlayer,
+  boardPositions,
+  roll,
+  movesRemaining,
+  dragCheckerHandler,
+  dropCheckerHandler,
+  endTurnHandler,
+  dispatch
+}) => {
+  const diceRollRef = useRef(roll)
 
   const rollDiceHandler = () => {
-    const roll = getDiceRoll()
-    const moves = initialMoves(roll)
+    const roll = getDiceRoll(dispatch)
+    const moves = initialMoves(roll, dispatch)
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
-    if (!activePlayer) {
-      const active = toggleActivePlayer(roll)
-      active === 'doubles' && rollDiceHandler()
-      console.log('ACTIVE', active)
-    }
-    const openPoints = getOpenPoints()
+
+    const openPoints = getOpenPoints(activePlayer, boardPositions, dispatch)
     const allPossibleMoves = getMoves(moves)
     //
     const valid = checkMoves(openPoints, roll as [number, number])
@@ -71,28 +68,23 @@ const GameBoard: FC = () => {
     // const possible = possibleMoves(activePlayer, roll)
   }
 
-  const dragCheckerHandler = (
-    dropPoint: number,
-    dragItem: { fromPoint: number; checkerColor: any }
-  ) => {
-    const valid = getValidMoves(dragItem, dropPoint)
-    return valid
+  const isCheckersBar = () => {
+    const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+    // check for checkers on bar
+    if (boardPositions[bar].length === 0)
+      return { isCheckers: false, point: bar }
+    return { isCheckers: true, point: bar }
   }
 
-  const dropCheckerHandler = (
-    dropPoint: number,
-    item: { fromPoint: number; checkerColor: any }
-  ) => {
-    moveChecker(dropPoint, item)
-    updateRemainingMoves(dropPoint, item)
-    getOpenPoints()
-  }
-
-  const endTurnHandler = () => {
-    toggleActivePlayer()
-    // TODO:
-    // push movesTaken
-    // updateTurnHistory()
+  const isCheckersHome = () => {
+    const home = activePlayer === 1 ? PLAYER_1_HOME_LIMIT : PLAYER_2_HOME_LIMIT
+    return (
+      boardPositions.filter((point, i) =>
+        activePlayer === 1
+          ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
+          : i > PLAYER_2_HOME_LIMIT && !point.includes(2)
+      ).length > 0
+    )
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -108,9 +100,9 @@ const GameBoard: FC = () => {
           validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
-          table={table}
+          board={boardPositions}
         >
-          <Checkers pointIndex={i} checkers={table[i]} />
+          <Checkers pointIndex={i} checkers={boardPositions[i]} />
           {/* {table[i].map((checker, checkerIndex) => {
             return (
               checker && (
@@ -129,7 +121,7 @@ const GameBoard: FC = () => {
   }
   const points = renderPoints()
 
-  const disable = state.movement.movesRemaining.length !== 0
+  const disable = movesRemaining.length !== 0
   const rollButtonColor = disable
     ? 'bg-gray-300'
     : 'bg-blue-600 hover:bg-blue-700'
@@ -141,7 +133,8 @@ const GameBoard: FC = () => {
         <div className={`flex`}>{points}</div>
       </div>
       <div>
-        {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />}
+        {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}
+        <Dice diceRoll={roll} activePlayer={activePlayer} />
         <button
           disabled={disable}
           onClick={() => rollDiceHandler()}

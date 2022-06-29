@@ -3,7 +3,6 @@ import type { FC, ReactNode } from 'react'
 import { useDrop } from 'react-dnd'
 
 import { ActiveChecker, ActivePlayer } from 'src/@types/types'
-import type { gameLogic } from 'src/utils/gameState'
 
 import {
   ItemTypes,
@@ -23,7 +22,7 @@ interface PointProps {
   ) => void
   pointIndex: number
   activePlayer: ActivePlayer
-  table: Array<1 | 2>[]
+  board: Array<1 | 2>[]
   children: ReactNode
 }
 
@@ -32,7 +31,7 @@ const BoardPoint: FC<PointProps> = ({
   dropHandler,
   pointIndex,
   activePlayer,
-  table,
+  board,
   children
 }) => {
   const droppable = !activePlayer

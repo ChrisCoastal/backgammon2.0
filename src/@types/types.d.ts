@@ -12,18 +12,19 @@ export type ActivePlayer = 1 | 2 | null
 export type ActiveChecker = 1 | 2
 
 // Dice rolls
-// export type DiceNumber = 1 | 2 | 3 | 4 | 5 | 6 | null
+// export type DiceNumber = 1 | 2 | 3 | 4 | 5 | 6
+// export type DiceRoll = [DiceNumber, DiceNumber]
 
-export type CheckerPositions = Array<1 | 2>
+export type CheckerPositions = Array<1 | 2>[]
 
-interface CheckerPositionsState {
-  table: Array<1 | 2>[]
+export interface TablePositionsState {
+  board: CheckerPositions
   openPoints: OpenPoint
   bearOff1: CheckerPositions
   bearOff2: CheckerPositions
 }
 
-export interface TableState {
+export interface GameState {
   gameHistory: {}[]
   checkerPositions: CheckerPositionsState
   activePlayer: 1 | 2 | null

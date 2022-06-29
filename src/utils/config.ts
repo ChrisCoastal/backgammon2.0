@@ -1,10 +1,10 @@
-import { TableState } from 'src/@types/types'
+import { GameState } from 'src/@types/types'
 
 export const PLAYER_1_BAR = 25
 export const PLAYER_1_HOME_LIMIT = 6
 export const PLAYER_2_BAR = 0
 export const PLAYER_2_HOME_LIMIT = 19
-export const INITIAL_POSITIONS: Array<1 | 2>[] = [
+export const INITIAL_BOARD_POSITION: Array<1 | 2>[] = [
   // [], // bar player2
   // [2, 2],
   // [],
@@ -31,6 +31,7 @@ export const INITIAL_POSITIONS: Array<1 | 2>[] = [
   // [],
   // [1, 1],
   // [] // bar player1
+  // Testing Positions
   [2], // bar player2
   [],
   [2],
@@ -59,10 +60,10 @@ export const INITIAL_POSITIONS: Array<1 | 2>[] = [
   [] // bar player1
 ]
 
-export const INITIAL_TABLE_STATE: TableState = {
+export const INITIAL_TABLE_STATE: GameState = {
   gameHistory: [],
   checkerPositions: {
-    table: INITIAL_POSITIONS,
+    board: INITIAL_BOARD_POSITION,
     openPoints: [],
     bearOff1: [],
     bearOff2: []

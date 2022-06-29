@@ -4,7 +4,7 @@ import { ActiveChecker, CheckerPositions } from 'src/@types/types'
 import Checker from '../Checker/Checker'
 
 interface CheckersProps {
-  // table: Array<1 | 2>[]
+  // board: Array<1 | 2>[]
   pointIndex: number
   // checkerColor: ActiveChecker
   checkers: (1 | 2)[]

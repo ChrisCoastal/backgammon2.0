@@ -1,18 +1,24 @@
-// Types
+// types
 import type { ReactNode, FC } from 'react'
-import { TableState, ReducerActions } from 'src/@types/types'
+import { GameState, ReducerActions } from 'src/@types/types'
 
-// Config
+// config
 import { INITIAL_TABLE_STATE } from 'src/utils/config'
 
-// Helpers
-import { toggleActivePlayer } from '../../utils/gameState'
+// helpers
+import {
+  initializeActivePlayer,
+  toggleActivePlayer,
+  getDiceRoll
+} from '../../utils/gameState'
+import { reducer } from 'src/utils/reducer'
 
-// Hooks
+// hooks
 import { useReducer } from 'react'
 
-// Components
+// components
 import GameBoard from '../GameBoard/GameBoard'
+import { getDialogUtilityClass } from '@mui/material'
 
 interface GameProps {
   // children: ReactNode
@@ -21,82 +27,6 @@ interface GameProps {
 const Game: FC<GameProps> = ({}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
 
-  // Reducer function
-  function reducer(state: TableState, action: ReducerActions): TableState {
-    const { type, payload } = action
-
-    switch (type) {
-      case 'setActivePlayer':
-        return { ...state, activePlayer: payload }
-      case 'setDice':
-        return {
-          ...state,
-          diceState: {
-            ...state.diceState,
-            diceRoll: payload.roll
-          }
-        }
-      case 'setOpenPoints':
-        return {
-          ...state,
-          checkerPositions: {
-            ...state.checkerPositions,
-            openPoints: payload
-          }
-        }
-      case 'setValidMoves':
-        return {
-          ...state,
-          movement: {
-            ...state.movement,
-            validMoves: payload
-          }
-        }
-      case 'setMovesRemaining':
-        return {
-          ...state,
-          movement: {
-            ...state.movement,
-            movesRemaining: payload.movesRemaining,
-            // FIXME: spreads to undefined on first pass
-            movesTaken: [...state.movement.movesTaken, payload.movesTaken]
-          }
-        }
-      // case 'setMovesPossible':
-      //   return {
-      //     ...state,
-      //     movement: {
-      //       ...state.movement,
-      //       movesPossible: payload
-      //     }
-      //   }
-      // case 'showValidMoves':
-      //   return {
-      //     ...state,
-      //     movement: {
-      //       ...state.movement,
-      //       validMoves: payload ? payload : null
-      //     }
-      //   }
-
-      case 'setCheckerPosition':
-        return { ...state, checkerPositions: payload }
-      case 'setDoublingCube':
-        return {
-          ...state,
-          diceState: {
-            ...state.diceState,
-            doublingCube: state.diceState.doublingCube * 2
-          }
-        }
-
-      case 'reset':
-        return INITIAL_TABLE_STATE
-      default:
-        return state
-    }
-  }
-
   const { table, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
@@ -104,30 +34,12 @@ const Game: FC<GameProps> = ({}) => {
   // TODO: avoid if possible?
   const diceRollRef = useRef(state.diceState)
 
-  useEffect(() => {
-    // pass state updates to gameState.ts
-    stateSubscriber(state, dispatch)
-    // ensures current diceState
-    diceRollRef.current = state.diceState
-  }, [state])
-
-  const rollDiceHandler = () => {
-    const roll = getDiceRoll()
-    const moves = initialMoves(roll)
-    // TODO: must check if there are any valid moves available
-    // pass every activePlayer occupied point through getValidMoves
-    if (!activePlayer) {
-      const active = toggleActivePlayer(roll)
-      active === 'doubles' && rollDiceHandler()
-      console.log('ACTIVE', active)
-    }
-    const openPoints = getOpenPoints()
-    const allPossibleMoves = getMoves(moves)
-    //
-    const valid = checkMoves(openPoints, roll as [number, number])
-    // TODO: if valid returns no moves possible call endTurnHandler
-    // const possible = possibleMoves(activePlayer, roll)
-  }
+  // useEffect(() => {
+  //   // pass state updates to gameState.ts
+  //   stateSubscriber(state, dispatch)
+  //   // ensures current diceState
+  //   diceRollRef.current = state.diceState
+  // }, [state])
 
   const dragCheckerHandler = (
     dropPoint: number,
@@ -153,9 +65,22 @@ const Game: FC<GameProps> = ({}) => {
     // updateTurnHistory()
   }
 
+  const initGame = () => {
+    if (!activePlayer) {
+      const active = initializeActivePlayer(roll)
+      active === 'DOUBLES' && getDiceRoll(dispatch)
+      console.log('ACTIVE', active)
+    }
+  }
+
+  const startGameHandler = () => {
+    initGame()
+  }
+
   return (
     <div>
       <GameBoard />
+      {/* <StartGameButton /> */}
     </div>
   )
 }

@@ -1,33 +1,27 @@
-import React from 'react'
+import type { MutableRefObject } from 'react'
+import { useRef } from 'react'
+
+// helpers
+import { getDiceRoll } from '../../utils/gameState'
+
+// types
 import { ReducerActions } from '../../@types/types'
 
 interface DiceProps {
-  dispatch: React.Dispatch<ReducerActions>
+  diceRoll: [number, number]
   activePlayer: 1 | 2 | null
 }
 
-const Dice = ({ activePlayer, dispatch }: DiceProps) => {
-  const dice = () => Math.floor(Math.random() * 6) + 1
+const Dice = ({ activePlayer, diceRoll }: DiceProps) => {
+  // const diceRoll = getDiceRoll(dispatch)
 
-  const getDiceRoll = () => {
-    const [die1, die2] = [dice(), dice()]
-    // const [die1, die2] = [6, 1]
+  const [die1, die2] = diceRoll
 
-    const roll = !activePlayer
-      ? [die1, 0, 0, die2]
-      : activePlayer === 1
-      ? [die1, die2, 0, 0]
-      : [0, 0, die1, die2] // ∴ activePlayer === 2
-
-    dispatch({
-      type: 'setDice',
-      payload: { roll: roll }
-    })
-
-    return [die1, die2]
-  }
-
-  const diceRoll = getDiceRoll()
+  const roll = !activePlayer
+    ? [die1, 0, 0, die2]
+    : activePlayer === 1
+    ? [die1, die2, 0, 0]
+    : [0, 0, die1, die2] // ∴ activePlayer === 2
 
   //TODO: add die component
   return (

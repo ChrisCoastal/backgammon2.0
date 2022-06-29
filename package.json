@@ -1,16 +1,16 @@
 {
-  "name": "reactjs-vite-tailwindcss-boilerplate",
-  "description": "This is a React + vite boilerplate to be used with Tailwindcss.",
+  "name": "backgammon",
+  "description": "A game of backgammon for two players",
   "version": "0.4.3",
   "private": true,
   "author": {
-    "name": "João Paulo Moraes",
-    "email": "joaopaulomoraes@outlook.com",
-    "url": "https://github.com/joaopaulomoraes"
+    "name": "Christopher Allen",
+    "email": "contactchriscoastal@gmail.com",
+    "url": "https://github.com/chriscoastal"
   },
   "bugs": {
-    "url": "https://github.com/joaopaulomoraes/reactjs-vite-tailwindcss-boilerplate/issues",
-    "email": "joaopaulomoraes@outlook.com"
+    "url": "https://github.com/ChrisCoastal/backgammon2.0/issues",
+    "email": "contactchriscoastal@gmail.com"
   },
   "scripts": {
     "dev": "vite",
