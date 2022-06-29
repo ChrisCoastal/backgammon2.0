@@ -10,10 +10,8 @@ const Dice = ({ activePlayer, dispatch }: DiceProps) => {
   const dice = () => Math.floor(Math.random() * 6) + 1
 
   const getDiceRoll = () => {
-    // // const [die1, die2] = [dice(), dice()]
+    const [die1, die2] = [dice(), dice()]
     // const [die1, die2] = [6, 1]
-    const diceRoll = [6, 1]
-    const [die1, die2] = diceRoll
 
     const roll = !activePlayer
       ? [die1, 0, 0, die2]
@@ -28,6 +26,9 @@ const Dice = ({ activePlayer, dispatch }: DiceProps) => {
 
     return [die1, die2]
   }
+
+  const diceRoll = getDiceRoll()
+
   //TODO: add die component
   return (
     <div>
