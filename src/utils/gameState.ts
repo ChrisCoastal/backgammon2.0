@@ -110,6 +110,22 @@ function reducer(state: TableState, action: ReducerActions): TableState {
 
 ////////////////////
 // Player Turn
+const initializeActivePlayer = (dice: [number, number]) => {
+  if (!gameState.activePlayer && dice[0] > dice[1]) {
+    dispatch({ type: 'setActivePlayer', payload: 1 })
+    
+  }
+  if (!gameState.activePlayer && dice[0] < dice[1]) {
+    dispatch({ type: 'setActivePlayer', payload: 2 })
+    
+  }
+  if (!gameState.activePlayer && dice[0] !== 0 && dice[0] === dice[1]) {
+    alert('DOUBLES ROLLED')
+    
+    // TODO: dispatch doubling cube
+}
+}
+
 const toggleActivePlayer = (dice?: number[]) => {
   let action = 'toggle'
 
