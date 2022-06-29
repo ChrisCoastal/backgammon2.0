@@ -60,7 +60,7 @@ export const INITIAL_BOARD_POSITION: Array<1 | 2>[] = [
   [] // bar player1
 ]
 
-export const INITIAL_TABLE_STATE: GameState = {
+export const INITIAL_GAME_STATE: GameState = {
   gameHistory: [],
   checkerPositions: {
     board: INITIAL_BOARD_POSITION,
@@ -71,7 +71,7 @@ export const INITIAL_TABLE_STATE: GameState = {
   activePlayer: 2,
   // activePlayer: null,
   diceState: {
-    diceRoll: [0, 0, 0, 0],
+    diceRoll: [null, null],
     doublingCube: 1
   },
   movement: {

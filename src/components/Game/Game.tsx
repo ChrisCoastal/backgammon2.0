@@ -3,18 +3,22 @@ import type { ReactNode, FC } from 'react'
 import { GameState, ReducerActions } from 'src/@types/types'
 
 // config
-import { INITIAL_TABLE_STATE } from 'src/utils/config'
+import { INITIAL_GAME_STATE } from 'src/utils/config'
 
 // helpers
 import {
   initializeActivePlayer,
   toggleActivePlayer,
+  getValidMoves,
+  getOpenPoints,
+  moveChecker,
+  updateRemainingMoves,
   getDiceRoll
 } from '../../utils/gameState'
 import { reducer } from 'src/utils/reducer'
 
 // hooks
-import { useReducer } from 'react'
+import { useReducer, useRef } from 'react'
 
 // components
 import GameBoard from '../GameBoard/GameBoard'
@@ -25,9 +29,9 @@ interface GameProps {
 }
 
 const Game: FC<GameProps> = ({}) => {
-  const [state, dispatch] = useReducer(reducer, INITIAL_TABLE_STATE)
+  const [state, dispatch] = useReducer(reducer, INITIAL_GAME_STATE)
 
-  const { table, bearOff1, bearOff2 } = state.checkerPositions
+  const { board, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
@@ -51,23 +55,24 @@ const Game: FC<GameProps> = ({}) => {
 
   const dropCheckerHandler = (
     dropPoint: number,
-    item: { fromPoint: number; checkerColor: any }
+    dragItem: { fromPoint: number; checkerColor: any }
   ) => {
-    moveChecker(dropPoint, item)
-    updateRemainingMoves(dropPoint, item)
-    getOpenPoints()
+    moveChecker(dropPoint, dragItem, dispatch)
+    updateRemainingMoves(dropPoint, dragItem, dispatch)
+    getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
   }
 
   const endTurnHandler = () => {
-    toggleActivePlayer()
+    toggleActivePlayer(state.activePlayer, dispatch)
     // TODO:
     // push movesTaken
     // updateTurnHistory()
   }
 
   const initGame = () => {
+    const roll = getDiceRoll(dispatch)
     if (!activePlayer) {
-      const active = initializeActivePlayer(roll)
+      const active = initializeActivePlayer(roll, dispatch)
       active === 'DOUBLES' && getDiceRoll(dispatch)
       console.log('ACTIVE', active)
     }
@@ -79,7 +84,16 @@ const Game: FC<GameProps> = ({}) => {
 
   return (
     <div>
-      <GameBoard />
+      <GameBoard
+        activePlayer={activePlayer}
+        checkerPositions={state.checkerPositions}
+        roll={diceRoll}
+        movesRemaining={state.movement.movesRemaining}
+        dragCheckerHandler={dragCheckerHandler}
+        dropCheckerHandler={dropCheckerHandler}
+        endTurnHandler={endTurnHandler}
+        dispatch={dispatch}
+      />
       {/* <StartGameButton /> */}
     </div>
   )

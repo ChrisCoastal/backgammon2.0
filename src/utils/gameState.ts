@@ -7,11 +7,13 @@ import {
   ActivePlayer,
   ActiveChecker,
   CheckerPositionsState,
-  OpenPoint
+  OpenPoint,
+  DiceRoll,
+  BoardPositions
 } from '../@types/types'
 
 import {
-  INITIAL_TABLE_STATE,
+  INITIAL_GAME_STATE,
   PLAYER_1_BAR,
   PLAYER_2_BAR,
   PLAYER_1_HOME_LIMIT,
@@ -32,13 +34,14 @@ export const getDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
     payload: { roll: [die1, die2] }
   })
 
-  return [die1, die2]
+  return [die1, die2] as DiceRoll
 }
 
 ////////////////////
 // Player Turn
-export const initializeActivePlayer = (dice: [number, number], dispatch: Dispatch<ReducerActions>) => {
+export const initializeActivePlayer = (dice: DiceRoll, dispatch: Dispatch<ReducerActions>) => {
   let action;
+  if (dice[0] === (null) || dice[1] === null) return
   if (dice[0] > dice[1]) {
     dispatch({ type: 'setActivePlayer', payload: 1 })
     action = 'PLAYER_1'
@@ -47,7 +50,7 @@ export const initializeActivePlayer = (dice: [number, number], dispatch: Dispatc
     dispatch({ type: 'setActivePlayer', payload: 2 })
     action = 'PLAYER_2'
   }
-  if (dice[0] !== 0 && dice[0] === dice[1]) {
+  if (dice[0] === dice[1]) {
     alert('DOUBLES ROLLED')
     dispatch({type: 'setDoublingCube' })
     action = 'DOUBLES'
@@ -107,7 +110,7 @@ export const toggleActivePlayer = (activePlayer: ActivePlayer, dispatch: Dispatc
 //   return [die1, die2]
 // }
 
-export const initialMoves = (diceRoll: number[], dispatch: Dispatch<ReducerActions>) => {
+export const initialMoves = (diceRoll: DiceRoll, dispatch: Dispatch<ReducerActions>) => {
   const moves = diceRoll
   // rolling doubles gives 4 moves of the rolled number
   if (moves[0] === moves[1]) moves.push(...moves)
@@ -117,13 +120,13 @@ export const initialMoves = (diceRoll: number[], dispatch: Dispatch<ReducerActio
     payload: { movesRemaining: moves, movesTaken: '' }
   })
   console.log([moves])
-  return moves
+  return moves as number[]
 }
 
 export const getDirection = (activePlayer: ActivePlayer) => (activePlayer === 1 ? -1 : 1)
 
-export const getOpenPoints = (activePlayer: ActivePlayer, checkerPositions: CheckerPositionsState, dispatch: Dispatch<ReducerActions>) => {
-  const openPoints = checkerPositions.map((point: Array<1 | 2>, i) => {
+export const getOpenPoints = (activePlayer: ActivePlayer, checkerPositions: BoardPositions, dispatch: Dispatch<ReducerActions>) => {
+  const openPoints = checkerPositions.map((point: Array<1 | 2>) => {
     return point.length === 0
       ? `open`
       : point.length === 1 && point[0] !== activePlayer

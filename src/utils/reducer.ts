@@ -2,7 +2,7 @@
 import { GameState, ReducerActions } from 'src/@types/types'
 
 // Config
-import { INITIAL_TABLE_STATE } from 'src/utils/config'
+import { INITIAL_GAME_STATE } from 'src/utils/config'
 
 export function reducer(state: GameState, action: ReducerActions): GameState {
   const { type, payload } = action
@@ -73,7 +73,7 @@ export function reducer(state: GameState, action: ReducerActions): GameState {
       }
 
     case 'reset':
-      return INITIAL_TABLE_STATE
+      return INITIAL_GAME_STATE
     default:
       return state
   }

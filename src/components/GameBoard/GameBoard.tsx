@@ -3,7 +3,9 @@ import { FC, useReducer, useEffect, useRef, Dispatch } from 'react'
 // types
 import {
   ActivePlayer,
-  CheckerPositions,
+  BoardPositions,
+  CheckerPositionsState,
+  DiceRoll,
   ReducerActions
 } from 'src/@types/types'
 
@@ -33,18 +35,24 @@ import Dice from '../Dice/Dice'
 
 interface GameBoardProps {
   activePlayer: ActivePlayer
-  boardPositions: CheckerPositions
-  roll: [number, number]
+  checkerPositions: CheckerPositionsState
+  roll: DiceRoll
   movesRemaining: number[]
-  dragCheckerHandler: () => boolean
-  dropCheckerHandler: () => void
+  dragCheckerHandler: (
+    dropPoint: number,
+    dragItem: { fromPoint: number; checkerColor: any }
+  ) => boolean
+  dropCheckerHandler: (
+    dropPoint: number,
+    dragItem: { fromPoint: number; checkerColor: any }
+  ) => void
   endTurnHandler: () => void
   dispatch: Dispatch<ReducerActions>
 }
 
 const GameBoard: FC<GameBoardProps> = ({
   activePlayer,
-  boardPositions,
+  checkerPositions,
   roll,
   movesRemaining,
   dragCheckerHandler,
@@ -60,7 +68,11 @@ const GameBoard: FC<GameBoardProps> = ({
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
 
-    const openPoints = getOpenPoints(activePlayer, boardPositions, dispatch)
+    const openPoints = getOpenPoints(
+      activePlayer,
+      checkerPositions.board,
+      dispatch
+    )
     const allPossibleMoves = getMoves(moves)
     //
     const valid = checkMoves(openPoints, roll as [number, number])
@@ -71,7 +83,7 @@ const GameBoard: FC<GameBoardProps> = ({
   const isCheckersBar = () => {
     const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
     // check for checkers on bar
-    if (boardPositions[bar].length === 0)
+    if (checkerPositions.board[bar].length === 0)
       return { isCheckers: false, point: bar }
     return { isCheckers: true, point: bar }
   }
@@ -79,7 +91,7 @@ const GameBoard: FC<GameBoardProps> = ({
   const isCheckersHome = () => {
     const home = activePlayer === 1 ? PLAYER_1_HOME_LIMIT : PLAYER_2_HOME_LIMIT
     return (
-      boardPositions.filter((point, i) =>
+      checkerPositions.board.filter((point, i) =>
         activePlayer === 1
           ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
           : i > PLAYER_2_HOME_LIMIT && !point.includes(2)
@@ -100,9 +112,9 @@ const GameBoard: FC<GameBoardProps> = ({
           validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
-          board={boardPositions}
+          board={checkerPositions.board}
         >
-          <Checkers pointIndex={i} checkers={boardPositions[i]} />
+          <Checkers pointIndex={i} checkers={checkerPositions.board[i]} />
           {/* {table[i].map((checker, checkerIndex) => {
             return (
               checker && (

@@ -5,10 +5,10 @@ import { useRef } from 'react'
 import { getDiceRoll } from '../../utils/gameState'
 
 // types
-import { ReducerActions } from '../../@types/types'
+import { DiceRoll, ReducerActions } from '../../@types/types'
 
 interface DiceProps {
-  diceRoll: [number, number]
+  diceRoll: DiceRoll
   activePlayer: 1 | 2 | null
 }
 

@@ -1,5 +1,5 @@
 import React, { FC } from 'react'
-import { ActiveChecker, CheckerPositions } from 'src/@types/types'
+import { ActiveChecker } from 'src/@types/types'
 
 import Checker from '../Checker/Checker'
 
