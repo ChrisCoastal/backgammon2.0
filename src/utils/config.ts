@@ -71,7 +71,7 @@ export const INITIAL_GAME_STATE: GameState = {
   activePlayer: 2,
   // activePlayer: null,
   diceState: {
-    diceRoll: [null, null],
+    diceRoll: [0, 0],
     doublingCube: 1
   },
   movement: {

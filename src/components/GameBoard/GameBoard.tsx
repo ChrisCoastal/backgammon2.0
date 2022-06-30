@@ -73,30 +73,17 @@ const GameBoard: FC<GameBoardProps> = ({
       checkerPositions.board,
       dispatch
     )
-    const allPossibleMoves = getMoves(moves)
+    const allPossibleMoves = getMoves(moves, checkerPositions, activePlayer)
     //
-    const valid = checkMoves(openPoints, roll as [number, number])
+    const valid = checkMoves(
+      openPoints,
+      checkerPositions.board,
+      activePlayer,
+      roll,
+      dispatch
+    )
     // TODO: if valid returns no moves possible call endTurnHandler
     // const possible = possibleMoves(activePlayer, roll)
-  }
-
-  const isCheckersBar = () => {
-    const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
-    // check for checkers on bar
-    if (checkerPositions.board[bar].length === 0)
-      return { isCheckers: false, point: bar }
-    return { isCheckers: true, point: bar }
-  }
-
-  const isCheckersHome = () => {
-    const home = activePlayer === 1 ? PLAYER_1_HOME_LIMIT : PLAYER_2_HOME_LIMIT
-    return (
-      checkerPositions.board.filter((point, i) =>
-        activePlayer === 1
-          ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
-          : i > PLAYER_2_HOME_LIMIT && !point.includes(2)
-      ).length > 0
-    )
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}

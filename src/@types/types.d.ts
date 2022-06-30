@@ -7,7 +7,7 @@ export type ActivePlayer = 1 | 2 | null
 export type ActiveChecker = 1 | 2
 
 // Dice rolls
-export type DiceNumber = 1 | 2 | 3 | 4 | 5 | 6 | null
+export type DiceNumber = 1 | 2 | 3 | 4 | 5 | 6 | 0
 export type DiceRoll = [DiceNumber, DiceNumber]
 
 // Board Positions
@@ -26,6 +26,13 @@ export interface CheckerPositionsState {
   bearOff2: PointPositions
 }
 
+export interface MovementState {
+  movesRemaining: number[] // want to push a new array
+  validMoves: { fromPoint: number; checkerQty: number }[]
+  // movesPossible: number[]
+  movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
+}
+
 export interface GameState {
   gameHistory: {}[]
   checkerPositions: CheckerPositionsState
@@ -35,12 +42,7 @@ export interface GameState {
     // movesRemaining: number[]
     doublingCube: number
   }
-  movement: {
-    movesRemaining: number[] // want to push a new array
-    validMoves: { fromPoint: number; checkerQty: number }[]
-    // movesPossible: number[]
-    movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
-  }
+  movement: MovementState
 }
 
 export interface ReducerActions {

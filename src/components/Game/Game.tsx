@@ -49,7 +49,13 @@ const Game: FC<GameProps> = ({}) => {
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
-    const valid = getValidMoves(dragItem, dropPoint)
+    const valid = getValidMoves(
+      dragItem,
+      dropPoint,
+      activePlayer,
+      state.checkerPositions,
+      state.movement
+    )
     return valid
   }
 
@@ -57,8 +63,8 @@ const Game: FC<GameProps> = ({}) => {
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
-    moveChecker(dropPoint, dragItem, dispatch)
-    updateRemainingMoves(dropPoint, dragItem, dispatch)
+    moveChecker(dropPoint, dragItem, state.checkerPositions, dispatch)
+    updateRemainingMoves(dropPoint, dragItem, state.movement, dispatch)
     getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
   }
 
