@@ -33,8 +33,13 @@ export interface MovementState {
   movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
 }
 
+export interface Turn {
+  turn: number
+  movesTaken: { fromPoint: number; toPoint: number; move: [] }[]
+}
+
 export interface GameState {
-  gameHistory: {}[]
+  gameHistory: Turn[]
   checkerPositions: CheckerPositionsState
   activePlayer: 1 | 2 | null
   diceState: {

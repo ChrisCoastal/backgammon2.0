@@ -22,7 +22,6 @@ import { useReducer, useRef } from 'react'
 
 // components
 import GameBoard from '../GameBoard/GameBoard'
-import { getDialogUtilityClass } from '@mui/material'
 
 interface GameProps {
   // children: ReactNode
@@ -36,7 +35,7 @@ const Game: FC<GameProps> = ({}) => {
   const { activePlayer } = state
 
   // TODO: avoid if possible?
-  const diceRollRef = useRef(state.diceState)
+  const diceRollRef = useRef(state.diceState.diceRoll)
 
   // useEffect(() => {
   //   // pass state updates to gameState.ts
@@ -56,6 +55,8 @@ const Game: FC<GameProps> = ({}) => {
       state.checkerPositions,
       state.movement
     )
+    console.log(valid)
+
     return valid
   }
 
@@ -63,6 +64,8 @@ const Game: FC<GameProps> = ({}) => {
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
   ) => {
+    console.log('drop')
+
     moveChecker(dropPoint, dragItem, state.checkerPositions, dispatch)
     updateRemainingMoves(dropPoint, dragItem, state.movement, dispatch)
     getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)

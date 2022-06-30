@@ -1,11 +1,8 @@
-import type { MutableRefObject } from 'react'
-import { useRef } from 'react'
-
 // helpers
 import { getDiceRoll } from '../../utils/gameState'
 
 // types
-import { DiceRoll, ReducerActions } from '../../@types/types'
+import { DiceRoll } from '../../@types/types'
 
 interface DiceProps {
   diceRoll: DiceRoll
@@ -15,13 +12,13 @@ interface DiceProps {
 const Dice = ({ activePlayer, diceRoll }: DiceProps) => {
   // const diceRoll = getDiceRoll(dispatch)
 
-  const [die1, die2] = diceRoll
+  // const [die1, die2] = diceRoll
 
-  const roll = !activePlayer
-    ? [die1, 0, 0, die2]
-    : activePlayer === 1
-    ? [die1, die2, 0, 0]
-    : [0, 0, die1, die2] // ∴ activePlayer === 2
+  // const roll = !activePlayer
+  //   ? [die1, 0, 0, die2]
+  //   : activePlayer === 1
+  //   ? [die1, die2, 0, 0]
+  //   : [0, 0, die1, die2] // ∴ activePlayer === 2
 
   //TODO: add die component
   return (

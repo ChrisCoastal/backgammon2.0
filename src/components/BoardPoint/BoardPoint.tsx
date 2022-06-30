@@ -59,7 +59,7 @@ const BoardPoint: FC<PointProps> = ({
         canDrop: monitor.canDrop()
       })
     }),
-    [activePlayer, table]
+    [activePlayer, board]
   )
 
   const dropColor =

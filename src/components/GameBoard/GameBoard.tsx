@@ -19,7 +19,7 @@ import {
 
 // helpers
 import {
-  initialMoves,
+  playerTurnMoves,
   getOpenPoints,
   getDiceRoll,
   getMoves,
@@ -64,7 +64,9 @@ const GameBoard: FC<GameBoardProps> = ({
 
   const rollDiceHandler = () => {
     const roll = getDiceRoll(dispatch)
-    const moves = initialMoves(roll, dispatch)
+    console.log(roll, dispatch)
+
+    const moves = playerTurnMoves(roll, dispatch)
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
 

@@ -25,8 +25,8 @@ import {
 const dice = () => Math.floor(Math.random() * 6) + 1
 
 export const getDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
-  const [die1, die2] = [dice(), dice()]
-  // const [die1, die2] = [6, 1]
+  // const [die1, die2] = [dice(), dice()]
+  const [die1, die2] = [1, 1]
 
   dispatch({
     type: 'setDice',
@@ -114,7 +114,7 @@ export const toggleActivePlayer = (
 //   return [die1, die2]
 // }
 
-export const initialMoves = (
+export const playerTurnMoves = (
   diceRoll: DiceRoll,
   dispatch: Dispatch<ReducerActions>
 ) => {
@@ -328,10 +328,12 @@ export const getValidMoves = (
   // dropPoint?: number
 ) => {
   const { fromPoint } = dragItem
-  const { openPoints } = checkerPositions
+  const { openPoints, board } = checkerPositions
   // console.log('HOME', isCheckersHome())
 
   // check that the fromPoint will allow all moves to be taken
+  /*
+    // TODO: add back
   if (!movement.validMoves.map((move) => move.fromPoint).includes(fromPoint)) {
     // alert('NO MOVE')
     return false
@@ -339,16 +341,24 @@ export const getValidMoves = (
   // check for remaining moves
   if (movement.movesRemaining.length === 0) return false
 
-  const bar = isCheckersBar(activePlayer, checkerPositions.board)
+  const bar = isCheckersBar(activePlayer, board)
   if (bar.isCheckers && fromPoint !== bar.point) return false
+  */
 
   const direction = getDirection(activePlayer)
+  console.log(movement.movesRemaining)
+
   const directionalMoves = movement.movesRemaining.map(
     (move) => move * direction
   )
+  // console.log(directionalMoves)
+
+  const validForward = getMoves(directionalMoves)
+  const validReverse = getMoves([...directionalMoves].reverse())
+  const validMoves = new Set([...validForward, ...validReverse])
 
   // TODO: add handling for blots
-  const getMoves = (moves: number[]) => {
+  function getMoves(moves: number[]) {
     let moveAcc = 0
     const moveCombos = moves.map((move) => (moveAcc += move))
     const isMoveValid = moveCombos.map((move) =>
@@ -364,13 +374,6 @@ export const getValidMoves = (
     return validCurrentMoves
   }
 
-  const validForward = getMoves(directionalMoves)
-  const validReverse = getMoves([...directionalMoves].reverse())
-  const validMoves = new Set([...validForward, ...validReverse])
-
-  // return dropPoint !== undefined
-  //   ? [...validMoves].includes(dropPoint)
-  //   : [...validMoves]
   // checks if the array of valid moves includes the point (div) hovered over
   return [...validMoves].includes(dropPoint)
 }
