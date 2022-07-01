@@ -438,13 +438,12 @@ export const moveChecker = (
 
   const barPoint = [PLAYER_1_BAR, PLAYER_2_BAR]
   let newState = checkerPositions
-  // move to open or anchor point
 
   // (!barPoint.includes(fromPoint) && openPoints[dropPoint] === 'open') ||
+  // move to open or anchor point
   if (openPoints[dropPoint] === 'open' || openPoints[dropPoint] === 'anchor') {
     const movingChecker = newState.board[fromPoint].pop() as ActiveChecker
     newState.board[dropPoint].push(movingChecker)
-    // newState.board[dropPoint].push(checkerColor)
   }
   // TODO: add hits in comboMoves
   // hit opponent blot
@@ -455,6 +454,14 @@ export const moveChecker = (
       : newState.board[PLAYER_2_BAR].push(hitBlot)
     const movingChecker = newState.board[fromPoint].pop() as ActiveChecker
     newState.board[dropPoint].push(movingChecker)
+  }
+
+  // bear off checker from homeboard
+  if (dropPoint === checkerColor * 100) {
+    const movingChecker = newState.board[fromPoint].pop() as ActiveChecker
+    movingChecker === 1
+      ? newState.bearOff1.push(movingChecker)
+      : newState.bearOff2.push(movingChecker)
   }
 
   dispatch({ type: 'setCheckerPosition', payload: newState })

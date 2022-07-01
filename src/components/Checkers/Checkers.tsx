@@ -14,7 +14,7 @@ const Checkers: FC<CheckersProps> = ({ pointIndex, checkers }) => {
   //TODO: add handling for over 5 checkers
   return (
     <>
-      {checkers.map((checker: 1 | 2, checkerIndex) => {
+      {checkers.map((checker: 1 | 2) => {
         // if (checkerIndex > 5) return
         return (
           checker && (

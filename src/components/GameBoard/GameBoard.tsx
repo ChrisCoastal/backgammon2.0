@@ -146,17 +146,6 @@ const GameBoard: FC<GameBoardProps> = ({
           board={checkerPositions.board}
         >
           <Checkers pointIndex={i} checkers={checkerPositions.board[i]} />
-          {/* {table[i].map((checker, checkerIndex) => {
-            return (
-              checker && (
-                <Checker
-                  key={`checker ${i + Math.random()}`}
-                  point={i}
-                  checkerColor={checker}
-                />
-              )
-            )
-          })} */}
         </BoardPoint>
       )
     }
@@ -180,7 +169,12 @@ const GameBoard: FC<GameBoardProps> = ({
           activePlayer={activePlayer}
           movesRemaining={movement.movesRemaining}
           board={checkerPositions.board}
-        ></BearOff>
+        >
+          <Checkers
+            pointIndex={PLAYER_1_BEAROFF}
+            checkers={checkerPositions.bearOff1}
+          />
+        </BearOff>
         <div className={`flex`}>{points}</div>
         <BearOff
           pointIndex={PLAYER_2_BEAROFF}
@@ -189,7 +183,12 @@ const GameBoard: FC<GameBoardProps> = ({
           activePlayer={activePlayer}
           movesRemaining={movement.movesRemaining}
           board={checkerPositions.board}
-        ></BearOff>
+        >
+          <Checkers
+            pointIndex={PLAYER_2_BEAROFF}
+            checkers={checkerPositions.bearOff2}
+          />
+        </BearOff>
       </div>
       <div>
         {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}
