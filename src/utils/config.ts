@@ -101,8 +101,8 @@ export const INITIAL_GAME_STATE: GameState = {
     bearOff1: [],
     bearOff2: []
   },
-  activePlayer: 2,
-  // activePlayer: null,
+  // activePlayer: 2,
+  activePlayer: null,
   diceState: {
     diceRoll: [0, 0],
     doublingCube: 1
@@ -120,7 +120,9 @@ export const BOARD_COLORS = {
   evenPoint: 'bg-blue-200',
   bar: 'bg-slate-500',
   player1checker: 'bg-red-500',
-  player2checker: 'bg-blue-500'
+  player2checker: 'bg-blue-500',
+  player1dice: 'bg-red-300',
+  player2dice: 'bg-blue-300'
 }
 
 // React DnD

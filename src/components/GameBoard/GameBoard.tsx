@@ -30,7 +30,7 @@ import {
   moveChecker,
   updateRemainingMoves,
   // getMoves,
-  checkMoves,
+  // checkMoves,
   isPlayerWinner
 } from 'src/utils/gameState'
 
@@ -68,37 +68,6 @@ const GameBoard: FC<GameBoardProps> = ({
   endTurnHandler,
   dispatch
 }) => {
-  const diceRollRef = useRef(roll)
-
-  const rollDiceHandler = () => {
-    const roll = getDiceRoll(dispatch)
-    const moves = playerTurnMoves(roll, dispatch)
-    // TODO: must check if there are any valid moves available
-    // pass every activePlayer occupied point through getValidMoves
-
-    const openPoints = getOpenPoints(
-      activePlayer,
-      checkerPositions.board,
-      dispatch
-    )
-    // const allPossibleMoves = getMoves(
-    //   moves,
-    //   checkerPositions.board,
-    //   activePlayer
-    // )
-    //
-    const valid = checkMoves(
-      openPoints,
-      checkerPositions.board,
-      activePlayer,
-      roll,
-      dispatch
-    )
-    // TODO: if valid returns no moves possible call endTurnHandler
-    // const possible = possibleMoves(activePlayer, roll)
-    console.log(valid)
-  }
-
   const dragCheckerHandler = (
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: ActiveChecker }
@@ -153,12 +122,6 @@ const GameBoard: FC<GameBoardProps> = ({
   }
   const points = renderPoints()
 
-  const disable = movement.movesRemaining.length !== 0
-  const rollButtonColor = disable
-    ? 'bg-gray-300'
-    : 'bg-blue-600 hover:bg-blue-700'
-  const buttonColor = disable ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
-
   return (
     <div>
       <div className={`flex`}>
@@ -190,45 +153,6 @@ const GameBoard: FC<GameBoardProps> = ({
           />
         </BearOff>
       </div>
-      <div>
-        {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}
-        <Dice diceRoll={roll} activePlayer={activePlayer} />
-        <button
-          disabled={disable}
-          onClick={() => rollDiceHandler()}
-          className={`py-2 px-6 m-2 rounded ${rollButtonColor} bg-g`}
-        >
-          ROLL
-        </button>
-      </div>
-      <button
-        disabled={disable}
-        onClick={endTurnHandler}
-        className={`py-2 px-6 m-2 rounded ${buttonColor}`}
-      >
-        END TURN
-      </button>
-      {/* <button
-        onClick={() => console.log('undo')}
-        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
-      >
-        UNDO
-      </button>
-      <button
-        onClick={() => startGameHandler()}
-        disabled={!!activePlayer}
-        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
-      >
-        START GAME
-      </button>
-      <button
-        onClick={() => endGameHandler}
-        disabled={!!activePlayer}
-        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
-      >
-        END GAME
-      </button> */}
-      {/* <GameOptions optionsHandler={optionsHandler} /> */}
     </div>
   )
 }

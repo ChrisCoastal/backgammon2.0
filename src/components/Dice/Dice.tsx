@@ -3,6 +3,7 @@ import { getDiceRoll } from '../../utils/gameState'
 
 // types
 import { DiceRoll } from '../../@types/types'
+import { BOARD_COLORS } from 'src/utils/config'
 
 interface DiceProps {
   diceRoll: DiceRoll
@@ -14,20 +15,22 @@ const Dice = ({ activePlayer, diceRoll }: DiceProps) => {
 
   // const [die1, die2] = diceRoll
 
-  // const roll = !activePlayer
-  //   ? [die1, 0, 0, die2]
-  //   : activePlayer === 1
-  //   ? [die1, die2, 0, 0]
-  //   : [0, 0, die1, die2] // ∴ activePlayer === 2
-
   //TODO: add die component
+
+  const diceColor =
+    activePlayer === null
+      ? [BOARD_COLORS.player1dice, BOARD_COLORS.player2dice]
+      : activePlayer === 1
+      ? [BOARD_COLORS.player1dice, BOARD_COLORS.player1dice]
+      : [BOARD_COLORS.player2dice, BOARD_COLORS.player2dice]
+
   return (
     <div>
       <ul>
-        {diceRoll.map((dice) => (
+        {diceRoll.map((dice, i) => (
           <li
             key={Math.random()}
-            className={`inline-flex py-3 px-3 m-2 bg-red-300 rounded-sm`}
+            className={`inline-flex ${diceColor[i]} py-3 px-3 m-2 rounded-sm text-white`}
           >
             {dice}
           </li>

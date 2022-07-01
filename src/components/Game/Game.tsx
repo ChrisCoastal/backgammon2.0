@@ -15,11 +15,14 @@ import { reducer } from 'src/utils/reducer'
 import {
   initializeActivePlayer,
   toggleActivePlayer,
+  playerTurnMoves,
+  // checkMoves,
   getValidMoves,
   getOpenPoints,
   moveChecker,
   updateRemainingMoves,
-  getDiceRoll
+  getDiceRoll,
+  resetDiceRoll
 } from '../../utils/gameState'
 
 // hooks
@@ -27,6 +30,7 @@ import { useReducer } from 'react'
 
 // components
 import GameBoard from '../GameBoard/GameBoard'
+import Dice from '../Dice/Dice'
 
 const Game: FC = ({}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_GAME_STATE)
@@ -35,54 +39,71 @@ const Game: FC = ({}) => {
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
-  // const dragCheckerHandler = (
-  //   dropPoint: number,
-  //   dragItem: { fromPoint: number; checkerColor: any }
-  // ) => {
-  //   const valid = getValidMoves(
-  //     dragItem,
-  //     dropPoint,
-  //     activePlayer,
-  //     state.checkerPositions,
-  //     state.movement.movesRemaining
-  //   )
+  // const diceRollRef = useRef(roll)
 
-  //   return valid
-  // }
+  const rollDiceHandler = () => {
+    const roll = getDiceRoll(dispatch)
+    const moves = playerTurnMoves(roll, dispatch)
+    // TODO: must check if there are any valid moves available
+    // pass every activePlayer occupied point through getValidMoves
 
-  // // make sure to pass relavent state down to the useDrop hook
-  // const dropCheckerHandler = (
-  //   dropPoint: number,
-  //   dragItem: { fromPoint: number; checkerColor: any }
-  // ) => {
-  //   console.log('drop')
-
-  //   moveChecker(dropPoint, dragItem, state.checkerPositions, dispatch)
-  //   updateRemainingMoves(dropPoint, dragItem, state.movement, dispatch)
-  //   // getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
-  // }
+    const openPoints = getOpenPoints(
+      activePlayer,
+      state.checkerPositions.board,
+      dispatch
+    )
+    // const allPossibleMoves = getMoves(
+    //   moves,
+    //   checkerPositions.board,
+    //   activePlayer
+    // )
+    //
+    // const valid = checkMoves(
+    //   openPoints,
+    //   state.checkerPositions.board,
+    //   activePlayer,
+    //   roll,
+    //   dispatch
+    // )
+    // TODO: if valid returns no moves possible call endTurnHandler
+    // const possible = possibleMoves(activePlayer, roll)
+    // console.log(valid)
+  }
 
   const endTurnHandler = () => {
     console.log('endturn')
 
+    resetDiceRoll(dispatch)
     toggleActivePlayer(state.activePlayer, dispatch)
+
     // TODO:
     // push movesTaken
     // updateTurnHistory()
   }
 
-  const initGame = () => {
+  const startGameHandler: any = () => {
     const roll = getDiceRoll(dispatch)
+    const openPoints = getOpenPoints(
+      activePlayer,
+      state.checkerPositions.board,
+      dispatch
+    )
     if (!activePlayer) {
       const active = initializeActivePlayer(roll, dispatch)
-      active === 'DOUBLES' && getDiceRoll(dispatch)
+      if (active === 'DOUBLES') {
+        return startGameHandler()
+      }
       console.log('ACTIVE', active)
     }
+    const moves = playerTurnMoves(roll, dispatch)
   }
 
-  const startGameHandler = () => {
-    initGame()
-  }
+  // TODO: add condition so end turn is required before roll
+  const disable = state.movement.movesRemaining.length !== 0
+  const rollButtonColor = disable
+    ? 'bg-gray-300'
+    : 'bg-blue-600 hover:bg-blue-700'
+  const buttonColor = disable ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
 
   return (
     <div>
@@ -91,12 +112,54 @@ const Game: FC = ({}) => {
         checkerPositions={state.checkerPositions}
         roll={diceRoll}
         movement={state.movement}
-        // dragCheckerHandler={dragCheckerHandler}
-        // dropCheckerHandler={dropCheckerHandler}
         endTurnHandler={endTurnHandler}
         dispatch={dispatch}
       />
       {/* <StartGameButton /> */}
+      <div>
+        <div>
+          {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}
+          <Dice
+            diceRoll={state.diceState.diceRoll}
+            activePlayer={activePlayer}
+          />
+          <button
+            disabled={disable}
+            onClick={rollDiceHandler}
+            className={`py-2 px-6 m-2 rounded ${rollButtonColor} bg-g`}
+          >
+            ROLL
+          </button>
+        </div>
+        <button
+          disabled={disable}
+          onClick={endTurnHandler}
+          className={`py-2 px-6 m-2 rounded ${buttonColor}`}
+        >
+          END TURN
+        </button>
+        <button
+          onClick={() => console.log('undo')}
+          className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
+        >
+          UNDO
+        </button>
+        <button
+          onClick={() => startGameHandler()}
+          disabled={!!activePlayer}
+          className={`py-2 px-6 m-2 rounded ${buttonColor}`}
+        >
+          START GAME
+        </button>
+        {/* <button
+        onClick={() => endGameHandler}
+        disabled={!!activePlayer}
+        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
+      >
+        END GAME
+      </button> */}
+        {/* <GameOptions optionsHandler={optionsHandler} /> */}
+      </div>
     </div>
   )
 }

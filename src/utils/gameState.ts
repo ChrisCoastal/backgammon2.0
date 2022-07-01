@@ -26,6 +26,13 @@ import {
 // Dice
 const dice = () => Math.floor(Math.random() * 6) + 1
 
+export const resetDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
+  dispatch({
+    type: 'setDice',
+    payload: { roll: [0, 0] }
+  })
+}
+
 export const getDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
   const [die1, die2] = [dice(), dice()]
   // const [die1, die2] = [1, 1]
@@ -247,93 +254,94 @@ export const getOpenPoints = (
 //   // console.log(validMoves)
 // }
 
-export const checkMoves = (
-  openPoints: OpenPoint,
-  boardPositions: BoardPositions,
-  activePlayer: ActivePlayer,
-  diceRoll: DiceRoll,
-  dispatch: Dispatch<ReducerActions>
-) => {
-  const direction = getDirection(activePlayer)
-  // const dirMoves = (moves || gameState.movement.movesRemaining).map(
-  const dirMoves = diceRoll.map((move) => move * direction)
-  const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+// FIXME: check moves now returns {fromPoint: 0, checkerQty: 0} or empty array for doubles
+// export const checkMoves = (
+//   openPoints: OpenPoint,
+//   boardPositions: BoardPositions,
+//   activePlayer: ActivePlayer,
+//   diceRoll: DiceRoll,
+//   dispatch: Dispatch<ReducerActions>
+// ) => {
+//   const direction = getDirection(activePlayer)
+//   // const dirMoves = (moves || gameState.movement.movesRemaining).map(
+//   const dirMoves = diceRoll.map((move) => move * direction)
+//   const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
 
-  let fromPoints
-  // if the active bar is occupied, can only move from there
-  if (isCheckersBar(activePlayer, boardPositions))
-    fromPoints = [
-      { fromPoint: bar, checkerQty: boardPositions[bar].length }
-    ] as {
-      fromPoint: number
-      checkerQty: number
-    }[]
-  // otherwise check all other occupied points
-  else
-    fromPoints = openPoints.reduce((acc, point, i) => {
-      // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
-      return point === 'anchor' || point === 'blot'
-        ? [...acc, { fromPoint: i, checkerQty: boardPositions[i].length }]
-        : acc
-    }, [] as { fromPoint: number; checkerQty: number }[])
+//   let fromPoints
+//   // if the active bar is occupied, can only move from there
+//   if (isCheckersBar(activePlayer, boardPositions))
+//     fromPoints = [
+//       { fromPoint: bar, checkerQty: boardPositions[bar].length }
+//     ] as {
+//       fromPoint: number
+//       checkerQty: number
+//     }[]
+//   // otherwise check all other occupied points
+//   else
+//     fromPoints = openPoints.reduce((acc, point, i) => {
+//       // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
+//       return point === 'anchor' || point === 'blot'
+//         ? [...acc, { fromPoint: i, checkerQty: boardPositions[i].length }]
+//         : acc
+//     }, [] as { fromPoint: number; checkerQty: number }[])
 
-  // TODO: move this into a map or forEach loop?
-  // check first number against all fromPoints.length > 0
-  // const check1Move = fromPoints.map((fromPoint) => {
-  //   const moveTo = openPoints[fromPoint.fromPoint + dirMoves[0]]
-  //   if (moveTo !== 'closed') return { ...fromPoint, dropPoint: moveTo }
-  //   return
-  // })
-  let check1Move = fromPoints.filter(
-    (fromPoint) => openPoints[fromPoint.fromPoint + dirMoves[0]] !== 'closed'
-  )
-  let check12Move = check1Move.filter(
-    (fromPoint) =>
-      openPoints[fromPoint.fromPoint + dirMoves[0] + dirMoves[1]] !== 'closed'
-  )
-  let check2Move = fromPoints.filter(
-    (fromPoint) => openPoints[fromPoint.fromPoint + dirMoves[1]] !== 'closed'
-  )
-  let check21Move = check2Move.filter(
-    (fromPoint) =>
-      openPoints[fromPoint.fromPoint + dirMoves[1] + dirMoves[0]] !== 'closed'
-  )
-  console.log(
-    '1',
-    check1Move,
-    '2',
-    check2Move,
-    '12',
-    check12Move,
-    '21',
-    check21Move
-  )
+//   // TODO: move this into a map or forEach loop?
+//   // check first number against all fromPoints.length > 0
+//   // const check1Move = fromPoints.map((fromPoint) => {
+//   //   const moveTo = openPoints[fromPoint.fromPoint + dirMoves[0]]
+//   //   if (moveTo !== 'closed') return { ...fromPoint, dropPoint: moveTo }
+//   //   return
+//   // })
+//   let check1Move = fromPoints.filter(
+//     (fromPoint) => openPoints[fromPoint.fromPoint + dirMoves[0]] !== 'closed'
+//   )
+//   let check12Move = check1Move.filter(
+//     (fromPoint) =>
+//       openPoints[fromPoint.fromPoint + dirMoves[0] + dirMoves[1]] !== 'closed'
+//   )
+//   let check2Move = fromPoints.filter(
+//     (fromPoint) => openPoints[fromPoint.fromPoint + dirMoves[1]] !== 'closed'
+//   )
+//   let check21Move = check2Move.filter(
+//     (fromPoint) =>
+//       openPoints[fromPoint.fromPoint + dirMoves[1] + dirMoves[0]] !== 'closed'
+//   )
+//   console.log(
+//     '1',
+//     check1Move,
+//     '2',
+//     check2Move,
+//     '12',
+//     check12Move,
+//     '21',
+//     check21Move
+//   )
 
-  let validMoves = [check1Move, check2Move].flat()
+//   let validMoves = [check1Move, check2Move].flat()
 
-  // if (check2Move.length === 1) {
-  //   // then must take move with that checker
-  // }
-  // // check 1 number against all fromPoints.length > 1
-  // // repeat for 2 number
-  if (check1Move.length === 0 && check2Move.length === 0) {
-    alert('NO MOVES AVAILABLE')
-    validMoves = []
-  }
-  if (check12Move.length > 0 && check2Move.length === 0) {
-    // check1Move.filter((move) => check12Move.includes(move))
-    // get rid of check1move
-    validMoves = check12Move
-  }
-  if (check1Move.length === 0 && check21Move.length > 0) {
-    // check2Move.filter((move) => check21Move.includes(move))
-    validMoves = check21Move
-  }
-  console.log(validMoves)
+//   // if (check2Move.length === 1) {
+//   //   // then must take move with that checker
+//   // }
+//   // // check 1 number against all fromPoints.length > 1
+//   // // repeat for 2 number
+//   if (check1Move.length === 0 && check2Move.length === 0) {
+//     alert('NO MOVES AVAILABLE')
+//     validMoves = []
+//   }
+//   if (check12Move.length > 0 && check2Move.length === 0) {
+//     // check1Move.filter((move) => check12Move.includes(move))
+//     // get rid of check1move
+//     validMoves = check12Move
+//   }
+//   if (check1Move.length === 0 && check21Move.length > 0) {
+//     // check2Move.filter((move) => check21Move.includes(move))
+//     validMoves = check21Move
+//   }
+//   console.log(validMoves)
 
-  dispatch({ type: 'setValidMoves', payload: validMoves })
-  return validMoves
-}
+//   dispatch({ type: 'setValidMoves', payload: validMoves })
+//   return validMoves
+// }
 
 // export const getMoves = (
 //   moves: number[],
