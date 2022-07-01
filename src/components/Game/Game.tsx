@@ -1,11 +1,17 @@
 // types
 import type { ReactNode, FC } from 'react'
-import { GameState, ReducerActions } from 'src/@types/types'
+import {
+  GameState,
+  ReducerActions,
+  ActivePlayer,
+  CheckerPositionsState
+} from 'src/@types/types'
 
 // config
 import { INITIAL_GAME_STATE } from 'src/utils/config'
 
 // helpers
+import { reducer } from 'src/utils/reducer'
 import {
   initializeActivePlayer,
   toggleActivePlayer,
@@ -15,34 +21,19 @@ import {
   updateRemainingMoves,
   getDiceRoll
 } from '../../utils/gameState'
-import { reducer } from 'src/utils/reducer'
 
 // hooks
-import { useReducer, useRef } from 'react'
+import { useReducer } from 'react'
 
 // components
 import GameBoard from '../GameBoard/GameBoard'
 
-interface GameProps {
-  // children: ReactNode
-}
-
-const Game: FC<GameProps> = ({}) => {
+const Game: FC = ({}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_GAME_STATE)
 
   const { board, bearOff1, bearOff2 } = state.checkerPositions
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
-
-  // TODO: avoid if possible?
-  const diceRollRef = useRef(state.diceState.diceRoll)
-
-  // useEffect(() => {
-  //   // pass state updates to gameState.ts
-  //   stateSubscriber(state, dispatch)
-  //   // ensures current diceState
-  //   diceRollRef.current = state.diceState
-  // }, [state])
 
   const dragCheckerHandler = (
     dropPoint: number,
@@ -53,13 +44,13 @@ const Game: FC<GameProps> = ({}) => {
       dropPoint,
       activePlayer,
       state.checkerPositions,
-      state.movement
+      state.movement.movesRemaining
     )
-    console.log(valid)
 
     return valid
   }
 
+  // make sure to pass relavent state down to the useDrop hook
   const dropCheckerHandler = (
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: any }
@@ -68,10 +59,12 @@ const Game: FC<GameProps> = ({}) => {
 
     moveChecker(dropPoint, dragItem, state.checkerPositions, dispatch)
     updateRemainingMoves(dropPoint, dragItem, state.movement, dispatch)
-    getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
+    // getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
   }
 
   const endTurnHandler = () => {
+    console.log('endturn')
+
     toggleActivePlayer(state.activePlayer, dispatch)
     // TODO:
     // push movesTaken

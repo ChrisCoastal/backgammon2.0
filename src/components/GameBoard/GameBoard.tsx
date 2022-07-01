@@ -22,13 +22,13 @@ import {
   playerTurnMoves,
   getOpenPoints,
   getDiceRoll,
-  getMoves,
+  // getMoves,
   checkMoves
 } from 'src/utils/gameState'
 
 //components
 import BoardPoint from '../BoardPoint/BoardPoint'
-import Bar from '../Bar/Bar'
+import BearOff from '../BearOff/BearOff'
 import Checkers from '../Checkers/Checkers'
 import Checker from '../Checker/Checker'
 import Dice from '../Dice/Dice'
@@ -64,8 +64,6 @@ const GameBoard: FC<GameBoardProps> = ({
 
   const rollDiceHandler = () => {
     const roll = getDiceRoll(dispatch)
-    console.log(roll, dispatch)
-
     const moves = playerTurnMoves(roll, dispatch)
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
@@ -75,7 +73,11 @@ const GameBoard: FC<GameBoardProps> = ({
       checkerPositions.board,
       dispatch
     )
-    const allPossibleMoves = getMoves(moves, checkerPositions, activePlayer)
+    // const allPossibleMoves = getMoves(
+    //   moves,
+    //   checkerPositions.board,
+    //   activePlayer
+    // )
     //
     const valid = checkMoves(
       openPoints,
@@ -86,6 +88,7 @@ const GameBoard: FC<GameBoardProps> = ({
     )
     // TODO: if valid returns no moves possible call endTurnHandler
     // const possible = possibleMoves(activePlayer, roll)
+    console.log(valid)
   }
 
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
@@ -101,6 +104,7 @@ const GameBoard: FC<GameBoardProps> = ({
           validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
+          movesRemaining={movesRemaining}
           board={checkerPositions.board}
         >
           <Checkers pointIndex={i} checkers={checkerPositions.board[i]} />
@@ -130,8 +134,24 @@ const GameBoard: FC<GameBoardProps> = ({
 
   return (
     <div>
-      <div>
+      <div className={`flex`}>
+        <BearOff
+          pointIndex={1}
+          validMoves={dragCheckerHandler}
+          dropHandler={dropCheckerHandler}
+          activePlayer={activePlayer}
+          movesRemaining={movesRemaining}
+          board={checkerPositions.board}
+        ></BearOff>
         <div className={`flex`}>{points}</div>
+        <BearOff
+          pointIndex={2}
+          validMoves={dragCheckerHandler}
+          dropHandler={dropCheckerHandler}
+          activePlayer={activePlayer}
+          movesRemaining={movesRemaining}
+          board={checkerPositions.board}
+        ></BearOff>
       </div>
       <div>
         {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}

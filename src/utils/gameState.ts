@@ -25,8 +25,8 @@ import {
 const dice = () => Math.floor(Math.random() * 6) + 1
 
 export const getDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
-  // const [die1, die2] = [dice(), dice()]
-  const [die1, die2] = [1, 1]
+  const [die1, die2] = [dice(), dice()]
+  // const [die1, die2] = [1, 1]
 
   dispatch({
     type: 'setDice',
@@ -72,47 +72,33 @@ export const toggleActivePlayer = (
 
 ////////////////////
 // Table Position
-// const isCheckersBar = () => {
-//   const { activePlayer, checkerPositions } = gameState
-//   const bar = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
-//   // check for checkers on bar
-//   if (checkerPositions.board[bar].length === 0)
-//     return { isCheckers: false, point: bar }
-//   return { isCheckers: true, point: bar }
-// }
-// const isCheckersHome = () => {
-//   const { activePlayer, checkerPositions } = gameState
-//   const home = activePlayer === 1 ? PLAYER_1_HOME_LIMIT : PLAYER_2_HOME_LIMIT
-//   return (
-//     checkerPositions.board.filter((point, i) =>
-//       activePlayer === 1
-//         ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
-//         : i > PLAYER_2_HOME_LIMIT && !point.includes(2)
-//     ).length > 0
-//   )
-// }
+const isCheckersBar = (
+  activePlayer: ActivePlayer,
+  boardPositions: BoardPositions
+) => {
+  const barPoint = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
+  // check for checkers on bar
+  return boardPositions[barPoint].length === 0
+    ? { isCheckers: false, point: barPoint }
+    : { isCheckers: true, point: barPoint }
+}
+
+const isCheckersHome = (
+  activePlayer: ActivePlayer,
+  boardPositions: BoardPositions
+) => {
+  // returns false if activePlayer checkers are outside homeboard
+  return (
+    boardPositions.filter((point, i) =>
+      activePlayer === 1
+        ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
+        : i < PLAYER_2_HOME_LIMIT && point.includes(2)
+    ).length === 0
+  )
+}
 
 ////////////////////
-// Dice and Movement
-// const dice = () => Math.floor(Math.random() * 6) + 1
-
-// const getDiceRoll = () => {
-//   // const [die1, die2] = [dice(), dice()]
-//   const [die1, die2] = [6, 1]
-
-//   const roll = !gameState.activePlayer
-//     ? [die1, 0, 0, die2]
-//     : gameState.activePlayer === 1
-//     ? [die1, die2, 0, 0]
-//     : [0, 0, die1, die2] // ∴ activePlayer === 2
-
-//   dispatch({
-//     type: 'setDice',
-//     payload: { roll: roll }
-//   })
-
-//   return [die1, die2]
-// }
+// Movement
 
 export const playerTurnMoves = (
   diceRoll: DiceRoll,
@@ -133,6 +119,95 @@ export const playerTurnMoves = (
 export const getDirection = (activePlayer: ActivePlayer) =>
   activePlayer === 1 ? -1 : 1
 
+export const getValidMoves = (
+  dragItem: { fromPoint: number; checkerColor: any },
+  dropPoint: number,
+  activePlayer: ActivePlayer,
+  checkerPositions: CheckerPositionsState,
+  movesRemaining: number[]
+  // dropPoint?: number
+) => {
+  console.log(dropPoint)
+
+  const { fromPoint } = dragItem
+  const { openPoints, board } = checkerPositions
+  // TODO: check that the fromPoint will allow all moves to be taken
+
+  // TODO: add back
+  // if (!movement.validMoves.map((move) => move.fromPoint).includes(fromPoint)) {
+  //   // alert('NO MOVE')
+  //   return false
+  // }
+  // check for remaining moves
+  if (movesRemaining.length === 0) return false
+
+  // checkers on bar
+  const bar = isCheckersBar(activePlayer, board)
+  if (bar.isCheckers && fromPoint !== bar.point) return false
+
+  // all checkers in homeboard
+  const home = isCheckersHome(activePlayer, board)
+  if (home)
+    return getValidHomeMoves(
+      dragItem,
+      dropPoint,
+      activePlayer,
+      checkerPositions,
+      movesRemaining
+    )
+
+  const direction = getDirection(activePlayer)
+  const directionalMoves = movesRemaining.map((move) => move * direction)
+
+  // TODO: add handling for blots
+  function getMoves(moves: number[]) {
+    let moveAcc = 0
+    const moveCombos = moves.map((move) => (moveAcc += move))
+    const isMoveValid = moveCombos.map((move) =>
+      fromPoint + move >= 1 && fromPoint + move <= 24
+        ? openPoints[fromPoint + move]
+        : 'closed'
+    )
+    const invalidIndex = isMoveValid.indexOf('closed')
+    const validMoves =
+      invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
+    const validCurrentMoves = validMoves.map((move) => fromPoint + move)
+
+    return validCurrentMoves
+  }
+  const validForward = getMoves(directionalMoves)
+  const validReverse = getMoves([...directionalMoves].reverse())
+  const validMoves = new Set([...validForward, ...validReverse])
+
+  // checks if the array of valid moves includes the point (div) hovered over
+  return [...validMoves].includes(dropPoint)
+}
+
+const getValidHomeMoves = (
+  dragItem: { fromPoint: number; checkerColor: any },
+  dropPoint: number,
+  activePlayer: ActivePlayer,
+  checkerPositions: CheckerPositionsState,
+  movesRemaining: number[]
+  // dropPoint?: number
+) => {
+  const backChecker =
+    activePlayer === 1
+      ? checkerPositions.board.reduce(
+          (acc, cV, i) =>
+            cV.includes(activePlayer as 1 | 2) ? (acc = i) : acc,
+          -1
+        )
+      : checkerPositions.board.reduce(
+          (acc, cV, i) =>
+            cV.includes(activePlayer as 1 | 2) && acc === -1 ? (acc = i) : acc,
+          -1
+        )
+  console.log(backChecker)
+  // TODO:
+  return true
+}
+
 export const getOpenPoints = (
   activePlayer: ActivePlayer,
   checkerPositions: BoardPositions,
@@ -147,51 +222,26 @@ export const getOpenPoints = (
       ? `closed`
       : `anchor`
   })
-
+  // TODO: derived state should not be kept in state
   dispatch({ type: 'setOpenPoints', payload: openPoints })
   return openPoints
 }
 
-const isCheckersBar = (
-  activePlayer: ActivePlayer,
-  boardPositions: BoardPositions
-) => {
-  const barPoint = activePlayer === 1 ? PLAYER_1_BAR : PLAYER_2_BAR
-  // check for checkers on bar
-  return boardPositions[barPoint].length === 0
-    ? { isCheckers: false, point: barPoint }
-    : { isCheckers: true, point: barPoint }
-}
+// export const isValidMoves = (openPoints: OpenPoint) => {
+//   // const { openPoints } = gameState.checkerPositions
+//   const fromPoints = openPoints.reduce((acc, point, i) => {
+//     return point === 'anchor' ? [...acc, i] : acc
+//   }, [] as number[])
+//   console.log(fromPoints)
 
-const isCheckersHome = (
-  activePlayer: ActivePlayer,
-  boardPositions: BoardPositions
-) => {
-  const home = activePlayer === 1 ? PLAYER_1_HOME_LIMIT : PLAYER_2_HOME_LIMIT
-  return (
-    boardPositions.filter((point, i) =>
-      activePlayer === 1
-        ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
-        : i > PLAYER_2_HOME_LIMIT && !point.includes(2)
-    ).length > 0
-  )
-}
-
-export const isValidMoves = (openPoints: OpenPoint) => {
-  // const { openPoints } = gameState.checkerPositions
-  const fromPoints = openPoints.reduce((acc, point, i) => {
-    return point === 'anchor' ? [...acc, i] : acc
-  }, [] as number[])
-  console.log(fromPoints)
-
-  // const validMoves = fromPoints.map((fromPoint) =>
-  //   getValidMoves(
-  //     {fromPoint: fromPoint,
-  //     checkerColor: gameState.activePlayer}
-  //   )
-  // )
-  // console.log(validMoves)
-}
+//   // const validMoves = fromPoints.map((fromPoint) =>
+//   //   getValidMoves(
+//   //     {fromPoint: fromPoint,
+//   //     checkerColor: gameState.activePlayer}
+//   //   )
+//   // )
+//   // console.log(validMoves)
+// }
 
 export const checkMoves = (
   openPoints: OpenPoint,
@@ -281,102 +331,39 @@ export const checkMoves = (
   return validMoves
 }
 
-export const getMoves = (
-  moves: number[],
-  checkerPositions: CheckerPositionsState,
-  activePlayer: ActivePlayer
-) => {
-  const { openPoints, board } = checkerPositions
+// export const getMoves = (
+//   moves: number[],
+//   boardPositions: BoardPositions,
+//   activePlayer: ActivePlayer
+// ) => {
+//   const direction = getDirection(activePlayer)
+//   const dirMoves = moves.map((move) => move * direction)
 
-  const direction = getDirection(activePlayer)
-  const dirMoves = moves.map((move) => move * direction)
+//   // get array of all occupied points
+//   const fromPoints = boardPositions.reduce(
+//     (acc, point, i) =>
+//       point[0] === activePlayer
+//         ? [...acc, { fromPoint: i, checkerQty: boardPositions[i].length }]
+//         : acc,
+//     [] as { fromPoint: number; checkerQty: number }[]
+//   )
+//   // const dropPoints = fromPoints.map((point) => )
 
-  // get array of all occupied points
-  // const fromPoints = board.map((point) => if (point[0] === activePlayer))
-  const fromPoints = board.reduce(
-    (acc, point, i) =>
-      point[0] === activePlayer
-        ? [...acc, { fromPoint: i, checkerQty: board[i].length }]
-        : acc,
-    [] as { fromPoint: number; checkerQty: number }[]
-  )
-  // const dropPoints = fromPoints.map((point) => )
+//   let moveAcc = 0
 
-  let moveAcc = 0
-  /*
-  const moveCombos = moves.map((move) => (moveAcc += move))
-  const isMoveValid = moveCombos.map((move) =>
-  fromPoint + move >= 1 && fromPoint + move <= 24
-  ? openPoints[fromPoint + move]
-  : 'closed'
-  )
-  const invalidIndex = isMoveValid.indexOf('closed')
-  const validMoves =
-  invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
-  const validCurrentMoves = validMoves.map((move) => fromPoint + move)
-  
-  return validCurrentMoves
-  */
-}
+//   const moveCombos = moves.map((move) => (moveAcc += move))
+//   const isMoveValid = moveCombos.map((move) =>
+//     fromPoint + move >= 1 && fromPoint + move <= 24
+//       ? openPoints[fromPoint + move]
+//       : 'closed'
+//   )
+//   const invalidIndex = isMoveValid.indexOf('closed')
+//   const validMoves =
+//     invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
+//   const validCurrentMoves = validMoves.map((move) => fromPoint + move)
 
-export const getValidMoves = (
-  dragItem: { fromPoint: number; checkerColor: any },
-  dropPoint: number,
-  activePlayer: ActivePlayer,
-  checkerPositions: CheckerPositionsState,
-  movement: MovementState
-  // dropPoint?: number
-) => {
-  const { fromPoint } = dragItem
-  const { openPoints, board } = checkerPositions
-  // console.log('HOME', isCheckersHome())
-
-  // check that the fromPoint will allow all moves to be taken
-  /*
-    // TODO: add back
-  if (!movement.validMoves.map((move) => move.fromPoint).includes(fromPoint)) {
-    // alert('NO MOVE')
-    return false
-  }
-  // check for remaining moves
-  if (movement.movesRemaining.length === 0) return false
-
-  const bar = isCheckersBar(activePlayer, board)
-  if (bar.isCheckers && fromPoint !== bar.point) return false
-  */
-
-  const direction = getDirection(activePlayer)
-  console.log(movement.movesRemaining)
-
-  const directionalMoves = movement.movesRemaining.map(
-    (move) => move * direction
-  )
-  // console.log(directionalMoves)
-
-  const validForward = getMoves(directionalMoves)
-  const validReverse = getMoves([...directionalMoves].reverse())
-  const validMoves = new Set([...validForward, ...validReverse])
-
-  // TODO: add handling for blots
-  function getMoves(moves: number[]) {
-    let moveAcc = 0
-    const moveCombos = moves.map((move) => (moveAcc += move))
-    const isMoveValid = moveCombos.map((move) =>
-      fromPoint + move >= 1 && fromPoint + move <= 24
-        ? openPoints[fromPoint + move]
-        : 'closed'
-    )
-    const invalidIndex = isMoveValid.indexOf('closed')
-    const validMoves =
-      invalidIndex !== -1 ? moveCombos.slice(0, invalidIndex) : moveCombos
-    const validCurrentMoves = validMoves.map((move) => fromPoint + move)
-
-    return validCurrentMoves
-  }
-
-  // checks if the array of valid moves includes the point (div) hovered over
-  return [...validMoves].includes(dropPoint)
-}
+//   return validCurrentMoves
+// }
 
 export const updateRemainingMoves = (
   dropPoint: number,
