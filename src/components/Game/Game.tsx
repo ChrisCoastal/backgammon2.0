@@ -35,32 +35,32 @@ const Game: FC = ({}) => {
   const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
-  const dragCheckerHandler = (
-    dropPoint: number,
-    dragItem: { fromPoint: number; checkerColor: any }
-  ) => {
-    const valid = getValidMoves(
-      dragItem,
-      dropPoint,
-      activePlayer,
-      state.checkerPositions,
-      state.movement.movesRemaining
-    )
+  // const dragCheckerHandler = (
+  //   dropPoint: number,
+  //   dragItem: { fromPoint: number; checkerColor: any }
+  // ) => {
+  //   const valid = getValidMoves(
+  //     dragItem,
+  //     dropPoint,
+  //     activePlayer,
+  //     state.checkerPositions,
+  //     state.movement.movesRemaining
+  //   )
 
-    return valid
-  }
+  //   return valid
+  // }
 
-  // make sure to pass relavent state down to the useDrop hook
-  const dropCheckerHandler = (
-    dropPoint: number,
-    dragItem: { fromPoint: number; checkerColor: any }
-  ) => {
-    console.log('drop')
+  // // make sure to pass relavent state down to the useDrop hook
+  // const dropCheckerHandler = (
+  //   dropPoint: number,
+  //   dragItem: { fromPoint: number; checkerColor: any }
+  // ) => {
+  //   console.log('drop')
 
-    moveChecker(dropPoint, dragItem, state.checkerPositions, dispatch)
-    updateRemainingMoves(dropPoint, dragItem, state.movement, dispatch)
-    // getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
-  }
+  //   moveChecker(dropPoint, dragItem, state.checkerPositions, dispatch)
+  //   updateRemainingMoves(dropPoint, dragItem, state.movement, dispatch)
+  //   // getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
+  // }
 
   const endTurnHandler = () => {
     console.log('endturn')
@@ -90,9 +90,9 @@ const Game: FC = ({}) => {
         activePlayer={activePlayer}
         checkerPositions={state.checkerPositions}
         roll={diceRoll}
-        movesRemaining={state.movement.movesRemaining}
-        dragCheckerHandler={dragCheckerHandler}
-        dropCheckerHandler={dropCheckerHandler}
+        movement={state.movement}
+        // dragCheckerHandler={dragCheckerHandler}
+        // dropCheckerHandler={dropCheckerHandler}
         endTurnHandler={endTurnHandler}
         dispatch={dispatch}
       />

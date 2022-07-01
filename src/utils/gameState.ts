@@ -17,7 +17,9 @@ import {
   PLAYER_1_BAR,
   PLAYER_2_BAR,
   PLAYER_1_HOME_LIMIT,
-  PLAYER_2_HOME_LIMIT
+  PLAYER_2_HOME_LIMIT,
+  PLAYER_1_BEAROFF,
+  PLAYER_2_BEAROFF
 } from './config'
 
 ////////////////////
@@ -87,14 +89,13 @@ const isCheckersHome = (
   activePlayer: ActivePlayer,
   boardPositions: BoardPositions
 ) => {
-  // returns false if activePlayer checkers are outside homeboard
-  return (
-    boardPositions.filter((point, i) =>
-      activePlayer === 1
-        ? i > PLAYER_1_HOME_LIMIT && !point.includes(1)
-        : i < PLAYER_2_HOME_LIMIT && point.includes(2)
-    ).length === 0
+  const home = boardPositions.filter((point, i) =>
+    activePlayer === 1
+      ? i > PLAYER_1_HOME_LIMIT && point.includes(1)
+      : i < PLAYER_2_HOME_LIMIT && point.includes(2)
   )
+  console.log(home, home.length === 0)
+  return home.length === 0
 }
 
 ////////////////////
@@ -127,7 +128,7 @@ export const getValidMoves = (
   movesRemaining: number[]
   // dropPoint?: number
 ) => {
-  console.log(dropPoint)
+  // console.log(dropPoint)
 
   const { fromPoint } = dragItem
   const { openPoints, board } = checkerPositions
@@ -205,7 +206,10 @@ const getValidHomeMoves = (
         )
   console.log(backChecker)
   // TODO:
-  return true
+
+  const bearOff = activePlayer === 1 ? PLAYER_1_BEAROFF : PLAYER_2_BEAROFF
+
+  return dropPoint === bearOff
 }
 
 export const getOpenPoints = (
@@ -268,7 +272,7 @@ export const checkMoves = (
   else
     fromPoints = openPoints.reduce((acc, point, i) => {
       // const canMove = openPoints[i + dirMoves[0]] !== 'closed' || openPoints[i + dirMoves[1]] !== 'closed'
-      return point === 'anchor'
+      return point === 'anchor' || point === 'blot'
         ? [...acc, { fromPoint: i, checkerQty: boardPositions[i].length }]
         : acc
     }, [] as { fromPoint: number; checkerQty: number }[])
@@ -458,6 +462,13 @@ export const moveChecker = (
   // const newOpenPoints = getOpenPoints()
   // dispatch({ type: 'setOpenPoints', payload: newOpenPoints })
 }
+
+export const isPlayerWinner = (
+  checkerPositions: CheckerPositionsState,
+  dispatch: Dispatch<ReducerActions>
+) =>
+  checkerPositions.bearOff1.length === 15 ||
+  checkerPositions.bearOff2.length === 15
 
 // export const gameLogic = {
 //   stateSubscriber,

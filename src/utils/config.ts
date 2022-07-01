@@ -2,35 +2,38 @@ import { GameState } from 'src/@types/types'
 
 export const PLAYER_1_BAR = 25
 export const PLAYER_1_HOME_LIMIT = 6
+export const PLAYER_1_BEAROFF = 100
 export const PLAYER_2_BAR = 0
 export const PLAYER_2_HOME_LIMIT = 19
+export const PLAYER_2_BEAROFF = 200
 export const INITIAL_BOARD_POSITION: Array<1 | 2>[] = [
-  [], // bar player2
-  [2, 2],
-  [],
-  [],
-  [],
-  [],
-  [1, 1, 1, 1, 1],
-  [],
-  [1, 1, 1],
-  [],
-  [],
-  [],
-  [2, 2, 2, 2, 2],
-  [1, 1, 1, 1, 1],
-  [],
-  [],
-  [],
-  [2, 2, 2],
-  [],
-  [2, 2, 2, 2, 2],
-  [],
-  [],
-  [],
-  [],
-  [1, 1],
-  [] // bar player1
+  // [], // bar player2
+  // [2, 2],
+  // [],
+  // [],
+  // [],
+  // [],
+  // [1, 1, 1, 1, 1],
+  // [],
+  // [1, 1, 1],
+  // [],
+  // [],
+  // [],
+  // [2, 2, 2, 2, 2],
+  // [1, 1, 1, 1, 1],
+  // [],
+  // [],
+  // [],
+  // [2, 2, 2],
+  // [],
+  // [2, 2, 2, 2, 2],
+  // [],
+  // [],
+  // [],
+  // [],
+  // [1, 1],
+  // [] // bar player1
+  ////
   // Testing Positions
   // [2], // bar player2
   // [],
@@ -58,6 +61,34 @@ export const INITIAL_BOARD_POSITION: Array<1 | 2>[] = [
   // [],
   // [1, 1],
   // [] // bar player1
+  ////
+  // Testing Home Positions
+  [], // bar player2
+  [],
+  [2],
+  [1, 1],
+  [1, 1],
+  [1, 1],
+  [1, 1, 1, 1, 1],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [2],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+  [] // bar player1
 ]
 
 export const INITIAL_GAME_STATE: GameState = {

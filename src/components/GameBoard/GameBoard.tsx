@@ -2,18 +2,22 @@ import { FC, useReducer, useEffect, useRef, Dispatch } from 'react'
 
 // types
 import {
+  ActiveChecker,
   ActivePlayer,
   BoardPositions,
   CheckerPositionsState,
   DiceRoll,
+  MovementState,
   ReducerActions
 } from 'src/@types/types'
 
 // config
 import {
   PLAYER_1_BAR,
+  PLAYER_1_BEAROFF,
   PLAYER_1_HOME_LIMIT,
   PLAYER_2_BAR,
+  PLAYER_2_BEAROFF,
   PLAYER_2_HOME_LIMIT
 } from '../../utils/config'
 
@@ -22,8 +26,12 @@ import {
   playerTurnMoves,
   getOpenPoints,
   getDiceRoll,
+  getValidMoves,
+  moveChecker,
+  updateRemainingMoves,
   // getMoves,
-  checkMoves
+  checkMoves,
+  isPlayerWinner
 } from 'src/utils/gameState'
 
 //components
@@ -37,15 +45,15 @@ interface GameBoardProps {
   activePlayer: ActivePlayer
   checkerPositions: CheckerPositionsState
   roll: DiceRoll
-  movesRemaining: number[]
-  dragCheckerHandler: (
-    dropPoint: number,
-    dragItem: { fromPoint: number; checkerColor: any }
-  ) => boolean
-  dropCheckerHandler: (
-    dropPoint: number,
-    dragItem: { fromPoint: number; checkerColor: any }
-  ) => void
+  movement: MovementState
+  // dragCheckerHandler: (
+  //   dropPoint: number,
+  //   dragItem: { fromPoint: number; checkerColor: any }
+  // ) => boolean
+  // dropCheckerHandler: (
+  //   dropPoint: number,
+  //   dragItem: { fromPoint: number; checkerColor: any }
+  // ) => void
   endTurnHandler: () => void
   dispatch: Dispatch<ReducerActions>
 }
@@ -54,9 +62,9 @@ const GameBoard: FC<GameBoardProps> = ({
   activePlayer,
   checkerPositions,
   roll,
-  movesRemaining,
-  dragCheckerHandler,
-  dropCheckerHandler,
+  movement,
+  // dragCheckerHandler,
+  // dropCheckerHandler,
   endTurnHandler,
   dispatch
 }) => {
@@ -91,6 +99,36 @@ const GameBoard: FC<GameBoardProps> = ({
     console.log(valid)
   }
 
+  const dragCheckerHandler = (
+    dropPoint: number,
+    dragItem: { fromPoint: number; checkerColor: ActiveChecker }
+  ) => {
+    const valid = getValidMoves(
+      dragItem,
+      dropPoint,
+      activePlayer,
+      checkerPositions,
+      movement.movesRemaining
+    )
+
+    return valid
+  }
+
+  // make sure to pass relavent state down to the useDrop hook
+  const dropCheckerHandler = (
+    dropPoint: number,
+    dragItem: { fromPoint: number; checkerColor: ActiveChecker }
+  ) => {
+    console.log('drop')
+
+    moveChecker(dropPoint, dragItem, checkerPositions, dispatch)
+    updateRemainingMoves(dropPoint, dragItem, movement, dispatch)
+    isPlayerWinner(checkerPositions, dispatch) &&
+      console.log(`Player ${activePlayer} wins!`)
+
+    // getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
+  }
+
   // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
 
   const renderPoints = () => {
@@ -104,7 +142,7 @@ const GameBoard: FC<GameBoardProps> = ({
           validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
-          movesRemaining={movesRemaining}
+          movesRemaining={movement.movesRemaining}
           board={checkerPositions.board}
         >
           <Checkers pointIndex={i} checkers={checkerPositions.board[i]} />
@@ -126,7 +164,7 @@ const GameBoard: FC<GameBoardProps> = ({
   }
   const points = renderPoints()
 
-  const disable = movesRemaining.length !== 0
+  const disable = movement.movesRemaining.length !== 0
   const rollButtonColor = disable
     ? 'bg-gray-300'
     : 'bg-blue-600 hover:bg-blue-700'
@@ -136,20 +174,20 @@ const GameBoard: FC<GameBoardProps> = ({
     <div>
       <div className={`flex`}>
         <BearOff
-          pointIndex={1}
+          pointIndex={PLAYER_1_BEAROFF}
           validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
-          movesRemaining={movesRemaining}
+          movesRemaining={movement.movesRemaining}
           board={checkerPositions.board}
         ></BearOff>
         <div className={`flex`}>{points}</div>
         <BearOff
-          pointIndex={2}
+          pointIndex={PLAYER_2_BEAROFF}
           validMoves={dragCheckerHandler}
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
-          movesRemaining={movesRemaining}
+          movesRemaining={movement.movesRemaining}
           board={checkerPositions.board}
         ></BearOff>
       </div>

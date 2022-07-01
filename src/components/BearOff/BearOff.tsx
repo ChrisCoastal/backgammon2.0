@@ -68,7 +68,8 @@ const BearOff: FC<BearOffProps> = ({
       ref={dropRef}
       className={`flex-column border-2 border-pink-500 ${color} ${dropColor} w-16 h-80`}
     >
-      Off {activePlayer}
+      <p>Off {activePlayer}</p>
+      {children}
     </div>
   )
 }
