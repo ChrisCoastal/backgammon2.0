@@ -8,7 +8,8 @@ import {
   ItemTypes,
   BOARD_COLORS,
   PLAYER_1_BAR,
-  PLAYER_2_BAR
+  PLAYER_2_BAR,
+  POINT_POSITIONS
 } from '../../utils/config'
 
 interface PointProps {
@@ -23,7 +24,7 @@ interface PointProps {
   pointIndex: number
   activePlayer: ActivePlayer
   movesRemaining: number[]
-  board: Array<1 | 2>[]
+  board: Array<1 | 2>
   children: ReactNode
 }
 
@@ -64,25 +65,34 @@ const BoardPoint: FC<PointProps> = ({
     [activePlayer, board, movesRemaining]
   )
 
+  // tailwind
   const dropColor =
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
-  const color =
-    pointIndex === 0 || pointIndex === 25
+
+  const pointColor =
+    pointIndex === PLAYER_1_BAR || pointIndex === PLAYER_2_BAR
       ? BOARD_COLORS.bar
       : pointIndex % 2
       ? BOARD_COLORS.oddPoint
       : BOARD_COLORS.evenPoint
 
+  const pointPosition = POINT_POSITIONS[pointIndex]
+  // FIXME:
+  const checkerAlign =
+    pointIndex === PLAYER_1_BAR
+      ? 'items-end'
+      : pointIndex > 12
+      ? 'items-end'
+      : 'items-start'
+
   return (
-    <div className="flex-column">
+    <div className={`flex-col ${pointPosition}`}>
+      <p className={`absolute`}>{pointIndex}</p>
       <div
         ref={dropRef}
-        className={`flex-column border-2 border-pink-500 ${color} ${dropColor} w-16 h-80`}
+        className={`flex-col ${checkerAlign} ${pointColor} ${dropColor} h-80`}
       >
         {children}
-      </div>
-      <div>
-        <p>{pointIndex}</p>
       </div>
     </div>
   )

@@ -112,7 +112,7 @@ const GameBoard: FC<GameBoardProps> = ({
           dropHandler={dropCheckerHandler}
           activePlayer={activePlayer}
           movesRemaining={movement.movesRemaining}
-          board={checkerPositions.board}
+          board={checkerPositions.board[i]}
         >
           <Checkers pointIndex={i} checkers={checkerPositions.board[i]} />
         </BoardPoint>
@@ -125,33 +125,35 @@ const GameBoard: FC<GameBoardProps> = ({
   return (
     <div>
       <div className={`flex`}>
-        <BearOff
-          pointIndex={PLAYER_1_BEAROFF}
-          validMoves={dragCheckerHandler}
-          dropHandler={dropCheckerHandler}
-          activePlayer={activePlayer}
-          movesRemaining={movement.movesRemaining}
-          board={checkerPositions.board}
-        >
-          <Checkers
+        <div className={`flex flex-col`}>
+          <BearOff
             pointIndex={PLAYER_1_BEAROFF}
-            checkers={checkerPositions.bearOff1}
-          />
-        </BearOff>
-        <div className={`flex`}>{points}</div>
-        <BearOff
-          pointIndex={PLAYER_2_BEAROFF}
-          validMoves={dragCheckerHandler}
-          dropHandler={dropCheckerHandler}
-          activePlayer={activePlayer}
-          movesRemaining={movement.movesRemaining}
-          board={checkerPositions.board}
-        >
-          <Checkers
+            validMoves={dragCheckerHandler}
+            dropHandler={dropCheckerHandler}
+            activePlayer={activePlayer}
+            movesRemaining={movement.movesRemaining}
+            board={checkerPositions.board}
+          >
+            <Checkers
+              pointIndex={PLAYER_1_BEAROFF}
+              checkers={checkerPositions.bearOff1}
+            />
+          </BearOff>
+          <BearOff
             pointIndex={PLAYER_2_BEAROFF}
-            checkers={checkerPositions.bearOff2}
-          />
-        </BearOff>
+            validMoves={dragCheckerHandler}
+            dropHandler={dropCheckerHandler}
+            activePlayer={activePlayer}
+            movesRemaining={movement.movesRemaining}
+            board={checkerPositions.board}
+          >
+            <Checkers
+              pointIndex={PLAYER_2_BEAROFF}
+              checkers={checkerPositions.bearOff2}
+            />
+          </BearOff>
+        </div>
+        <div className={`grid grid-cols-[repeat(13,1fr)]`}>{points}</div>
       </div>
     </div>
   )
