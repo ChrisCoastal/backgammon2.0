@@ -51,23 +51,22 @@ export const initializeActivePlayer = (
   dice: DiceRoll,
   dispatch: Dispatch<ReducerActions>
 ) => {
-  let action
-  if (dice[0] === null || dice[1] === null) return
+  let player
   if (dice[0] > dice[1]) {
     dispatch({ type: 'setActivePlayer', payload: 1 })
-    action = 'PLAYER_1'
+    player = 1
   }
   if (dice[0] < dice[1]) {
     dispatch({ type: 'setActivePlayer', payload: 2 })
-    action = 'PLAYER_2'
+    player = 2
   }
   if (dice[0] === dice[1]) {
     alert('DOUBLES ROLLED')
     dispatch({ type: 'setDoublingCube' })
-    action = 'DOUBLES'
+    player = null
     // TODO: dispatch doubling cube
   }
-  return action
+  return player as ActivePlayer
 }
 
 export const toggleActivePlayer = (

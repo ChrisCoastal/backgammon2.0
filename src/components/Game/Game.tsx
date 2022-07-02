@@ -83,18 +83,20 @@ const Game: FC = ({}) => {
 
   const startGameHandler: any = () => {
     const roll = getDiceRoll(dispatch)
+    const player = initializeActivePlayer(roll, dispatch)
+    console.log(activePlayer)
+
     const openPoints = getOpenPoints(
-      activePlayer,
+      player,
       state.checkerPositions.board,
       dispatch
     )
-    if (!activePlayer) {
-      const active = initializeActivePlayer(roll, dispatch)
-      if (active === 'DOUBLES') {
-        return startGameHandler()
-      }
-      console.log('ACTIVE', active)
+
+    if (!player) {
+      return startGameHandler()
     }
+    console.log('ACTIVE', player)
+
     const moves = playerTurnMoves(roll, dispatch)
   }
 
