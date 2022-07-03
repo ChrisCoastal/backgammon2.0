@@ -30,9 +30,9 @@ const Dice = ({ activePlayer, diceRoll }: DiceProps) => {
         {diceRoll.map((dice, i) => (
           <li
             key={Math.random()}
-            className={`inline-flex ${diceColor[i]} py-3 px-3 m-2 rounded-sm text-white`}
+            className={`inline-flex ${diceColor[i]} py-8 px-8 mx-2 rounded-sm text-white text-xl font-extrabold`}
           >
-            {dice}
+            {dice > 0 && dice}
           </li>
         ))}
       </ul>

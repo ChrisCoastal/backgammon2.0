@@ -13,6 +13,7 @@ import {
 
 // config
 import {
+  BOARD_COLORS,
   PLAYER_1_BAR,
   PLAYER_1_BEAROFF,
   PLAYER_1_HOME_LIMIT,
@@ -46,15 +47,6 @@ interface GameBoardProps {
   checkerPositions: CheckerPositionsState
   roll: DiceRoll
   movement: MovementState
-  // dragCheckerHandler: (
-  //   dropPoint: number,
-  //   dragItem: { fromPoint: number; checkerColor: any }
-  // ) => boolean
-  // dropCheckerHandler: (
-  //   dropPoint: number,
-  //   dragItem: { fromPoint: number; checkerColor: any }
-  // ) => void
-  endTurnHandler: () => void
   dispatch: Dispatch<ReducerActions>
 }
 
@@ -63,9 +55,6 @@ const GameBoard: FC<GameBoardProps> = ({
   checkerPositions,
   roll,
   movement,
-  // dragCheckerHandler,
-  // dropCheckerHandler,
-  endTurnHandler,
   dispatch
 }) => {
   const dragCheckerHandler = (
@@ -89,8 +78,8 @@ const GameBoard: FC<GameBoardProps> = ({
     dragItem: { fromPoint: number; checkerColor: ActiveChecker }
   ) => {
     console.log('drop')
-
-    moveChecker(dropPoint, dragItem, checkerPositions, dispatch)
+    const openPoints = getOpenPoints(activePlayer, checkerPositions.board)
+    moveChecker(dropPoint, dragItem, checkerPositions, openPoints, dispatch)
     updateRemainingMoves(dropPoint, dragItem, movement, dispatch)
     isPlayerWinner(checkerPositions, dispatch) &&
       console.log(`Player ${activePlayer} wins!`)
@@ -123,37 +112,41 @@ const GameBoard: FC<GameBoardProps> = ({
   const points = renderPoints()
 
   return (
-    <div>
-      <div className={`flex`}>
-        <div className={`flex flex-col`}>
-          <BearOff
+    <div
+      className={`flex ${BOARD_COLORS.bar} justify-center p-16 w-full h-full`}
+    >
+      {/* <div className={`flex flex-col`}>
+        <BearOff
+          pointIndex={PLAYER_1_BEAROFF}
+          validMoves={dragCheckerHandler}
+          dropHandler={dropCheckerHandler}
+          activePlayer={activePlayer}
+          movesRemaining={movement.movesRemaining}
+          board={checkerPositions.board}
+        >
+          <Checkers
             pointIndex={PLAYER_1_BEAROFF}
-            validMoves={dragCheckerHandler}
-            dropHandler={dropCheckerHandler}
-            activePlayer={activePlayer}
-            movesRemaining={movement.movesRemaining}
-            board={checkerPositions.board}
-          >
-            <Checkers
-              pointIndex={PLAYER_1_BEAROFF}
-              checkers={checkerPositions.bearOff1}
-            />
-          </BearOff>
-          <BearOff
+            checkers={checkerPositions.bearOff1}
+          />
+        </BearOff>
+        <BearOff
+          pointIndex={PLAYER_2_BEAROFF}
+          validMoves={dragCheckerHandler}
+          dropHandler={dropCheckerHandler}
+          activePlayer={activePlayer}
+          movesRemaining={movement.movesRemaining}
+          board={checkerPositions.board}
+        >
+          <Checkers
             pointIndex={PLAYER_2_BEAROFF}
-            validMoves={dragCheckerHandler}
-            dropHandler={dropCheckerHandler}
-            activePlayer={activePlayer}
-            movesRemaining={movement.movesRemaining}
-            board={checkerPositions.board}
-          >
-            <Checkers
-              pointIndex={PLAYER_2_BEAROFF}
-              checkers={checkerPositions.bearOff2}
-            />
-          </BearOff>
-        </div>
-        <div className={`grid grid-cols-[repeat(13,1fr)]`}>{points}</div>
+            checkers={checkerPositions.bearOff2}
+          />
+        </BearOff>
+      </div> */}
+      <div
+        className={`grid grid-cols-[repeat(13,1fr)] w-full mx-16 items-stretch`}
+      >
+        {points}
       </div>
     </div>
   )

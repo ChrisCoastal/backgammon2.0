@@ -31,6 +31,7 @@ import { useReducer } from 'react'
 // components
 import GameBoard from '../GameBoard/GameBoard'
 import Dice from '../Dice/Dice'
+import GameControls from '../GameControls/GameControls'
 
 const Game: FC = ({}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_GAME_STATE)
@@ -47,11 +48,11 @@ const Game: FC = ({}) => {
     // TODO: must check if there are any valid moves available
     // pass every activePlayer occupied point through getValidMoves
 
-    const openPoints = getOpenPoints(
-      activePlayer,
-      state.checkerPositions.board,
-      dispatch
-    )
+    // const openPoints = getOpenPoints(
+    //   activePlayer,
+    //   state.checkerPositions.board,
+    //   dispatch
+    // )
     // const allPossibleMoves = getMoves(
     //   moves,
     //   checkerPositions.board,
@@ -86,11 +87,11 @@ const Game: FC = ({}) => {
     const player = initializeActivePlayer(roll, dispatch)
     console.log(activePlayer)
 
-    const openPoints = getOpenPoints(
-      player,
-      state.checkerPositions.board,
-      dispatch
-    )
+    // const openPoints = getOpenPoints(
+    //   player,
+    //   state.checkerPositions.board,
+    //   dispatch
+    // )
 
     if (!player) {
       return startGameHandler()
@@ -100,67 +101,24 @@ const Game: FC = ({}) => {
     const moves = playerTurnMoves(roll, dispatch)
   }
 
-  // TODO: add condition so end turn is required before roll
-  const disable = state.movement.movesRemaining.length !== 0
-  const rollButtonColor = disable
-    ? 'bg-gray-300'
-    : 'bg-blue-600 hover:bg-blue-700'
-  const buttonColor = disable ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
-
   return (
-    <div>
-      <GameBoard
-        activePlayer={activePlayer}
-        checkerPositions={state.checkerPositions}
-        roll={diceRoll}
-        movement={state.movement}
-        endTurnHandler={endTurnHandler}
-        dispatch={dispatch}
-      />
-      {/* <StartGameButton /> */}
-      <div>
-        <div>
-          {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}
-          <Dice
-            diceRoll={state.diceState.diceRoll}
-            activePlayer={activePlayer}
-          />
-          <button
-            disabled={disable}
-            onClick={rollDiceHandler}
-            className={`py-2 px-6 m-2 rounded ${rollButtonColor} bg-g`}
-          >
-            ROLL
-          </button>
-        </div>
-        <button
-          disabled={disable}
-          onClick={endTurnHandler}
-          className={`py-2 px-6 m-2 rounded ${buttonColor}`}
-        >
-          END TURN
-        </button>
-        <button
-          onClick={() => console.log('undo')}
-          className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
-        >
-          UNDO
-        </button>
-        <button
-          onClick={() => startGameHandler()}
-          disabled={!!activePlayer}
-          className={`py-2 px-6 m-2 rounded ${buttonColor}`}
-        >
-          START GAME
-        </button>
-        {/* <button
-        onClick={() => endGameHandler}
-        disabled={!!activePlayer}
-        className={`py-2 px-6 m-2 rounded bg-blue-600 hover:bg-blue-700`}
-      >
-        END GAME
-      </button> */}
-        {/* <GameOptions optionsHandler={optionsHandler} /> */}
+    <div className={``}>
+      <div className={`flex justify-center h-screen`}>
+        <GameBoard
+          activePlayer={activePlayer}
+          checkerPositions={state.checkerPositions}
+          roll={diceRoll}
+          movement={state.movement}
+          dispatch={dispatch}
+        />
+        <GameControls
+          activePlayer={activePlayer}
+          diceRoll={diceRoll}
+          movesRemaining={state.movement.movesRemaining}
+          rollDiceHandler={rollDiceHandler}
+          startGameHandler={startGameHandler}
+          endTurnHandler={endTurnHandler}
+        />
       </div>
     </div>
   )

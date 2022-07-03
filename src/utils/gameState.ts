@@ -220,8 +220,8 @@ const getValidHomeMoves = (
 
 export const getOpenPoints = (
   activePlayer: ActivePlayer,
-  checkerPositions: BoardPositions,
-  dispatch: Dispatch<ReducerActions>
+  checkerPositions: BoardPositions
+  // dispatch: Dispatch<ReducerActions>
 ) => {
   const openPoints = checkerPositions.map((point: Array<1 | 2>) => {
     return point.length === 0
@@ -233,7 +233,7 @@ export const getOpenPoints = (
       : `anchor`
   })
   // TODO: derived state should not be kept in state
-  dispatch({ type: 'setOpenPoints', payload: openPoints })
+  // dispatch({ type: 'setOpenPoints', payload: openPoints })
   return openPoints
 }
 
@@ -438,10 +438,10 @@ export const moveChecker = (
   dropPoint: number,
   dragItem: { fromPoint: number; checkerColor: ActiveChecker },
   checkerPositions: CheckerPositionsState,
+  openPoints: OpenPoint,
   dispatch: Dispatch<ReducerActions>
 ) => {
   const { fromPoint, checkerColor } = dragItem
-  const openPoints = checkerPositions.openPoints
 
   const barPoint = [PLAYER_1_BAR, PLAYER_2_BAR]
   let newState = checkerPositions

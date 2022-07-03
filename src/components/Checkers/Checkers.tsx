@@ -18,9 +18,9 @@ const Checkers: FC<CheckersProps> = ({ pointIndex, checkers }) => {
         if (index >= 5 && index === arr.length - 1) {
           // if (index > 5) {
           return (
-            <p className={`w-4 h-4 absolute text-black top-0 text-center`}>{`+${
-              index - 4
-            }`}</p>
+            <p
+              className={`w-4 h-4 absolute text-white font-bold top-0 text-center`}
+            >{`+${index - 4}`}</p>
           )
         }
         if (index < 5)

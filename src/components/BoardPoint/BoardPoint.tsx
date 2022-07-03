@@ -80,17 +80,19 @@ const BoardPoint: FC<PointProps> = ({
   // FIXME:
   const checkerAlign =
     pointIndex === PLAYER_1_BAR
-      ? 'items-end'
+      ? 'justify-start'
+      : pointIndex === PLAYER_2_BAR
+      ? 'justify-end'
       : pointIndex > 12
-      ? 'items-end'
-      : 'items-start'
+      ? 'justify-end'
+      : 'justify-start'
 
   return (
-    <div className={`flex-col ${pointPosition}`}>
-      <p className={`absolute`}>{pointIndex}</p>
+    <div className={`relative ${pointPosition} w-auto`}>
+      {/* <p className={`absolute`}>{pointIndex}</p> */}
       <div
         ref={dropRef}
-        className={`flex-col ${checkerAlign} ${pointColor} ${dropColor} h-80`}
+        className={`absolute flex flex-col ${checkerAlign} ${pointColor} ${dropColor} w-full h-full px-0.5`}
       >
         {children}
       </div>
