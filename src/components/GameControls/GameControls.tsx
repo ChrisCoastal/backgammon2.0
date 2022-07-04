@@ -1,12 +1,13 @@
 import React, { FC } from 'react'
-import { ActivePlayer, DiceRoll } from 'src/@types/types'
+import { ActivePlayer, DiceRoll, DiceState } from 'src/@types/types'
 
 // components
 import Dice from '../Dice/Dice'
+import DoublingCube from '../Dice/DoublingCube'
 
 interface GameControlsProps {
   activePlayer: ActivePlayer
-  diceRoll: DiceRoll
+  diceState: DiceState
   movesRemaining: number[]
   rollDiceHandler: () => void
   startGameHandler: () => void
@@ -15,13 +16,15 @@ interface GameControlsProps {
 
 const GameControls: FC<GameControlsProps> = ({
   activePlayer,
-  diceRoll,
+  diceState,
   movesRemaining,
   rollDiceHandler,
   startGameHandler,
   endTurnHandler
 }) => {
   // TODO: add condition so end turn is required before roll
+  const { diceRoll, doublingCube } = diceState
+
   const disable = movesRemaining.length !== 0
   const rollButtonColor = disable
     ? 'bg-gray-300'
@@ -29,13 +32,14 @@ const GameControls: FC<GameControlsProps> = ({
   const buttonColor = disable ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
 
   return (
-    <div>
-      <div className={`py-16`}>
+    <div className={`py-16 h-screen`}>
+      <div className={`py-16 bg-zinc-200`}>
         {!!activePlayer && (
           <div>
             <div>
               {/* {diceRoll && <Dice diceRoll={diceRoll} activePlayer={activePlayer} />} */}
               <Dice diceRoll={diceRoll} activePlayer={activePlayer} />
+              <DoublingCube cubeValue={doublingCube} />
               <button
                 disabled={disable}
                 onClick={rollDiceHandler}

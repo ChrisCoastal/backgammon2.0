@@ -35,9 +35,6 @@ import GameControls from '../GameControls/GameControls'
 
 const Game: FC = ({}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_GAME_STATE)
-
-  const { board, bearOff1, bearOff2 } = state.checkerPositions
-  const { diceRoll, doublingCube } = state.diceState
   const { activePlayer } = state
 
   // const diceRollRef = useRef(roll)
@@ -75,7 +72,7 @@ const Game: FC = ({}) => {
     console.log('endturn')
 
     resetDiceRoll(dispatch)
-    toggleActivePlayer(state.activePlayer, dispatch)
+    toggleActivePlayer(activePlayer, dispatch)
 
     // TODO:
     // push movesTaken
@@ -86,12 +83,6 @@ const Game: FC = ({}) => {
     const roll = getDiceRoll(dispatch)
     const player = initializeActivePlayer(roll, dispatch)
     console.log(activePlayer)
-
-    // const openPoints = getOpenPoints(
-    //   player,
-    //   state.checkerPositions.board,
-    //   dispatch
-    // )
 
     if (!player) {
       return startGameHandler()
@@ -107,13 +98,12 @@ const Game: FC = ({}) => {
         <GameBoard
           activePlayer={activePlayer}
           checkerPositions={state.checkerPositions}
-          roll={diceRoll}
           movement={state.movement}
           dispatch={dispatch}
         />
         <GameControls
           activePlayer={activePlayer}
-          diceRoll={diceRoll}
+          diceState={state.diceState}
           movesRemaining={state.movement.movesRemaining}
           rollDiceHandler={rollDiceHandler}
           startGameHandler={startGameHandler}

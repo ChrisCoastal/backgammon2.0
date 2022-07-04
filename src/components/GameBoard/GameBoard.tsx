@@ -1,12 +1,10 @@
-import { FC, useReducer, useEffect, useRef, Dispatch } from 'react'
+import { FC, Dispatch } from 'react'
 
 // types
 import {
   ActiveChecker,
   ActivePlayer,
-  BoardPositions,
   CheckerPositionsState,
-  DiceRoll,
   MovementState,
   ReducerActions
 } from 'src/@types/types'
@@ -14,24 +12,16 @@ import {
 // config
 import {
   BOARD_COLORS,
-  PLAYER_1_BAR,
   PLAYER_1_BEAROFF,
-  PLAYER_1_HOME_LIMIT,
-  PLAYER_2_BAR,
-  PLAYER_2_BEAROFF,
-  PLAYER_2_HOME_LIMIT
+  PLAYER_2_BEAROFF
 } from '../../utils/config'
 
 // helpers
 import {
-  playerTurnMoves,
   getOpenPoints,
-  getDiceRoll,
   getValidMoves,
   moveChecker,
   updateRemainingMoves,
-  // getMoves,
-  // checkMoves,
   isPlayerWinner
 } from 'src/utils/gameState'
 
@@ -39,13 +29,10 @@ import {
 import BoardPoint from '../BoardPoint/BoardPoint'
 import BearOff from '../BearOff/BearOff'
 import Checkers from '../Checkers/Checkers'
-import Checker from '../Checker/Checker'
-import Dice from '../Dice/Dice'
 
 interface GameBoardProps {
   activePlayer: ActivePlayer
   checkerPositions: CheckerPositionsState
-  roll: DiceRoll
   movement: MovementState
   dispatch: Dispatch<ReducerActions>
 }
@@ -53,7 +40,6 @@ interface GameBoardProps {
 const GameBoard: FC<GameBoardProps> = ({
   activePlayer,
   checkerPositions,
-  roll,
   movement,
   dispatch
 }) => {
@@ -72,7 +58,7 @@ const GameBoard: FC<GameBoardProps> = ({
     return valid
   }
 
-  // make sure to pass relavent state down to the useDrop hook
+  // pass ALL relevant state dependencies down to the useDrop hook
   const dropCheckerHandler = (
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: ActiveChecker }
@@ -83,15 +69,10 @@ const GameBoard: FC<GameBoardProps> = ({
     updateRemainingMoves(dropPoint, dragItem, movement, dispatch)
     isPlayerWinner(checkerPositions, dispatch) &&
       console.log(`Player ${activePlayer} wins!`)
-
-    // getOpenPoints(activePlayer, state.checkerPositions.board, dispatch)
   }
-
-  // {/* <div className={`h-full w-full flex flex-wrap`}>{points}</div> */}
 
   const renderPoints = () => {
     const pointArr = []
-    // TODO: change to render bar
     for (let i = 0; i < 26; i++) {
       pointArr.push(
         <BoardPoint
@@ -115,7 +96,7 @@ const GameBoard: FC<GameBoardProps> = ({
     <div
       className={`flex ${BOARD_COLORS.bar} justify-center p-16 w-full h-full`}
     >
-      {/* <div className={`flex flex-col`}>
+      <div className={`flex flex-col`}>
         <BearOff
           pointIndex={PLAYER_1_BEAROFF}
           validMoves={dragCheckerHandler}
@@ -142,10 +123,8 @@ const GameBoard: FC<GameBoardProps> = ({
             checkers={checkerPositions.bearOff2}
           />
         </BearOff>
-      </div> */}
-      <div
-        className={`grid grid-cols-[repeat(13,1fr)] w-full mx-16 items-stretch`}
-      >
+      </div>
+      <div className={`grid grid-cols-[repeat(13,1fr)] w-full items-stretch`}>
         {points}
       </div>
     </div>

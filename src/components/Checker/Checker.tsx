@@ -32,7 +32,7 @@ const Checker: FC<CheckerProps> = ({ point, checkerColor }) => {
   return (
     <div
       ref={dragRef}
-      className={`aspect-square w-full rounded-full ${color}`}
+      className={`h-0 pb-1/1 w-full rounded-full ${color}`}
     ></div>
   )
 }
