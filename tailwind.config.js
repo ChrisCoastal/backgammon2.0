@@ -9,7 +9,14 @@ module.exports = {
     extend: {
       spacing: {
         '1/5': '20%',
+        '1/2': '50%',
         '1/1': '100%'
+      },
+      width: {
+        '1/2vw': '50vw'
+      },
+      height: {
+        '1/4vw': '40vw'
       }
     }
   },

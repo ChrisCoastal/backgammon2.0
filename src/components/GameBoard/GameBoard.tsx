@@ -19,7 +19,9 @@ import {
 // helpers
 import {
   getOpenPoints,
+  isCheckersHome,
   getValidMoves,
+  getValidHomeMoves,
   moveChecker,
   updateRemainingMoves,
   isPlayerWinner
@@ -47,13 +49,24 @@ const GameBoard: FC<GameBoardProps> = ({
     dropPoint: number,
     dragItem: { fromPoint: number; checkerColor: ActiveChecker }
   ) => {
-    const valid = getValidMoves(
-      dragItem,
-      dropPoint,
-      activePlayer,
-      checkerPositions,
-      movement.movesRemaining
-    )
+    // all checkers in homeboard
+    const home = isCheckersHome(activePlayer, checkerPositions.board)
+
+    const valid = !home
+      ? getValidMoves(
+          dragItem,
+          dropPoint,
+          activePlayer,
+          checkerPositions,
+          movement.movesRemaining
+        )
+      : getValidHomeMoves(
+          dragItem,
+          dropPoint,
+          activePlayer,
+          checkerPositions,
+          movement.movesRemaining
+        )
 
     return valid
   }
@@ -93,10 +106,8 @@ const GameBoard: FC<GameBoardProps> = ({
   const points = renderPoints()
 
   return (
-    <div
-      className={`flex ${BOARD_COLORS.bar} justify-center p-16 w-full h-full`}
-    >
-      <div className={`flex flex-col`}>
+    <div className={`flex ${BOARD_COLORS.bar} justify-center w-3/4`}>
+      <div className={` grid grid-cols-[repeat(14,1fr)] `}>
         <BearOff
           pointIndex={PLAYER_1_BEAROFF}
           validMoves={dragCheckerHandler}
@@ -123,8 +134,6 @@ const GameBoard: FC<GameBoardProps> = ({
             checkers={checkerPositions.bearOff2}
           />
         </BearOff>
-      </div>
-      <div className={`grid grid-cols-[repeat(13,1fr)] w-full items-stretch`}>
         {points}
       </div>
     </div>

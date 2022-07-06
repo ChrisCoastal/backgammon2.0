@@ -1,0 +1,84 @@
+export const <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="100px"
+	 height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+<g id="Layer_1">
+	<g>
+		<defs>
+			<ellipse id="SVGID_1_" cx="50.01" cy="49.917" rx="49.843" ry="49.751"/>
+		</defs>
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="-5.4741" y1="-11.7041" x2="84.0365" y2="87.7075">
+			<stop  offset="0.0683" style="stop-color:#141414"/>
+			<stop  offset="0.2019" style="stop-color:#D4D4D4"/>
+			<stop  offset="0.2051" style="stop-color:#CFCFCF"/>
+			<stop  offset="0.2439" style="stop-color:#9B9B9B"/>
+			<stop  offset="0.2832" style="stop-color:#6D6D6D"/>
+			<stop  offset="0.3224" style="stop-color:#494949"/>
+			<stop  offset="0.3615" style="stop-color:#2C2C2C"/>
+			<stop  offset="0.4003" style="stop-color:#181818"/>
+			<stop  offset="0.4388" style="stop-color:#101010"/>
+			<stop  offset="0.4768" style="stop-color:#0C0C0C"/>
+			<stop  offset="0.5083" style="stop-color:#0F0F0F"/>
+			<stop  offset="0.5369" style="stop-color:#171717"/>
+			<stop  offset="0.5645" style="stop-color:#282828"/>
+			<stop  offset="0.5913" style="stop-color:#424242"/>
+			<stop  offset="0.6176" style="stop-color:#646464"/>
+			<stop  offset="0.6436" style="stop-color:#8D8D8D"/>
+			<stop  offset="0.6693" style="stop-color:#BEBEBE"/>
+			<stop  offset="0.6941" style="stop-color:#F5F5F5"/>
+			<stop  offset="0.6981" style="stop-color:#FFFFFF"/>
+			<stop  offset="0.7474" style="stop-color:#F2F2F2"/>
+			<stop  offset="0.7779" style="stop-color:#DCDCDC"/>
+			<stop  offset="0.8088" style="stop-color:#C9C9C9"/>
+			<stop  offset="0.8322" style="stop-color:#DCDCDC"/>
+			<stop  offset="0.8535" style="stop-color:#E8E8E8"/>
+			<stop  offset="0.8728" style="stop-color:#C3C3C3"/>
+			<stop  offset="0.9193" style="stop-color:#717171"/>
+			<stop  offset="0.9575" style="stop-color:#343434"/>
+			<stop  offset="0.9853" style="stop-color:#0E0E0E"/>
+			<stop  offset="1" style="stop-color:#000000"/>
+		</linearGradient>
+		<use xlink:href="#SVGID_1_"  overflow="visible" fill="url(#SVGID_2_)"/>
+		<clipPath id="SVGID_3_">
+			<use xlink:href="#SVGID_1_"  overflow="visible"/>
+		</clipPath>
+	</g>
+	<g>
+		<defs>
+			<ellipse id="SVGID_4_" cx="50.01" cy="49.917" rx="49.843" ry="49.751"/>
+		</defs>
+		<radialGradient id="SVGID_5_" cx="50.0103" cy="49.918" r="49.7976" gradientUnits="userSpaceOnUse">
+			<stop  offset="0" style="stop-color:#141414;stop-opacity:0.2"/>
+			<stop  offset="0.1202" style="stop-color:#3F3F3F;stop-opacity:0.1737"/>
+			<stop  offset="0.4001" style="stop-color:#A5A5A5;stop-opacity:0.1125"/>
+			<stop  offset="0.5947" style="stop-color:#E6E6E6;stop-opacity:0.07"/>
+			<stop  offset="0.6861" style="stop-color:#FFFFFF;stop-opacity:0.05"/>
+			<stop  offset="0.7345" style="stop-color:#FCFCFC;stop-opacity:0.104"/>
+			<stop  offset="0.7751" style="stop-color:#F1F1F1;stop-opacity:0.1492"/>
+			<stop  offset="0.8129" style="stop-color:#E0E0E0;stop-opacity:0.1914"/>
+			<stop  offset="0.8491" style="stop-color:#C7C7C7;stop-opacity:0.2317"/>
+			<stop  offset="0.884" style="stop-color:#A8A8A8;stop-opacity:0.2707"/>
+			<stop  offset="0.918" style="stop-color:#818181;stop-opacity:0.3086"/>
+			<stop  offset="0.9514" style="stop-color:#525252;stop-opacity:0.3458"/>
+			<stop  offset="0.9833" style="stop-color:#1E1E1E;stop-opacity:0.3813"/>
+			<stop  offset="1" style="stop-color:#000000;stop-opacity:0.4"/>
+		</radialGradient>
+		<use xlink:href="#SVGID_4_"  overflow="visible" fill="url(#SVGID_5_)"/>
+		<clipPath id="SVGID_6_">
+			<use xlink:href="#SVGID_4_"  overflow="visible"/>
+		</clipPath>
+	</g>
+</g>
+<g id="Layer_2">
+	<g>
+	</g>
+	<g>
+	</g>
+	<g>
+	</g>
+	<g>
+	</g>
+	<g>
+	</g>
+	<g>
+	</g>
+</g>
+</svg>

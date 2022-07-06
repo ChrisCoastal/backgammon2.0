@@ -92,9 +92,16 @@ const Game: FC = ({}) => {
     const moves = playerTurnMoves(roll, dispatch)
   }
 
+  const screenOrientation = `@media screen and (min-width: 200px) and (max-width: 780px) and (orientation: portrait) {
+    h-[100vw]
+  } max-h-screen
+  `
+
   return (
-    <div className={``}>
-      <div className={`flex justify-center h-screen`}>
+    <div className={`w-full mx-auto`}>
+      <div
+        className={`flex justify-center ${screenOrientation} bg-zinc-200 max-w-7xl`}
+      >
         <GameBoard
           activePlayer={activePlayer}
           checkerPositions={state.checkerPositions}

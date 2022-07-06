@@ -3,8 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/src/public/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
     <title>React + Vite Tailwindcss boilerplate</title>
+    <style>
+      @media screen and (min-width: 200px) and (max-width: 780px) and (orientation: portrait) {
+        html {
+          transform: rotate(-90deg);
+          transform-origin: left top;
+          width: 100vh;
+          overflow-x: hidden;
+          position: absolute;
+          top: 100%;
+          left: 0;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

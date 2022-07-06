@@ -34,8 +34,8 @@ export const resetDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
 }
 
 export const getDiceRoll = (dispatch: Dispatch<ReducerActions>) => {
-  const [die1, die2] = [dice(), dice()]
-  // const [die1, die2] = [1, 1]
+  // const [die1, die2] = [dice(), dice()]
+  const [die1, die2] = [5, 1]
 
   dispatch({
     type: 'setDice',
@@ -91,7 +91,7 @@ const isCheckersBar = (
     : { isCheckers: true, point: barPoint }
 }
 
-const isCheckersHome = (
+export const isCheckersHome = (
   activePlayer: ActivePlayer,
   boardPositions: BoardPositions
 ) => {
@@ -152,17 +152,6 @@ export const getValidMoves = (
   const bar = isCheckersBar(activePlayer, board)
   if (bar.isCheckers && fromPoint !== bar.point) return false
 
-  // all checkers in homeboard
-  const home = isCheckersHome(activePlayer, board)
-  if (home)
-    return getValidHomeMoves(
-      dragItem,
-      dropPoint,
-      activePlayer,
-      checkerPositions,
-      movesRemaining
-    )
-
   const direction = getDirection(activePlayer)
   const directionalMoves = movesRemaining.map((move) => move * direction)
 
@@ -190,7 +179,7 @@ export const getValidMoves = (
   return [...validMoves].includes(dropPoint)
 }
 
-const getValidHomeMoves = (
+export const getValidHomeMoves = (
   dragItem: { fromPoint: number; checkerColor: any },
   dropPoint: number,
   activePlayer: ActivePlayer,

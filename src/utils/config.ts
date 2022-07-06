@@ -116,32 +116,32 @@ export const INITIAL_GAME_STATE: GameState = {
 }
 
 export const POINT_POSITIONS = [
-  'col-start-7 row-start-1', // player 2 bar
-  'col-start-1 row-start-1',
+  'col-start-8 row-start-1', // player 2 bar
   'col-start-2 row-start-1',
   'col-start-3 row-start-1',
   'col-start-4 row-start-1',
   'col-start-5 row-start-1',
   'col-start-6 row-start-1',
-  'col-start-8 row-start-1',
+  'col-start-7 row-start-1',
   'col-start-9 row-start-1',
   'col-start-10 row-start-1',
   'col-start-11 row-start-1',
   'col-start-12 row-start-1',
   'col-start-13 row-start-1',
+  'col-start-14 row-start-1',
+  'col-start-14 row-start-2',
   'col-start-13 row-start-2',
   'col-start-12 row-start-2',
   'col-start-11 row-start-2',
   'col-start-10 row-start-2',
   'col-start-9 row-start-2',
-  'col-start-8 row-start-2',
+  'col-start-7 row-start-2',
   'col-start-6 row-start-2',
   'col-start-5 row-start-2',
   'col-start-4 row-start-2',
   'col-start-3 row-start-2',
   'col-start-2 row-start-2',
-  'col-start-1 row-start-2',
-  'col-start-7 row-start-2' // player 1 bar
+  'col-start-8 row-start-2' // player 1 bar
 ]
 
 export const BOARD_COLORS = {

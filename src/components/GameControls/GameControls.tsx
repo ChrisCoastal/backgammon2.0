@@ -25,15 +25,15 @@ const GameControls: FC<GameControlsProps> = ({
   // TODO: add condition so end turn is required before roll
   const { diceRoll, doublingCube } = diceState
 
-  const disable = movesRemaining.length !== 0
-  const rollButtonColor = disable
+  const hasMoves = movesRemaining.length !== 0
+  const rollButtonColor = hasMoves
     ? 'bg-gray-300'
     : 'bg-blue-600 hover:bg-blue-700'
-  const buttonColor = disable ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
+  const buttonColor = hasMoves ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
 
   return (
-    <div className={`py-16 h-screen`}>
-      <div className={`py-16 bg-zinc-200`}>
+    <div className={`py-8 h-full w-1/4`}>
+      <div className={``}>
         {!!activePlayer && (
           <div>
             <div>
@@ -41,7 +41,7 @@ const GameControls: FC<GameControlsProps> = ({
               <Dice diceRoll={diceRoll} activePlayer={activePlayer} />
               <DoublingCube cubeValue={doublingCube} />
               <button
-                disabled={disable}
+                disabled={hasMoves}
                 onClick={rollDiceHandler}
                 className={`py-2 px-6 m-2 rounded ${rollButtonColor} bg-g`}
               >
@@ -49,7 +49,7 @@ const GameControls: FC<GameControlsProps> = ({
               </button>
             </div>
             <button
-              disabled={disable}
+              disabled={hasMoves}
               onClick={endTurnHandler}
               className={`py-2 px-6 m-2 rounded ${buttonColor}`}
             >
@@ -67,7 +67,7 @@ const GameControls: FC<GameControlsProps> = ({
           <button
             onClick={() => startGameHandler()}
             disabled={!!activePlayer}
-            className={`py-2 px-6 m-2 rounded ${buttonColor}`}
+            className={`py-2 px-6 mx-8 rounded ${buttonColor}`}
           >
             START GAME
           </button>

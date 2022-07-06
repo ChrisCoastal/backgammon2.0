@@ -8,9 +8,15 @@ interface DoublingCubeProps {
 const DoublingCube: FC<DoublingCubeProps> = ({ cubeValue }) => {
   return (
     <div
-      className={`inline-block py-4 px-4 mt-8 mx-2 rounded-sm text-red-400 text-xl font-extrabold ${BOARD_COLORS.bar}`}
+      className={`inline-block w-12 mt-8 mx-2 rounded-sm text-red-400 text-xl font-extrabold ${BOARD_COLORS.bar}`}
     >
-      <p>{cubeValue}</p>
+      <span className={`block relative pb-1/1`}>
+        <div
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2`}
+        >
+          {cubeValue}
+        </div>
+      </span>
     </div>
   )
 }
