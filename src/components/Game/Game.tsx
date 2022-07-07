@@ -100,7 +100,7 @@ const Game: FC = ({}) => {
   return (
     <div className={`w-full mx-auto`}>
       <div
-        className={`flex justify-center ${screenOrientation} bg-zinc-200 max-w-7xl`}
+        className={`flex ${screenOrientation} bg-gradient-to-tr from-[#1a065b] to-red-300`}
       >
         <GameBoard
           activePlayer={activePlayer}

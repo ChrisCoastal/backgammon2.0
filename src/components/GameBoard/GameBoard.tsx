@@ -106,35 +106,41 @@ const GameBoard: FC<GameBoardProps> = ({
   const points = renderPoints()
 
   return (
-    <div className={`flex ${BOARD_COLORS.bar} justify-center w-3/4`}>
-      <div className={` grid grid-cols-[repeat(14,1fr)] `}>
-        <BearOff
-          pointIndex={PLAYER_1_BEAROFF}
-          validMoves={dragCheckerHandler}
-          dropHandler={dropCheckerHandler}
-          activePlayer={activePlayer}
-          movesRemaining={movement.movesRemaining}
-          board={checkerPositions.board}
+    <div className={`flex justify-center w-3/4`}>
+      <div
+        className={`self-center bg-gradient-to-tr from-slate-900 to-slate-800  w-3/4 p-6 rounded-md`}
+      >
+        <div
+          className={`grid self-center grid-cols-[repeat(14,1fr)] shadow-sm shadow-slate-900 w-full`}
         >
-          <Checkers
+          <BearOff
             pointIndex={PLAYER_1_BEAROFF}
-            checkers={checkerPositions.bearOff1}
-          />
-        </BearOff>
-        <BearOff
-          pointIndex={PLAYER_2_BEAROFF}
-          validMoves={dragCheckerHandler}
-          dropHandler={dropCheckerHandler}
-          activePlayer={activePlayer}
-          movesRemaining={movement.movesRemaining}
-          board={checkerPositions.board}
-        >
-          <Checkers
+            validMoves={dragCheckerHandler}
+            dropHandler={dropCheckerHandler}
+            activePlayer={activePlayer}
+            movesRemaining={movement.movesRemaining}
+            board={checkerPositions.board}
+          >
+            <Checkers
+              pointIndex={PLAYER_1_BEAROFF}
+              checkers={checkerPositions.bearOff1}
+            />
+          </BearOff>
+          <BearOff
             pointIndex={PLAYER_2_BEAROFF}
-            checkers={checkerPositions.bearOff2}
-          />
-        </BearOff>
-        {points}
+            validMoves={dragCheckerHandler}
+            dropHandler={dropCheckerHandler}
+            activePlayer={activePlayer}
+            movesRemaining={movement.movesRemaining}
+            board={checkerPositions.board}
+          >
+            <Checkers
+              pointIndex={PLAYER_2_BEAROFF}
+              checkers={checkerPositions.bearOff2}
+            />
+          </BearOff>
+          {points}
+        </div>
       </div>
     </div>
   )

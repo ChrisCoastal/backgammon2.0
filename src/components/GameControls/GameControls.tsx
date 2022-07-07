@@ -32,7 +32,7 @@ const GameControls: FC<GameControlsProps> = ({
   const buttonColor = hasMoves ? 'bg-gray-300' : 'bg-blue-600 hover:bg-blue-700'
 
   return (
-    <div className={`py-8 h-full w-1/4`}>
+    <div className={`flex flex-col py-8 w-1/4 justify-center`}>
       <div className={``}>
         {!!activePlayer && (
           <div>

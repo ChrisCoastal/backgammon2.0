@@ -11,6 +11,7 @@ import {
   PLAYER_2_BAR,
   POINT_POSITIONS
 } from '../../utils/config'
+import PointIcon from './PointIcon'
 
 interface PointProps {
   validMoves: (
@@ -70,8 +71,10 @@ const BoardPoint: FC<PointProps> = ({
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
 
   const pointColor =
-    pointIndex === PLAYER_1_BAR || pointIndex === PLAYER_2_BAR
-      ? BOARD_COLORS.bar
+    pointIndex === PLAYER_1_BAR
+      ? BOARD_COLORS.bar1
+      : pointIndex === PLAYER_2_BAR
+      ? BOARD_COLORS.bar2
       : pointIndex % 2
       ? BOARD_COLORS.oddPoint
       : BOARD_COLORS.evenPoint
@@ -80,12 +83,12 @@ const BoardPoint: FC<PointProps> = ({
   // FIXME:
   const checkerAlign =
     pointIndex === PLAYER_1_BAR
-      ? 'justify-start py-1'
+      ? `justify-start py-1 `
       : pointIndex === PLAYER_2_BAR
-      ? 'justify-end bottom-0 py-1'
+      ? `justify-end bottom-0 py-1 `
       : pointIndex > 12
-      ? 'justify-end bottom-0'
-      : 'justify-start'
+      ? `justify-end bottom-0 pt-4`
+      : `justify-start pb-4`
 
   return (
     <div className={`${pointPosition}`}>

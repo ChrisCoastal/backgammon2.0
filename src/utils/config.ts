@@ -147,7 +147,9 @@ export const POINT_POSITIONS = [
 export const BOARD_COLORS = {
   oddPoint: 'bg-red-200',
   evenPoint: 'bg-blue-200',
-  bar: 'bg-slate-500',
+  bar1: 'bg-slate-900',
+  bar2: 'bg-gradient-to-t from-slate-900 to-slate-800',
+  bearOff: 'bg-gradient-to-tr from-slate-900 to-slate-700',
   player1checker: 'bg-red-500',
   player2checker: 'bg-blue-500',
   player1dice: 'bg-red-300',

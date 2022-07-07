@@ -26,13 +26,13 @@ const Dice = ({ activePlayer, diceRoll }: DiceProps) => {
 
   return (
     <div>
-      <ul>
+      <ul className={`flex gap-2`}>
         {diceRoll.map((dice, i) => (
           <li
             key={Math.random()}
-            className={`inline-block ${diceColor[i]} py-8 px-8 mx-2 rounded-sm text-white text-xl font-extrabold`}
+            className={`flex justify-center items-center ${diceColor[i]} w-16 h-16 mx-2 rounded-md text-white text-xl font-extrabold`}
           >
-            <p>{dice > 0 && dice}</p>
+            <p className={``}>{dice > 0 && dice}</p>
           </li>
         ))}
       </ul>

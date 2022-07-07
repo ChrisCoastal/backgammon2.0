@@ -61,7 +61,7 @@ const BearOff: FC<BearOffProps> = ({
   const dropColor =
     isOver && canDrop ? 'bg-green-200' : canDrop ? 'bg-green-100' : ''
 
-  const color = BOARD_COLORS.bar
+  const color = BOARD_COLORS.bearOff
 
   const bearOff =
     pointIndex === 100 ? 'col-start-1 row-start-1' : 'col-start-1 row-start-2'
@@ -69,7 +69,7 @@ const BearOff: FC<BearOffProps> = ({
   return (
     <div
       ref={dropRef}
-      className={`flex-column border-2 border-pink-500 ${bearOff} ${color} ${dropColor}`}
+      className={`flex-column border-2 border-white ${bearOff} ${color} ${dropColor}`}
     >
       <p>Off</p>
       {children}

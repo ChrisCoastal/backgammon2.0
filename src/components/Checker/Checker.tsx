@@ -8,7 +8,7 @@ import { useDrag } from 'react-dnd'
 import { ItemTypes, PLAYER_1_BAR, PLAYER_2_BAR } from '../../utils/config'
 
 // images
-import { ReactComponent as CheckerImage } from '../../images/checker.svg'
+import CheckerIcon from './CheckerIcon'
 
 type CheckerProps = {
   point: number | 'bearOff1' | 'bearOff2'
@@ -36,9 +36,7 @@ const Checker: FC<CheckerProps> = ({ point, checkerColor }) => {
     <span
       ref={dragRef}
       className={`relative pb-1/1 rounded-full ${color} flex-shrink`}
-    >
-      <CheckerImage />
-    </span>
+    ></span>
   )
 }
 

@@ -17,6 +17,12 @@ module.exports = {
       },
       height: {
         '1/4vw': '40vw'
+      },
+      maxHeight: {
+        '9/10vh': '90vh'
+      },
+      colors: {
+        'deep-purple': '#1a065b'
       }
     }
   },
