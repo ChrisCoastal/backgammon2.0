@@ -32,6 +32,7 @@ import { useReducer } from 'react'
 import GameBoard from '../GameBoard/GameBoard'
 import Dice from '../Dice/Dice'
 import GameControls from '../GameControls/GameControls'
+import Header from '../Header'
 
 const Game: FC = ({}) => {
   const [state, dispatch] = useReducer(reducer, INITIAL_GAME_STATE)
@@ -99,6 +100,7 @@ const Game: FC = ({}) => {
 
   return (
     <div className={`w-full mx-auto`}>
+      {/* <Header /> */}
       <div
         className={`flex ${screenOrientation} bg-gradient-to-tr from-[#1a065b] to-red-300`}
       >

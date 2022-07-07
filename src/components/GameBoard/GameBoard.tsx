@@ -108,11 +108,9 @@ const GameBoard: FC<GameBoardProps> = ({
   return (
     <div className={`flex justify-center w-3/4`}>
       <div
-        className={`self-center bg-gradient-to-tr from-slate-900 to-slate-800  w-3/4 p-6 rounded-md`}
+        className={`self-center bg-gradient-to-tr from-slate-900 to-slate-800 w-3/4 p-6 rounded-md drop-shadow-md`}
       >
-        <div
-          className={`grid self-center grid-cols-[repeat(14,1fr)] shadow-sm shadow-slate-900 w-full`}
-        >
+        <div className={`grid self-center grid-cols-[repeat(14,1fr)] w-full`}>
           <BearOff
             pointIndex={PLAYER_1_BEAROFF}
             validMoves={dragCheckerHandler}

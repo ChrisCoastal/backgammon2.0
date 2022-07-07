@@ -16,14 +16,18 @@ module.exports = {
         '1/2vw': '50vw'
       },
       height: {
-        '1/4vw': '40vw'
+        '1/4vw': '40vw',
+        '1/10': '10%'
       },
       maxHeight: {
-        '9/10vh': '90vh'
+        '9/10vh': '90vh',
+        '1/10': '10%'
       },
       colors: {
-        'deep-purple': '#1a065b'
-      }
+        'deep-purple': '#1a065b',
+        'slate-1000': '#030811'
+      },
+      fontfamily: {}
     }
   },
   plugins: []

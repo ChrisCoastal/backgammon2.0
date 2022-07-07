@@ -149,7 +149,7 @@ export const BOARD_COLORS = {
   evenPoint: 'bg-blue-200',
   bar1: 'bg-slate-900',
   bar2: 'bg-gradient-to-t from-slate-900 to-slate-800',
-  bearOff: 'bg-gradient-to-tr from-slate-900 to-slate-700',
+  bearOff: 'bg-gradient-to-tr from-slate-800 to-slate-1000',
   player1checker: 'bg-red-500',
   player2checker: 'bg-blue-500',
   player1dice: 'bg-red-300',
